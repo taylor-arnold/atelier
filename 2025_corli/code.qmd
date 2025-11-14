@@ -1,0 +1,761 @@
+---
+title: "Atelier : R pour la linguistique"
+author: ["Taylor Arnold"]
+date: "2025-11-13"
+format:
+  html:
+
+    include-in-header: templates/head.html
+    include-before-body: templates/before.html
+    include-after-body: templates/after.html
+    toc: true
+    code-copy: hover
+    link-external-newwindow: true
+    lightbox: true
+
+lang: fr
+language: _language.yml
+---
+
+```{r}
+#| message: false
+#| echo: false
+Sys.setenv(LANG = "fr")
+
+library(tidyverse)
+library(stringi)
+library(slider)
+library(readtextgrid)
+library(udpipe)
+library(word2vec)
+library(umap)
+library(tidytext)
+library(glmnet)
+library(xgboost)
+
+set.seed(1L)
+
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_minimal())
+```
+
+Dans cet atelier, nous présentons une introduction complète au language R
+pour l'étude de la linguistique. R est un language de programmation libre avec
+le code source ouvert qui est particulièrement populaire dans les sciences
+naturelles et sociales. Nous commençons par une introduction générale aux
+fonctions permettant de télécharger, visualiser et manipuler des
+données structurées sous forme de tableau. Ensuite, nous continuons à étudier
+des modèles specifiques pour l'étude du langage. Nous finissons avec 
+l'application des interfaces de programmation d'application (API) pour usage des
+grands modèles de langage. Dans tous les exemples, nous employons les données
+qui provienne de divers parties de la linguistique. 
+
+## 1. Configuration 
+
+Pour suivre des exemples vous-mêmes, vous pouvez également [exécuter le code
+dans Google Colab]() ou [télécharger R et RStudio]() dans votre propre
+ordinateur. 
+
+## 2. Données dans un tableau
+
+Nous commençons avec des données de la production des voyelles anglaises qui 
+viennent d'une étude de 139 personnes en 1995 (Hillenbrand et al.). Je les ai 
+choisies parce qu'elles sont suffisamment petites pour une première application
+mais assez complèxes pour être intéressantes.
+
+J'ai préparé cette collection dans un fichier CSV. Vous pouvez également 
+enregistrer vos données en format CSV en utilisant tous les tableurs comme
+LibreOffice, Google Sheets ou Excel. Afin de charger ces données dans R, on peut
+utiliser la fonction `read_csv2`. Cette fonction nécessite un argument qui
+spécifie le chemin d'accès au fichier par rapport au code. Voici est un exemple
+de charger les données de la production des voyelles anglaises :
+
+```{r}
+#| message: false
+read_csv2("data/hillenbrand_voyelle_eng.csv")
+```
+
+Nous voyons que cette fonction renvoie un objet qui s'appelle un « tibble ».
+Dans R, un tibble et la structure dans laquelle on charge les données
+structurées sous forme de tableau. L'objet au-dessus a 1668 lignes et 8 colonnes.
+Chaque ligne montre les démographics d'un locuteur et les mesures phonétiques
+d'une voyelle. Par défaut, nous ne voyons que les dix premières lignes. Pour
+chaque colonne, il y a un nom (id, groupe, etc.) et un type de donné. Les
+colonnes numériques ont le type <dbl> (« double ») et les colonnes catégoriques
+ont le type <chr> (« caractère »). Nous allons voir que ces structures sont 
+essentielles pour tous les étapes de l'analyse de donnée en R.
+
+Dans le code au-dessus, nous avons créé et imprimé un tibble. Cependant, aprés 
+l'exécution du code le tibble n'existe plus dans R. Afin de le sauvgarder, nous
+devons attribuer la sortie de la fonction à un nom à l'aide d'une flèche
+(signe supérieur et signe moins). Voici nous sauvgarder le tibble
+dans l'objet `phone`.
+
+```{r}
+#| message: false
+phone <- read_csv2("data/hillenbrand_voyelle_eng.csv")
+```
+
+Puis, après exécution, nous pouvons utiliser l'object `phone` dans n'importe
+quelle autre tâche. Par example, dans la section suivante, nous allons 
+visualiser ces données avec un langage adapté à l'exploration d'informations
+quantitatives.
+
+## 3. Visualiser
+
+La visualisation est un étape essentiel dans l'exploration de données. Nous
+appliquerons un langage général, qui s'appelle la « grammaire des graphiques »,
+pour décrire et coder les visualisations dans R. Nous avons besoin d'un peu de
+la théorie avant de continuer, mais cette construction rend les visualisations
+complexes relativement faciles à réaliser.
+
+Dans la grammaire des graphiques, une couche consiste de trois élements:
+
+- **un tibble** : L'objet qui contient l'information à visualiser.
+- **une géométrie** : La forme qui correspond à chaque ligne du tibble. La 
+visualisation consiste d'une forme pour chaque ligne.
+- **des esthétiques** : Les associations entre colonnes du tibble et 
+les parametres de chaque forme.
+
+Une visualizations consiste de une ou plus couches. Un exemple sert à clarifier
+la moyenne dans laquelle ces parties peuvent correspondre aux éléments graphiques.
+Voici, le code de créer une visualization de notre tibble `phone` qui a un
+point pour chaque ligne avec une position horizontale indiqué par la fréquence
+fondamentale (`f0`) et une position veritcal indiqué par le durée de la voyelle
+(`dur`).
+
+```{r}
+phone |>
+  ggplot() +
+  geom_point(aes(x = f0, y = dur))
+```
+
+Dans cet exemple, nous commençons avec le nom d'un tibble (`phone`) suivant par 
+le symbole `|>`. Cet symbole s'appelle une « pipe ». Il passe le tibble à les
+prochaines étapes. Nous continuions avec la fonction `ggplot()` pour indiquer
+que nous voulons créer une visualisation. Dans la ligne dernière, nous appliquons
+le fonction `geom_point` pour spécifier la géométrie. À l'intérieur de la
+fonction, nous mettons la function `aes()` (pour *aesthetic*, esthétique en
+anglais) avec les associations entre les noms de colonnes et les positions 
+horizontal et vertical. Comme convention, la grammaire des graphiques utilise
+la lettre **x** pour la dimension horizontal et **y** pour la dimension vertical.
+
+Comme l'exemple au-dessus, la géométrie des points a deux estétiques requis (`x`
+et `y`). Il y a d'autres estétiques facultatives qu'on peut ajouter pour 
+améliorer l'information porter par la visualisation. Par exemple, il y a une
+estétique de la couleur qui fonctionne de changer la couleur de chaque point 
+selon une colonne du tibble. Voici, un exemple ou la couleur indique la
+groupe du locateur ou de la locatrice.
+
+```{r}
+phone |>
+  ggplot() +
+  geom_point(aes(x = f0, y = dur, colour = groupe))
+```
+
+Déjà, cette visualisation montre certains corréspondances entre les colonnes.
+Nous voyons que les differences entre les fréquences fondamentales corresponde
+à une séperation des hommes et des autres. Et, qu'il peut exister un
+correspondence ou les hommes ont des durations légèrement plus petites que les
+femmes et les enfants.
+
+Les connections entre chaque couleur et chaque groupe ne sont pas explicites  
+dans notre code. Le système de la grammaire de graphiques peut choisir les 
+couleurs automatiquement. C'était la même chose pour les positions horizontal
+et vertical : nous n'indiquions ni leurs amplitudes ni leurs étiquettes. Mais,
+souvent on a besoin de les changer. Pour specifier la relation entre les 
+esthétiques et les elements réels d'un graphique, on peut applique les 
+*scales*. Les scales peuvent être ajouter comme une autre ligne de notre code.
+Voici un exemple où nous modifions les couleurs à l'aide d'une palette adaptée
+aux personnes atteintes de daltonisme.
+
+```{r}
+phone |>
+  ggplot() +
+  geom_point(aes(x = f0, y = dur, colour = groupe)) +
+  scale_colour_viridis_d()
+```
+
+Voyons maintenant la visualisation le plus courante pour les données
+phonétiques qui fournit la rélation entre les deux premiers formants F1 et F2.
+Ce graphique est au cœur la même chose : les points avec les noms `f2` et `f1`,
+respectivement, attribuent aux esthétiques `x` et `y`. Mais, il y a une
+complèxitie. Afin de corresponder de la forme du langue pour quelqu'un
+qui regarde vers sa droite, nous devons inverser le sens des axes. Cela nécessite
+l'application des scales `scale_x_reverse()` et `scale_x_reverse()`. L'exemple
+suivant donne la forme correct.
+
+```{r}
+phone |>
+  ggplot() +
+  geom_point(aes(x = f2, y = f1)) +
+  scale_x_reverse() +
+  scale_y_reverse()
+```
+
+Cette visualisation montre la forme triangulaire classique de l'espace des
+voyelles. Supposons qu'on peut voir quelles voyelles correspondent à ces points.
+Comment pourrions-nous faire cela ? Nous devons appliquons une nouvelle
+géométrie : `geom_text`. Elle ne crée pas de points pour chaque ligne de données.
+En revanche, la géométrie de texte place des caractères dans le graphique. Nous
+devons donner une esthétique nouvelle pour indique la colonne qui corresponde à
+ses caractères. Voici, la façon d'avoir une visualization avec les symboles IPA
+à la place des points.
+
+```{r}
+phone |>
+  ggplot(aes(f2, f1)) +
+  geom_text(aes(label = ipa)) +
+  scale_x_reverse() +
+  scale_y_reverse()
+```
+
+Il existe beaucoup de géométries, d'esthétiques et de scales pour s'élarger
+les possibilités de visualisations dans la grammaire de graphiques. Vous pouvez
+consulter les liens suivant comme références : []() []().
+
+Nous avons vu les éléments centrals à la grammaire de graphiques. Dans le but 
+d'aller plus loin, nous continuons par étudier les méthodes pour modifier les
+tibbles avec les fonctions liées aux bases de données.
+
+## 4. Manipuler un tableau
+
+Souvent, il faut transformer un tableau de données d'un autre tableau avec les
+éléments différents ou réorganiser. Dans R, nous pouvons manipuler les tableau
+avec une collection des fonctions qui s'appellent « verbes ». Ces fonctions ont
+la même structure : on les donne un tibble puis on reçoit un tibble nouveau. 
+Cette structure permette d'appliquer un nombre quelconque de fonctions à un
+tibble. Il existe environ 50 verbes. Heureusement, nous n'avons besoin
+d'apprendre que 12 pour effectuer toutes les opérations possibles. Dans cette
+section, nous commençons avec les 8 premier verbes.
+
+Le verbe `slice_head` retienne les `n` premiers lignes d'un tibble, ou `n` est
+un argument dans la fonction. Comme tous les verbes, nous utilisons une pipe 
+(`|>`) pour donner l'object de données à la fonction. 
+
+```{r}
+phone |>
+  slice_head(n=4)
+```
+
+Le verbe `filter` retienne les lignes selon une relation entre les valeurs. Pour
+appliquer cette fonction, on place une expression à l'intérieur avec les noms 
+des colonnes. Les lignes ou l'expression est vrai seront conservées. Voici un
+exemple de trouver les lignes de la voyelle `u`.
+
+```{r}
+phone |>
+  filter(ipa == "u")
+```
+
+Pour réorganiser des lignes par les valeurs dans une ou plusieurs colonnes, 
+nous appliquons la fonction `arrange`. Nous simplement indiquons le nom
+de colonne dans la fonction.
+
+```{r}
+phone |>
+  arrange(dur)
+```
+
+La réorganisation des lignes, par défaut, trie les lignes par ordre croissant.
+Pour un ordre décroissant, nous ajoutons la fonction `desc`.
+
+```{r}
+phone |>
+  arrange(desc(dur))
+```
+
+Afin de démontrer l'application de plusieurs verbes, notons qu'il est souvent
+efficace d'appliquer `arrange` puis `slice_head` pour trouver les lignes des
+valeurs extrêmes. Nous voyons que chaque ligne, sauf la dernière, a une pipe 
+à sa fin.
+
+```{r}
+phone |>
+  arrange(desc(f1)) |>
+  slice_head(n=10)
+```
+
+Le verbe `mutate` ajoute une colonne au tableau. Cela marche avec un nom de
+nouvelle colonne et la formule pour créer des autres colonnes. Par example,
+au-dessous on a un exemple de la création d'une colonne `dur_s` (durée en
+secondes) qui est définé par la durée (en milliseconds) divisé par 1000.
+
+```{r}
+phone |>
+  mutate(dur_s = dur / 1000)
+```
+
+Nous finissions cette sections avec deux verbes qui fonctionnent
+souvent ensemble: `group_by` et `summarise`. Comme `mutate`, le verbe 
+`summarise` fonctionne de créer les nouvelles colonnes. Mais, il réduire les
+lignes d'un sommaire avec l'application des fonctions comme `mean` (la moyenne)
+ou `sd` (lécart-type). La fonction `group_by` indique par quelle colonne
+(ou colonnes) le sommaire est appliqué. Un exemple peut clarifier la relation
+entre les deux. Voici, le code de calculer les moyennes de F1 et F2 selon 
+la voyelle.
+
+```{r}
+phone |>
+  group_by(ipa) |>
+  summarise(
+    f1_m = mean(f1),
+    f2_m = mean(f2)
+  )
+```
+
+Le pouvoir de la fonction `summarise` devienne plus clair en voyant l'application
+aux visualisations. Avec une combination des verbes et couches de graphiques, 
+nous avons les outils pour visualiser les formants moyennes de chaque voyelle
+dans les données.
+
+```{r}
+phone |>
+  group_by(ipa) |>
+  summarise(
+    f1_m = mean(f1),
+    f2_m = mean(f2)
+  ) |>
+  ggplot(aes(f2_m, f1_m)) +
+    geom_point(size = 8) +
+    geom_text(aes(label = ipa), colour="#fff") +
+    scale_x_reverse() +
+    scale_y_reverse() 
+```
+
+Maintenant nous avons une base solide de verbes et fonctions de la visualisation.
+Tous ces éléments sont au cœur de la science des données. Dans la section
+suivante, nous ajoutons des fonctions de modélisation.
+
+## 5. Les modèles statistiques 
+
+Voici, nous commençons par importer les données issues d'un enregistrement de frappes au clavier. Il s'agit d'un fichier compressé contenant des mesures temporelles pour chaque touche pressée. La fonction utilisée permet de lire un fichier CSV avec un séparateur particulier et de convertir automatiquement les valeurs manquantes. L'objectif ici est simplement de charger l'ensemble des observations et de vérifier que le tableau obtenu s'affiche correctement, afin de pouvoir ensuite sélectionner les variables utiles et préparer les analyses statistiques.
+
+```{r}
+#| message: false
+touches <- read_csv2("data/keylog-touches.csv.bz2", na="NA")
+touches
+```
+
+Une fois les données chargées, le bloc suivant réalise une première étape de préparation. Il consiste à filtrer les observations pour ne retenir que deux types précis de touches, ici l'espace et le point. Cette sélection permet de comparer plus facilement la durée d'appui de ces deux catégories, en évitant que d'autres touches avec des comportements très différents ne viennent brouiller l'interprétation. Le sous-ensemble obtenu servira directement aux premières analyses comparatives.
+
+```{r}
+touches_sub <- touches |>
+  filter(code %in% c("Space", "Period"))
+```
+
+Après cette préparation, nous appliquons un test statistique de comparaison de moyennes. Le test t permet d'évaluer si les durées d'appui mesurées diffèrent de manière significative entre les deux types de touches retenus. L'idée est de vérifier si l'espace et le point présentent des temps d'appui systématiquement différents, ce qui pourrait refléter des habitudes de frappe ou des contraintes mécaniques spécifiques.
+
+```{r}
+t.test(dur ~ code, data = touches_sub)
+```
+
+Le bloc suivant étend l'analyse à un autre angle. Cette fois, il s'agit d'un test ANOVA à un facteur qui utilise l'identifiant de la personne ou de la session comme variable explicative. L'objectif est d'estimer si la durée d'appui varie beaucoup d'un individu à l'autre. Si la variabilité est importante, cela peut indiquer que les différences interpersonnelles jouent un rôle déterminant dans la vitesse ou le style de frappe.
+
+```{r}
+oneway.test(dur ~ id, data = touches)
+```
+
+Enfin, le dernier bloc propose une analyse par régression linéaire. Il s'agit ici de comprendre comment la durée d'appui d'une touche pourrait être associée à l'écart temporel qui suit immédiatement cette frappe. Le modèle construit cherche à déterminer si, lorsque l'on appuie plus ou moins longtemps sur une touche, cela influence la rapidité avec laquelle on enchaîne la frappe suivante. La sortie résumée du modèle permet d'interpréter la force de la relation et la signification statistique des coefficients estimés.
+
+```{r}
+summary(lm(gap_apres ~ dur, data = touches))
+```
+
+
+## 6. Plusieurs tableaux
+
+Dans cette nouvelle section, nous commençons par charger un second tableau de données contenant des informations descriptives sur les utilisateurs ou les sessions de frappe. Ce fichier regroupe généralement des métadonnées telles que la langue, le niveau déclaré ou d'autres caractéristiques permettant de mieux contextualiser les mesures. L'affichage immédiat du tableau permet de se familiariser avec sa structure avant de le combiner à d'autres sources d'information.
+
+```{r}
+#| message: false
+meta <- read_csv2("data/keylog-meta.csv.bz2")
+meta
+```
+
+Nous importons ensuite un troisième tableau, cette fois centré sur des mesures liées aux mots eux-mêmes. Il peut s'agir, par exemple, de durées de frappe associées à chaque mot tapé, ce qui fournit une information plus synthétique que l'analyse touche par touche. De la même façon, on affiche les données brutes afin de repérer les variables disponibles et vérifier que le chargement s'est déroulé correctement.
+
+```{r}
+#| message: false
+mots <- read_csv2("data/keylog-mots.csv.bz2")
+mots
+```
+
+Une fois ces deux tableaux disponibles, nous effectuons une jonction entre eux à partir d'un identifiant commun. Cette opération permet de combiner les caractéristiques présentes dans les métadonnées avec les observations relatives aux mots, enrichissant ainsi chaque ligne d'information contextuelle supplémentaire. Le résultat est une table fusionnée où les durées ou autres mesures des mots peuvent être interprétées en fonction des profils utilisateurs.
+
+```{r}
+#| message: false
+mots |>
+  left_join(meta, by = "id")
+```
+
+Le bloc suivant exploite cette jonction pour procéder à un regroupement selon une variable décrivant le niveau de compétence linguistique. Après avoir regroupé les observations selon ce critère, on calcule la médiane d'une mesure temporelle spécifique, ce qui permet d'obtenir un indicateur robuste de la performance typographique pour chaque niveau. Le tri final met en évidence les niveaux pour lesquels la médiane est la plus élevée, facilitant la comparaison globale.
+
+```{r}
+#| message: false
+mots |>
+  left_join(meta, by = "id") |>
+  group_by(cefr) |>
+  summarize(mu = median(d1)) |>
+  arrange(desc(mu))
+```
+
+Enfin, sur un principe similaire, l'analyse est répétée en regroupant cette fois les données selon la langue déclarée. L'objectif est d'examiner si la performance sur les mots varie sensiblement d'une langue à l'autre. En calculant la médiane des durées et en triant les résultats, on obtient une vue d'ensemble des différences éventuelles liées à la langue de saisie, ce qui peut éclairer des interprétations sur les rythmes de frappe ou sur des effets d'habitude linguistique.
+
+```{r}
+#| message: false
+mots |>
+  left_join(meta, by = "id") |>
+  group_by(lang) |>
+  summarize(mu = median(d1)) |>
+  arrange(desc(mu))
+```
+
+## 7. Les fonctions de fenêtre 
+
+Dans cette section, nous commençons par créer un tableau simplifié contenant uniquement les variables essentielles pour illustrer l'usage des fonctions de fenêtre. Cette réduction permet de se concentrer sur les éléments temporels fondamentaux comme les instants de début et de fin des frappes, la durée d'appui ainsi que les identifiants des touches et des utilisateurs. L'objectif est de disposer d'une version plus légère des données afin de faciliter les manipulations ultérieures et de rendre l'exemple plus clair pour un lecteur découvrant ces techniques.
+
+```{r}
+#| echo: false
+touches_min <- select(touches, id, t0, t1, dur, touche, code)
+```
+```{r}
+touches_min
+```
+
+Après cette sélection ciblée, nous affichons simplement le tableau obtenu pour permettre une vérification visuelle du contenu. Cette étape est utile pour confirmer que les variables conservées correspondent bien aux besoins de l'analyse et que les transformations précédentes n'ont pas introduit d'erreur.
+
+```{r}
+touches_min |>
+  arrange(id, t0) |>
+  group_by(id) |>
+  mutate(
+    diff_avant = t0 - lag(t0, n=1),
+    diff_apres = lead(t0, n=1) - t0,
+    gap_avant = t0 - lag(t1, n=1),
+    gap_apres = lead(t0, n=1) - t1,    
+  )
+```
+
+Le bloc suivant illustre l'usage de plusieurs fonctions de fenêtre classiques comme lag et lead, fréquemment utilisées dans l'analyse de séries temporelles ou de séquences ordonnées. Après avoir trié les observations par utilisateur puis par ordre chronologique, nous calculons différents écarts temporels entre une frappe et ses voisines immédiates. Ces différences permettent, par exemple, d'évaluer la fluidité de la frappe, la rapidité avec laquelle les touches s'enchaînent et la manière dont les pauses se répartissent dans le temps. Les nouvelles colonnes ainsi créées offrent une perspective plus dynamique sur le comportement de frappe que les seules durées individuelles.
+
+```{r}
+touches_min |>
+  filter(id == "R_00RbUqO7jXLDItP") |>
+  arrange(t0) |>
+  mutate(
+    dur_moyenne10 = slide_mean(dur, before=10),
+    dur_moyenne100 = slide_mean(dur, before=100),
+    dur_moyenne1000 = slide_mean(dur, before=1000) 
+  ) |>
+  ggplot(aes(t0, dur_moyenne10)) +
+    geom_line(colour = "#fa8072") +
+    geom_line(aes(y=dur_moyenne100), colour = "#808000") +
+    geom_line(aes(y=dur_moyenne1000), colour = "#6fa8dc")     
+```
+
+Enfin, le dernier bloc explore l'utilisation de fenêtres glissantes plus larges permettant de calculer des moyennes mobiles sur différents horizons. Après avoir filtré un utilisateur particulier, nous ordonnons ses frappes puis appliquons plusieurs tailles de fenêtre afin de lisser progressivement les durées observées. Cela donne des courbes plus ou moins réactives aux variations locales : une petite fenêtre suit de près les changements instantanés, tandis qu'une grande fenêtre met en évidence des tendances plus globales. Le graphique obtenu superpose ces différentes moyennes, offrant une visualisation intuitive de l'évolution du rythme de frappe au cours du temps.
+
+## 8. Expressions régulières
+
+Dans cette section, nous introduisons l'usage des expressions régulières pour analyser le contenu textuel des mots enregistrés. Le premier bloc montre comment ajouter une variable indiquant la longueur de chaque mot. La fonction utilisée permet de compter le nombre de caractères avec précision, y compris dans des contextes multilingues. Disposer de cette information est essentiel pour comprendre comment les propriétés internes d'un mot influencent les temps de frappe ou d'autres mesures liées à la saisie.
+
+```{r}
+mots |>
+  mutate(nchar = stri_length(mot))
+```
+
+Le bloc suivant combine cette nouvelle information à celle provenant du tableau des métadonnées. Après avoir joint les deux tables selon l'identifiant utilisateur, nous regroupons les mots par langue, puis calculons la longueur moyenne des mots pour chaque groupe. Ce type de résumé aide à comparer les différentes langues présentes dans le corpus, en examinant si certaines présentent systématiquement des mots plus longs, ce qui pourrait influencer la dynamique de frappe observée. L'ordre décroissant permet de visualiser rapidement les langues associées aux longueurs les plus élevées.
+
+```{r}
+mots |>
+  mutate(nchar = stri_length(mot)) |>
+  left_join(meta, by = "id") |>
+  group_by(lang) |>
+  summarize(mu = mean(nchar)) |>
+  arrange(desc(mu))
+```
+
+Nous introduisons ensuite une expression régulière simple servant à détecter la présence de lettres majuscules dans chaque mot. Cette étape crée une nouvelle variable booléenne qui indique si un mot comporte au moins un caractère majuscule. Une telle transformation peut être utile pour distinguer des catégories lexicales (comme les noms propres) ou pour repérer des variations dans la manière dont les participants ont saisi le texte.
+
+```{r}
+mots |>
+  mutate(nombre_maj = stri_detect(mot, regex = "[A-Z]"))
+```
+
+Le bloc suivant combine plusieurs opérations pour mieux comprendre l'influence de la présence de majuscules sur les temps de frappe. Après avoir détecté les majuscules et recalculé la longueur du mot, nous filtrons les cas les plus courts afin de faciliter la visualisation. Les données sont ensuite regroupées par longueur et par présence ou absence de majuscule, avant de calculer une médiane des durées associées à la frappe du mot. Le graphique produit illustre ces tendances en représentant, pour chaque longueur, les différences éventuelles entre les deux types de mots, ce qui fournit un aperçu visuel clair des variations liées à la mise en forme du texte.
+
+```{r}
+mots |>
+  mutate(has_maj = stri_detect(mot, regex = "[A-Z]")) |>
+  mutate(nchar = stri_length(mot)) |>
+  filter(nchar < 10) |>
+  group_by(nchar, has_maj) |>
+  summarize(mu = median(dur_mot)) |>
+  ggplot(aes(factor(nchar), mu)) +
+    geom_point(aes(colour = has_maj))
+```
+
+Enfin, le dernier bloc propose une autre utilisation des expressions régulières, cette fois pour estimer le nombre approximatif de syllabes dans chaque mot. La règle mise en œuvre compte les groupes successifs de voyelles, ce qui fournit une estimation simple mais informative de la structure phonétique du mot. De telles mesures peuvent être mobilisées pour relier la complexité linguistique à la vitesse de frappe ou à d'autres paramètres comportementaux.
+
+```{r}
+mots |>
+  mutate(nsyl = stri_count(mot, regex = "[aeiouyAEIOUY]+"))
+```
+
+## 9. TextGrid
+
+Dans cette partie, nous travaillons avec des fichiers TextGrid, un format couramment utilisé en phonétique pour annoter des enregistrements audio. Le premier bloc consiste à charger un fichier TextGrid contenant plusieurs niveaux d'annotation, chacun représentant des informations différentes comme des segments phonétiques, des contours prosodiques ou d'autres repères temporels. L'affichage de l'objet chargé permet d'examiner la structure du fichier et de vérifier que les tiers et leurs champs temporels ont été lus correctement, ce qui est essentiel pour pouvoir ensuite croiser l'information contenue dans les différentes couches d'annotation.
+
+```{r}
+#| message: false
+tg <- read_textgrid("data/tg/Rhap-M0018-Pro.TextGrid")
+tg
+```
+
+Le bloc suivant extrait spécifiquement le tier correspondant aux phonèmes, généralement appelé « phone ». Ce niveau contient une segmentation fine de la parole où chaque entrée représente un segment phonétique délimité dans le temps. Extraire ce tier isolément permet de se concentrer sur les unités les plus courtes et d'effectuer des mesures précises, comme les durées phonémiques, indépendamment des autres niveaux d'annotation.
+
+```{r}
+tg_phone <- tg |>
+  filter(tier_name == "phone")
+tg_phone
+```
+
+Nous procédons ensuite à une analyse descriptive des durées phonémiques. En éliminant les segments marqués par un symbole de remplissage, nous regroupons les phonèmes par type et calculons la durée moyenne correspondante. Cela permet de visualiser, sous forme de nuage de points, les phonèmes les plus courts et les plus longs, révélant ainsi des tendances phonétiques naturelles comme la brièveté des voyelles réduites ou la relative lenteur de certains consonnes. L'ordonnancement automatique facilite la comparaison en présentant les phonèmes du plus court au plus long.
+
+```{r}
+tg_phone |>
+  filter(text != "_") |>
+  group_by(text) |>
+  summarize(dur_moyenne = mean(xmax - xmin)) |>
+  arrange(dur_moyenne) |>
+  ggplot(aes(fct_inorder(text), dur_moyenne)) +
+    geom_point()
+```
+
+Le bloc suivant extrait un autre tier, ici appelé « contour », qui peut représenter des catégories prosodiques ou des niveaux mélodiques associés à la parole. En filtrant ce tier pour ne conserver que certains symboles choisis, on se concentre sur les principales catégories d'annotation nécessaires à l'analyse. Afficher le tableau obtenu permet de vérifier que les entrées retenues sont bien celles attendues avant de les utiliser comme éléments de référence pour une fusion avec les phonèmes.
+
+```{r}
+tg_contour <- tg |>
+  filter(tier_name == "contour") |>
+  filter(text %in% c("M", "C", "H", "L"))
+tg_contour
+```
+
+Le bloc suivant illustre une opération plus avancée : il s'agit de joindre les informations phonémiques et prosodiques en fonction de leurs chevauchements temporels. Cette jonction exploite une condition où un phonème est associé à une catégorie prosodique si ses bornes temporelles se trouvent incluses dans l'intervalle correspondant du contour. Le résultat est un tableau enrichi où chaque phonème porte, en plus de son étiquette propre, l'annotation prosodique qui lui correspond. Ce type de fusion temporelle est courant en traitement de la parole pour relier différents niveaux d'analyse.
+
+```{r}
+tg_join <- tg_phone |>
+  left_join(
+    select(tg_contour, xmin, xmax, text),
+    by = join_by(
+      xmin >= xmin,
+      xmax <= xmax
+    ),
+    suffix = c("", "_contour")
+  )
+tg_join
+```
+
+Enfin, nous terminons par un tableau croisé qui récapitule la distribution des phonèmes selon les catégories prosodiques associées. Ce tableau permet de repérer rapidement quelles combinaisons apparaissent fréquemment et lesquelles sont rares ou absentes. Une telle vue d'ensemble peut aider à détecter des structures prosodiques typiques ou à identifier d'éventuelles incohérences dans l'annotation.
+
+```{r}
+table(tg_join$text, tg_join$text_contour)
+```
+
+## 10. Analyse grammaticale
+
+Dans cette section, nous explorons l'analyse grammaticale automatique à l'aide du modèle UDPipe, un outil qui permet d'annoter du texte de manière détaillée : identification des mots, lemmatisation, catégorisation grammaticale et détection de traits morphologiques. Le premier bloc charge un modèle de langue pré-entraîné pour le français. Ce modèle, dérivé du corpus Universal Dependencies, contient les informations nécessaires pour reconnaître la structure interne des phrases françaises. Son chargement est une étape indispensable avant de pouvoir annoter du texte.
+
+```{r}
+#| message: false
+udmodel_fr <- udpipe_load_model(file = "data/french-gsd-ud-2.5-191206.udpipe")
+```
+
+Le bloc suivant applique ce modèle à un texte littéraire classique, la « tirade du nez ». Le texte est lu depuis un fichier brut puis passé au moteur d'annotation qui segmente les mots, identifie leur catégorie grammaticale, leur lemme et leurs traits morphologiques. Le résultat, converti en tibble, permet d'inspecter les annotations ligne par ligne. Cette représentation est utile pour comprendre en détail comment un outil d'analyse grammaticale automatique décompose une phrase, surtout pour un public qui découvre ces méthodes.
+
+```{r}
+#| message: false
+txt_tirade <- read_lines("data/tirade_du_nez.txt")
+df_tirade <- as_tibble(udpipe_annotate(
+  udmodel_fr, x = txt_tirade
+))
+df_tirade
+```
+
+Ensuite, nous chargeons un corpus tiré de Wikipédia, déjà prétraité pour inclure des annotations grammaticales. Ce corpus volumineux permet d'étudier les habitudes grammaticales de milliers de phrases, ce qui ouvre la voie à des analyses quantitatives plus ambitieuses. L'affichage du tableau permet de vérifier la présence des colonnes clés, notamment les catégories grammaticales et les traits morphologiques.
+
+```{r}
+#| message: false
+wikifr <- read_csv2("data/wiki_parsed.csv.bz2")
+wikifr
+```
+
+Le bloc suivant effectue une analyse centrée sur les verbes et leurs temps conjugués. Nous filtrons d'abord les entrées pour ne conserver que les verbes qui portent un trait morphologique indiquant un temps verbal. Ensuite, nous détectons la présence de plusieurs temps — présent, imparfait et passé — en comptant combien de fois chaque trait apparaît dans les annotations. En regroupant les occurrences par lemme, nous obtenons une estimation de la fréquence moyenne des temps verbaux utilisés pour chaque verbe. Après filtrage des lemmes suffisamment fréquents, nous trions les résultats pour mettre en avant ceux dont le présent apparaît le moins souvent. Cette approche montre comment extraire des tendances grammaticales générales à partir d'un grand corpus.
+
+```{r}
+wikifr |>
+  filter(pos == "VERB") |>
+  filter(stri_detect(morph, fixed = "Tense=")) |>
+  mutate(
+    pres = stri_count(morph, fixed = "Tense=Pres"),
+    imp = stri_count(morph, fixed = "Tense=Imp"),
+    passe = stri_count(morph, fixed = "Tense=Past")
+  ) |>
+  group_by(lemma) |>
+  summarize(
+    pres_moyenne = mean(pres),
+    imp_moyenne = mean(imp),
+    passe_moyenne = mean(passe),
+    n = n()
+  ) |>
+  filter(n > 800) |>
+  arrange(pres_moyenne) |>
+  print(n = Inf)
+```
+
+Nous chargeons ensuite un corpus au format CoNLL-U, structure standard utilisée dans le projet Universal Dependencies pour représenter des annotations linguistiques complètes. Ce fichier contient des exemples annotés manuellement, ce qui en fait une ressource précieuse pour entraîner ou évaluer des modèles. La conversion en tibble permet d'en inspecter facilement les colonnes, notamment les mots, les lemmes, les étiquettes grammaticales et les dépendances syntaxiques.
+
+```{r}
+#| message: false
+ud <- as_tibble(udpipe_read_conllu("data/fr_sequoia-ud-train.conllu"))
+ud
+```
+
+Le bloc suivant, qui n'est pas exécuté, montre comment entraîner son propre modèle UDPipe à partir d'un corpus annoté. L'entraînement consiste à apprendre un tokenizer, un étiqueteur morphosyntaxique et un analyseur en dépendances. Même si le code n'est pas évalué ici, il illustre la possibilité de construire un modèle adapté à un domaine ou à un style particulier, ce qui peut produire de meilleures performances dans des contextes spécialisés.
+
+```{r}
+#| eval: false
+m <- udpipe_train(
+  file = "data/exemple_fr.udpipe",
+  files_conllu_training = "data/fr_sequoia-ud-train.conllu", 
+  annotation_tokenizer = "default",
+  annotation_tagger = "default",
+  annotation_parser = "default"
+)
+```
+
+Enfin, le dernier bloc charge ce modèle nouvellement entraîné, puis l'applique au texte de la tirade afin de comparer les résultats avec ceux du modèle standard. Cette étape permet d'évaluer les différences d'annotation, d'observer les éventuelles améliorations ou divergences, et d'illustrer concrètement l'importance du choix du modèle dans une chaîne d'analyse grammaticale automatisée.
+
+```{r}
+#| message: false
+udmodel_fr_nouv <- udpipe_load_model(
+  file = "data/exemple_fr.udpipe"
+)
+df_tirade_nouv <- as_tibble(udpipe_annotate(
+  udmodel_fr_nouv, x = txt_tirade
+))
+df_tirade_nouv
+```
+
+
+
+## 11. PCA + UMAP
+
+Dans cette section, nous explorons deux méthodes très répandues de réduction de dimensionnalité, la PCA (analyse en composantes principales) et UMAP, qui permettent de représenter des données complexes dans un espace de faible dimension tout en conservant autant que possible leur structure. Le contexte ici est l'analyse de représentations vectorielles de mots obtenues par un modèle de type fastText, qui génère pour chaque mot un vecteur de grande dimension reflétant ses similarités sémantiques dans de vastes corpus textuels. Réduire ces vecteurs à deux dimensions permet de visualiser les relations entre mots d'un simple coup d'œil. [fasttext](https://fasttext.cc/docs/en/crawl-vectors.html).
+
+
+```{r}
+#| message: false
+fl <- read_csv2("data/fruitlegumes.csv")
+fl
+```
+
+Le premier bloc charge un tableau contenant une liste de fruits et légumes ainsi qu'une indication de leur catégorie. Ce tableau servira de référence pour associer chaque mot (par exemple « pomme », « carotte ») à sa classe (« fruit » ou « légume »), ce qui facilitera la visualisation et l'interprétation des résultats produits par les méthodes de réduction de dimensionnalité.
+
+```{r}
+embed <- read_rds("data/embed.rds")
+idx <- match(fl$nom, rownames(embed))
+X <- embed[idx, ]
+dim(X)
+```
+
+Nous chargeons ensuite une matrice de vecteurs d'embedding, c'est-à-dire une représentation numérique du sens des mots. Chaque mot correspond à une ligne de la matrice et chaque colonne à une dimension latente. En faisant correspondre les noms du tableau de fruits/légumes aux lignes de cette matrice, nous extrayons les vecteurs utiles pour notre analyse. L'affichage de la dimension de la matrice résultante permet de vérifier que la sélection s'est déroulée correctement et que les vecteurs utilisés correspondent bien à la liste initiale.
+
+```{r}
+pca <- prcomp(X, center = TRUE, scale. = TRUE)
+fl$pca1 <- pca$x[, 1]
+fl$pca2 <- pca$x[, 2]
+fl
+```
+
+Le bloc suivant applique la PCA aux vecteurs. Cette méthode linéaire vise à projeter les données dans un espace de plus faible dimension en conservant la direction de variance maximale. Nous retenons ici les deux premières composantes principales et les ajoutons au tableau initial afin de pouvoir les utiliser directement pour l'affichage. Cela permet de visualiser, de manière simplifiée, comment les représentations des mots se distribuent dans l'espace.
+
+```{r}
+fl |>
+  ggplot(aes(pca1, pca2)) +
+    geom_point(aes(colour = type)) +
+    geom_text(
+      aes(label = nom, colour = type),
+      size = 2,
+      nudge_y = -0.25
+    )
+```
+
+Une fois les deux composantes extraites, nous les représentons graphiquement. Chaque point correspond à un fruit ou un légume, la couleur désigne la catégorie, et les étiquettes textuelles facilitent l'identification individuelle. Cette visualisation met généralement en évidence des regroupements naturels : par exemple, les fruits tendent à se rassembler dans une zone du plan, les légumes dans une autre, ce qui illustre la capacité des embeddings à capturer des dimensions sémantiques pertinentes.
+
+```{r}
+obj <- umap(X)
+fl$umap1 <- obj$layout[, 1]
+fl$umap2 <- obj$layout[, 2]
+```
+
+Le bloc suivant applique UMAP, une méthode non linéaire beaucoup plus flexible que la PCA. UMAP cherche à préserver la structure locale des données et est particulièrement efficace pour faire apparaître des groupes compacts ainsi que des relations sémantiques fines. Les coordonnées résultantes sont ajoutées au tableau principal afin de pouvoir les visualiser de la même manière que les composantes PCA.
+
+```{r}
+fl |>
+  ggplot(aes(umap1, umap2)) +
+    geom_point(aes(colour = type)) +
+    geom_text(
+      aes(label = nom, colour = type),
+      size = 2,
+      nudge_y = -0.1
+    )
+```
+
+La dernière visualisation montre le résultat d'UMAP dans un plan à deux dimensions. Ce type de projection peut révéler des structures que la PCA ne met pas en évidence, comme des sous-groupes plus subtils ou des distances sémantiques plus cohérentes à petite échelle. La combinaison des couleurs et des étiquettes rend la lecture intuitive et facilite la comparaison des deux approches de réduction de dimensionnalité.
+
+## 12. Modèles prédictifs
+
+Dans cette dernière section, nous abordons la construction d'un modèle prédictif à partir des données textuelles issues des mots tapés par les utilisateurs. L'objectif est d'illustrer comment transformer des données brutes en un ensemble de caractéristiques exploitables par un algorithme d'apprentissage supervisé. Le premier bloc commence par créer une matrice sparse (creuse) représentant la fréquence des mots pour chaque utilisateur. Pour cela, les mots sont d'abord mis en minuscules afin d'uniformiser les formes, puis regroupés pour sélectionner uniquement les termes suffisamment fréquents. La fonction cast_sparse transforme alors ces occurrences en une matrice de grande dimension où chaque ligne correspond à un utilisateur et chaque colonne à un token. Ensuite, un tableau contenant les métadonnées est joint selon les identifiants, afin de récupérer la langue déclarée. La variable cible y est définit comme une variable binaire : elle vaut 1 pour les utilisateurs dont la langue est l'anglais, et 0 sinon. Cette préparation constitue une étape importante, car un modèle prédictif dépend fortement de la qualité de ses variables d'entrée.
+
+```{r}
+X <- mots |>
+  mutate(token = stri_trans_tolower(mot)) |>
+  group_by(token) |>
+  filter(n() > 25) |>
+  cast_sparse(id, token)
+
+df_meta <- tibble(id = rownames(X)) |>
+  left_join(meta, by = "id")
+y <- as.numeric(df_meta$lang == "English")
+```
+
+Nous construisons ensuite un modèle de régression logistique pénalisée à l'aide de glmnet. Ce type de modèle est particulièrement adapté aux données textuelles, car il peut gérer un très grand nombre de variables, souvent bien plus nombreuses que les observations, tout en évitant le surapprentissage grâce à la régularisation. L'utilisation de `cv.glmnet` permet de choisir automatiquement la valeur optimale du paramètre de pénalisation via une validation croisée. La courbe affichée montre comment l'erreur de validation évolue en fonction du niveau de régularisation, ce qui aide à comprendre où se situe le compromis optimal entre complexité du modèle et performance prédictive.
+
+```{r}
+model <- cv.glmnet(X, y, family="binomial")
+plot(model)
+```
+
+Une fois le modèle entraîné, nous produisons des prédictions sur les mêmes données utilisées pour l'entraînement. Bien qu'il s'agisse ici d'une évaluation interne et non d'un test sur un ensemble indépendant, ce tableau permet d'illustrer comment traduire les probabilités prédites en décisions binaires, en fixant un seuil simple. Le tableau de contingence indique combien de cas sont correctement ou incorrectement prédits, ce qui donne une première idée des capacités discriminantes du modèle dans ce contexte.
+
+```{r}
+pred <- predict(model, newx=X)
+table(pred=(pred > 0), y=y)
+```
+
+Enfin, nous inspectons les coefficients du modèle pour identifier quels termes jouent un rôle dans la prédiction. Comme la régression logistique pénalisée effectue une sélection automatique de variables, beaucoup de coefficients sont ramenés à zéro. En affichant uniquement ceux qui ne sont pas nuls, nous mettons en évidence les mots dont la présence est particulièrement indicative de la langue anglaise ou, au contraire, de la langue opposée. Cette étape est précieuse pour interpréter le modèle, car elle révèle les indices linguistiques sur lesquels il s'appuie pour trancher entre les classes.
+
+```{r}
+cf <- coef(model)
+cf[cf[,1] != 0,,drop=FALSE] 
+```
+
+## 13. Conclusions
+
+Ce parcours à travers diverses techniques de traitement et d'analyse des données textuelles et temporelles a montré la richesse des outils disponibles en R pour explorer des corpus linguistiques, qu'ils proviennent de frappes clavier, d'annotations phonétiques, de textes littéraires ou de grands ensembles issus du web. En partant de transformations simples de tableaux et de statistiques descriptives, nous avons progressivement étendu la palette d'analyses vers des modèles plus sophistiqués : fonctions de fenêtre pour décrire des dynamiques, expressions régulières pour extraire de l'information fine au sein des mots, annotation grammaticale automatique pour comprendre la structure des phrases, réduction de dimensionnalité pour visualiser des représentations sémantiques, et enfin modèles prédictifs pour relier des caractéristiques textuelles à des propriétés externes.
+
+L'ensemble de ces approches montre comment des données très hétérogènes — temps d'appui sur les touches, phonèmes, traits morphologiques, vecteurs d'embedding ou encore fréquences lexicales — peuvent être articulées pour éclairer des questions linguistiques ou comportementales. Les exemples présentés ne constituent qu'un point de départ : ils ouvrent la voie à des analyses plus fines, des comparaisons plus larges et des modèles plus ambitieux. L'essentiel est de comprendre que chaque étape, du prétraitement aux modèles prédictifs, contribue à transformer des données brutes en connaissances interprétables. Ces techniques offrent ainsi un ensemble puissant et flexible pour explorer empiriquement la langue et les usages qu'en font les locuteurs.
+
+

@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Taylor Arnold">
+
+<title>Atelier : R pour la linguistique</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="code_files/libs/clipboard/clipboard.min.js"></script>
+<script src="code_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="code_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="code_files/libs/quarto-html/popper.min.js"></script>
+<script src="code_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="code_files/libs/quarto-html/anchor.min.js"></script>
+<link href="code_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="code_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="code_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="code_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="code_files/libs/bootstrap/bootstrap-81267100e462c21b3d6c0d5bf76a3417.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="code_files/libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="code_files/libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="code_files/libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/site.css">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table des matières</h2>
+   
+  <ul>
+  <li><a href="#configuration" id="toc-configuration" class="nav-link active" data-scroll-target="#configuration">1. Configuration</a></li>
+  <li><a href="#données-dans-un-tableau" id="toc-données-dans-un-tableau" class="nav-link" data-scroll-target="#données-dans-un-tableau">2. Données dans un tableau</a></li>
+  <li><a href="#visualiser" id="toc-visualiser" class="nav-link" data-scroll-target="#visualiser">3. Visualiser</a></li>
+  <li><a href="#manipuler-un-tableau" id="toc-manipuler-un-tableau" class="nav-link" data-scroll-target="#manipuler-un-tableau">4. Manipuler un tableau</a></li>
+  <li><a href="#les-modèles-statistiques" id="toc-les-modèles-statistiques" class="nav-link" data-scroll-target="#les-modèles-statistiques">5. Les modèles statistiques</a></li>
+  <li><a href="#plusieurs-tableaux" id="toc-plusieurs-tableaux" class="nav-link" data-scroll-target="#plusieurs-tableaux">6. Plusieurs tableaux</a></li>
+  <li><a href="#les-fonctions-de-fenêtre" id="toc-les-fonctions-de-fenêtre" class="nav-link" data-scroll-target="#les-fonctions-de-fenêtre">7. Les fonctions de fenêtre</a></li>
+  <li><a href="#expressions-régulières" id="toc-expressions-régulières" class="nav-link" data-scroll-target="#expressions-régulières">8. Expressions régulières</a></li>
+  <li><a href="#textgrid" id="toc-textgrid" class="nav-link" data-scroll-target="#textgrid">9. TextGrid</a></li>
+  <li><a href="#analyse-grammaticale" id="toc-analyse-grammaticale" class="nav-link" data-scroll-target="#analyse-grammaticale">10. Analyse grammaticale</a></li>
+  <li><a href="#pca-umap" id="toc-pca-umap" class="nav-link" data-scroll-target="#pca-umap">11. PCA + UMAP</a></li>
+  <li><a href="#modèles-prédictifs" id="toc-modèles-prédictifs" class="nav-link" data-scroll-target="#modèles-prédictifs">12. Modèles prédictifs</a></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">13. Conclusions</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Atelier : R pour la linguistique</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Auteur·rice</div>
+    <div class="quarto-title-meta-contents">
+             <p>Taylor Arnold </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Date de publication</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">13 novembre 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Dans cet atelier, nous présentons une introduction complète au language R pour l’étude de la linguistique. R est un language de programmation libre avec le code source ouvert qui est particulièrement populaire dans les sciences naturelles et sociales. Nous commençons par une introduction générale aux fonctions permettant de télécharger, visualiser et manipuler des données structurées sous forme de tableau. Ensuite, nous continuons à étudier des modèles specifiques pour l’étude du langage. Nous finissons avec l’application des interfaces de programmation d’application (API) pour usage des grands modèles de langage. Dans tous les exemples, nous employons les données qui provienne de divers parties de la linguistique.</p>
+<section id="configuration" class="level2">
+<h2 class="anchored" data-anchor-id="configuration">1. Configuration</h2>
+<p>Pour suivre des exemples vous-mêmes, vous pouvez également <a href="">exécuter le code dans Google Colab</a> ou <a href="">télécharger R et RStudio</a> dans votre propre ordinateur.</p>
+</section>
+<section id="données-dans-un-tableau" class="level2">
+<h2 class="anchored" data-anchor-id="données-dans-un-tableau">2. Données dans un tableau</h2>
+<p>Nous commençons avec des données de la production des voyelles anglaises qui viennent d’une étude de 139 personnes en 1995 (Hillenbrand et al.). Je les ai choisies parce qu’elles sont suffisamment petites pour une première application mais assez complèxes pour être intéressantes.</p>
+<p>J’ai préparé cette collection dans un fichier CSV. Vous pouvez également enregistrer vos données en format CSV en utilisant tous les tableurs comme LibreOffice, Google Sheets ou Excel. Afin de charger ces données dans R, on peut utiliser la fonction <code>read_csv2</code>. Cette fonction nécessite un argument qui spécifie le chemin d’accès au fichier par rapport au code. Voici est un exemple de charger les données de la production des voyelles anglaises :</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv2</span>(<span class="st">"data/hillenbrand_voyelle_eng.csv"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,668 × 8
+      id groupe ipa     dur    f0    f1    f2    f3
+   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1     1 fille  æ       257   238   630  2423  3166
+ 2     1 fille  ɑ       212   241   831  1676  2602
+ 3     1 fille  ɔ       242   247   725  1384  2642
+ 4     1 fille  ɛ       184   214   713  2095  3129
+ 5     1 fille  e       222   230   534  2690  3335
+ 6     1 fille  ɜ˞      227   240   608  1733  2159
+ 7     1 fille  ɪ       197   263   551  2393  3324
+ 8     1 fille  i       237   277   554  3022  3541
+ 9     1 fille  o       267   250   693  1235  2850
+10     1 fille  ʊ       184   247   553  1495  2868
+# ℹ 1,658 more rows</code></pre>
+</div>
+</div>
+<p>Nous voyons que cette fonction renvoie un objet qui s’appelle un « tibble ». Dans R, un tibble et la structure dans laquelle on charge les données structurées sous forme de tableau. L’objet au-dessus a 1668 lignes et 8 colonnes. Chaque ligne montre les démographics d’un locuteur et les mesures phonétiques d’une voyelle. Par défaut, nous ne voyons que les dix premières lignes. Pour chaque colonne, il y a un nom (id, groupe, etc.) et un type de donné. Les colonnes numériques ont le type <dbl> (« double ») et les colonnes catégoriques ont le type <chr> (« caractère »). Nous allons voir que ces structures sont essentielles pour tous les étapes de l’analyse de donnée en R.</chr></dbl></p>
+<p>Dans le code au-dessus, nous avons créé et imprimé un tibble. Cependant, aprés l’exécution du code le tibble n’existe plus dans R. Afin de le sauvgarder, nous devons attribuer la sortie de la fonction à un nom à l’aide d’une flèche (signe supérieur et signe moins). Voici nous sauvgarder le tibble dans l’objet <code>phone</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>phone <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"data/hillenbrand_voyelle_eng.csv"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Puis, après exécution, nous pouvons utiliser l’object <code>phone</code> dans n’importe quelle autre tâche. Par example, dans la section suivante, nous allons visualiser ces données avec un langage adapté à l’exploration d’informations quantitatives.</p>
+</section>
+<section id="visualiser" class="level2">
+<h2 class="anchored" data-anchor-id="visualiser">3. Visualiser</h2>
+<p>La visualisation est un étape essentiel dans l’exploration de données. Nous appliquerons un langage général, qui s’appelle la « grammaire des graphiques », pour décrire et coder les visualisations dans R. Nous avons besoin d’un peu de la théorie avant de continuer, mais cette construction rend les visualisations complexes relativement faciles à réaliser.</p>
+<p>Dans la grammaire des graphiques, une couche consiste de trois élements:</p>
+<ul>
+<li><strong>un tibble</strong> : L’objet qui contient l’information à visualiser.</li>
+<li><strong>une géométrie</strong> : La forme qui correspond à chaque ligne du tibble. La visualisation consiste d’une forme pour chaque ligne.</li>
+<li><strong>des esthétiques</strong> : Les associations entre colonnes du tibble et les parametres de chaque forme.</li>
+</ul>
+<p>Une visualizations consiste de une ou plus couches. Un exemple sert à clarifier la moyenne dans laquelle ces parties peuvent correspondre aux éléments graphiques. Voici, le code de créer une visualization de notre tibble <code>phone</code> qui a un point pour chaque ligne avec une position horizontale indiqué par la fréquence fondamentale (<code>f0</code>) et une position veritcal indiqué par le durée de la voyelle (<code>dur</code>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> f0, <span class="at">y =</span> dur))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-4-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="code_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Dans cet exemple, nous commençons avec le nom d’un tibble (<code>phone</code>) suivant par le symbole <code>|&gt;</code>. Cet symbole s’appelle une « pipe ». Il passe le tibble à les prochaines étapes. Nous continuions avec la fonction <code>ggplot()</code> pour indiquer que nous voulons créer une visualisation. Dans la ligne dernière, nous appliquons le fonction <code>geom_point</code> pour spécifier la géométrie. À l’intérieur de la fonction, nous mettons la function <code>aes()</code> (pour <em>aesthetic</em>, esthétique en anglais) avec les associations entre les noms de colonnes et les positions horizontal et vertical. Comme convention, la grammaire des graphiques utilise la lettre <strong>x</strong> pour la dimension horizontal et <strong>y</strong> pour la dimension vertical.</p>
+<p>Comme l’exemple au-dessus, la géométrie des points a deux estétiques requis (<code>x</code> et <code>y</code>). Il y a d’autres estétiques facultatives qu’on peut ajouter pour améliorer l’information porter par la visualisation. Par exemple, il y a une estétique de la couleur qui fonctionne de changer la couleur de chaque point selon une colonne du tibble. Voici, un exemple ou la couleur indique la groupe du locateur ou de la locatrice.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> f0, <span class="at">y =</span> dur, <span class="at">colour =</span> groupe))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-5-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="code_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Déjà, cette visualisation montre certains corréspondances entre les colonnes. Nous voyons que les differences entre les fréquences fondamentales corresponde à une séperation des hommes et des autres. Et, qu’il peut exister un correspondence ou les hommes ont des durations légèrement plus petites que les femmes et les enfants.</p>
+<p>Les connections entre chaque couleur et chaque groupe ne sont pas explicites<br>
+dans notre code. Le système de la grammaire de graphiques peut choisir les couleurs automatiquement. C’était la même chose pour les positions horizontal et vertical : nous n’indiquions ni leurs amplitudes ni leurs étiquettes. Mais, souvent on a besoin de les changer. Pour specifier la relation entre les esthétiques et les elements réels d’un graphique, on peut applique les <em>scales</em>. Les scales peuvent être ajouter comme une autre ligne de notre code. Voici un exemple où nous modifions les couleurs à l’aide d’une palette adaptée aux personnes atteintes de daltonisme.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> f0, <span class="at">y =</span> dur, <span class="at">colour =</span> groupe)) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_viridis_d</span>()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-6-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="code_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Voyons maintenant la visualisation le plus courante pour les données phonétiques qui fournit la rélation entre les deux premiers formants F1 et F2. Ce graphique est au cœur la même chose : les points avec les noms <code>f2</code> et <code>f1</code>, respectivement, attribuent aux esthétiques <code>x</code> et <code>y</code>. Mais, il y a une complèxitie. Afin de corresponder de la forme du langue pour quelqu’un qui regarde vers sa droite, nous devons inverser le sens des axes. Cela nécessite l’application des scales <code>scale_x_reverse()</code> et <code>scale_x_reverse()</code>. L’exemple suivant donne la forme correct.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> f2, <span class="at">y =</span> f1)) <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_reverse</span>() <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reverse</span>()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-7-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="code_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Cette visualisation montre la forme triangulaire classique de l’espace des voyelles. Supposons qu’on peut voir quelles voyelles correspondent à ces points. Comment pourrions-nous faire cela ? Nous devons appliquons une nouvelle géométrie : <code>geom_text</code>. Elle ne crée pas de points pour chaque ligne de données. En revanche, la géométrie de texte place des caractères dans le graphique. Nous devons donner une esthétique nouvelle pour indique la colonne qui corresponde à ses caractères. Voici, la façon d’avoir une visualization avec les symboles IPA à la place des points.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(f2, f1)) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> ipa)) <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_reverse</span>() <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reverse</span>()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-8-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="code_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Il existe beaucoup de géométries, d’esthétiques et de scales pour s’élarger les possibilités de visualisations dans la grammaire de graphiques. Vous pouvez consulter les liens suivant comme références : <a href=""></a> <a href=""></a>.</p>
+<p>Nous avons vu les éléments centrals à la grammaire de graphiques. Dans le but d’aller plus loin, nous continuons par étudier les méthodes pour modifier les tibbles avec les fonctions liées aux bases de données.</p>
+</section>
+<section id="manipuler-un-tableau" class="level2">
+<h2 class="anchored" data-anchor-id="manipuler-un-tableau">4. Manipuler un tableau</h2>
+<p>Souvent, il faut transformer un tableau de données d’un autre tableau avec les éléments différents ou réorganiser. Dans R, nous pouvons manipuler les tableau avec une collection des fonctions qui s’appellent « verbes ». Ces fonctions ont la même structure : on les donne un tibble puis on reçoit un tibble nouveau. Cette structure permette d’appliquer un nombre quelconque de fonctions à un tibble. Il existe environ 50 verbes. Heureusement, nous n’avons besoin d’apprendre que 12 pour effectuer toutes les opérations possibles. Dans cette section, nous commençons avec les 8 premier verbes.</p>
+<p>Le verbe <code>slice_head</code> retienne les <code>n</code> premiers lignes d’un tibble, ou <code>n</code> est un argument dans la fonction. Comme tous les verbes, nous utilisons une pipe (<code>|&gt;</code>) pour donner l’object de données à la fonction.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">4</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 8
+     id groupe ipa     dur    f0    f1    f2    f3
+  &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1     1 fille  æ       257   238   630  2423  3166
+2     1 fille  ɑ       212   241   831  1676  2602
+3     1 fille  ɔ       242   247   725  1384  2642
+4     1 fille  ɛ       184   214   713  2095  3129</code></pre>
+</div>
+</div>
+<p>Le verbe <code>filter</code> retienne les lignes selon une relation entre les valeurs. Pour appliquer cette fonction, on place une expression à l’intérieur avec les noms des colonnes. Les lignes ou l’expression est vrai seront conservées. Voici un exemple de trouver les lignes de la voyelle <code>u</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ipa <span class="sc">==</span> <span class="st">"u"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 139 × 8
+      id groupe ipa     dur    f0    f1    f2    f3
+   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1     1 fille  u       253   246   502  1540  3176
+ 2     2 fille  u       327   287   559  1312  2870
+ 3     3 fille  u       304   194   506  2378  2991
+ 4     4 fille  u       292   258   503  1104  3346
+ 5     5 fille  u       260   240   481  1226  3131
+ 6     6 fille  u       303   330   609  1658  2644
+ 7     7 fille  u       262   228   440  1124  3117
+ 8     8 fille  u       211   255   503  1119  3100
+ 9     9 fille  u       275   215   463  1676  2976
+10    10 fille  u       246   197   430  1448  2896
+# ℹ 129 more rows</code></pre>
+</div>
+</div>
+<p>Pour réorganiser des lignes par les valeurs dans une ou plusieurs colonnes, nous appliquons la fonction <code>arrange</code>. Nous simplement indiquons le nom de colonne dans la fonction.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(dur)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,668 × 8
+      id groupe ipa     dur    f0    f1    f2    f3
+   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1    74 homme  ʊ       111   156   463  1086  2453
+ 2    71 homme  ɛ       125   128   636  1893  2765
+ 3    90 homme  u       125   171   374   887  2478
+ 4    74 homme  ʌ       128   152   622  1285  2472
+ 5    59 homme  ɪ       134   145   424  1913  2556
+ 6    74 homme  ɪ       134   165   440  2119  2694
+ 7    75 homme  ʊ       134   160   500  1067  2435
+ 8     7 fille  ɛ       135   205   605  2445  3265
+ 9    22 fille  ɪ       137   229   447  2645  3302
+10    64 homme  ɛ       138   128   615  1624  2265
+# ℹ 1,658 more rows</code></pre>
+</div>
+</div>
+<p>La réorganisation des lignes, par défaut, trie les lignes par ordre croissant. Pour un ordre décroissant, nous ajoutons la fonction <code>desc</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(dur))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,668 × 8
+      id groupe ipa     dur    f0    f1    f2    f3
+   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1    93 femme  æ       486   214   624  2442  3091
+ 2    19 fille  e       465   232   463  2745  3155
+ 3   111 femme  ɔ       465   226   698  1127  2886
+ 4    93 femme  ɔ       464   211   760  1225  2796
+ 5   115 femme  æ       461   220   646  2406  3283
+ 6    31 garçon æ       456   227   682  2638  3510
+ 7   126 femme  ɑ       455   208   952  1676  2862
+ 8    93 femme  e       453   220   477  2704  3102
+ 9    24 fille  æ       451   220   643  2434  3326
+10    93 femme  ɑ       443   209   883  1682  2962
+# ℹ 1,658 more rows</code></pre>
+</div>
+</div>
+<p>Afin de démontrer l’application de plusieurs verbes, notons qu’il est souvent efficace d’appliquer <code>arrange</code> puis <code>slice_head</code> pour trouver les lignes des valeurs extrêmes. Nous voyons que chaque ligne, sauf la dernière, a une pipe à sa fin.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(f1)) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">10</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 8
+      id groupe ipa     dur    f0    f1    f2    f3
+   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1    41 garçon ɑ       299   233  1316  1752  3113
+ 2    29 garçon ɑ       298   208  1312  1820  3308
+ 3    22 fille  ɑ       238   228  1205  1605  2708
+ 4    35 garçon ɑ       321   245  1197  1734  3187
+ 5   123 femme  ɑ       283   241  1163  1685  3250
+ 6    38 garçon ɑ       317   200  1154  1932  3044
+ 7    25 fille  ɑ       270   223  1147  1553  2877
+ 8    45 garçon ɑ       259   234  1145  1655  3062
+ 9   138 femme  ɑ       326   224  1145  1455  3272
+10    44 garçon ɑ       220   235  1129  2005  2826</code></pre>
+</div>
+</div>
+<p>Le verbe <code>mutate</code> ajoute une colonne au tableau. Cela marche avec un nom de nouvelle colonne et la formule pour créer des autres colonnes. Par example, au-dessous on a un exemple de la création d’une colonne <code>dur_s</code> (durée en secondes) qui est définé par la durée (en milliseconds) divisé par 1000.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dur_s =</span> dur <span class="sc">/</span> <span class="dv">1000</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,668 × 9
+      id groupe ipa     dur    f0    f1    f2    f3 dur_s
+   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1     1 fille  æ       257   238   630  2423  3166 0.257
+ 2     1 fille  ɑ       212   241   831  1676  2602 0.212
+ 3     1 fille  ɔ       242   247   725  1384  2642 0.242
+ 4     1 fille  ɛ       184   214   713  2095  3129 0.184
+ 5     1 fille  e       222   230   534  2690  3335 0.222
+ 6     1 fille  ɜ˞      227   240   608  1733  2159 0.227
+ 7     1 fille  ɪ       197   263   551  2393  3324 0.197
+ 8     1 fille  i       237   277   554  3022  3541 0.237
+ 9     1 fille  o       267   250   693  1235  2850 0.267
+10     1 fille  ʊ       184   247   553  1495  2868 0.184
+# ℹ 1,658 more rows</code></pre>
+</div>
+</div>
+<p>Nous finissions cette sections avec deux verbes qui fonctionnent souvent ensemble: <code>group_by</code> et <code>summarise</code>. Comme <code>mutate</code>, le verbe <code>summarise</code> fonctionne de créer les nouvelles colonnes. Mais, il réduire les lignes d’un sommaire avec l’application des fonctions comme <code>mean</code> (la moyenne) ou <code>sd</code> (lécart-type). La fonction <code>group_by</code> indique par quelle colonne (ou colonnes) le sommaire est appliqué. Un exemple peut clarifier la relation entre les deux. Voici, le code de calculer les moyennes de F1 et F2 selon la voyelle.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ipa) <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">f1_m =</span> <span class="fu">mean</span>(f1),</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">f2_m =</span> <span class="fu">mean</span>(f2)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 12 × 3
+   ipa    f1_m  f2_m
+   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 e      526. 2426.
+ 2 i      412. 2725.
+ 3 o      551. 1030.
+ 4 u      445. 1167.
+ 5 æ      663. 2257.
+ 6 ɑ      891. 1508.
+ 7 ɔ      767. 1173.
+ 8 ɛ      686. 2050.
+ 9 ɜ˞     529. 1564.
+10 ɪ      476. 2323.
+11 ʊ      520. 1286.
+12 ʌ      708. 1380.</code></pre>
+</div>
+</div>
+<p>Le pouvoir de la fonction <code>summarise</code> devienne plus clair en voyant l’application aux visualisations. Avec une combination des verbes et couches de graphiques, nous avons les outils pour visualiser les formants moyennes de chaque voyelle dans les données.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ipa) <span class="sc">|&gt;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">f1_m =</span> <span class="fu">mean</span>(f1),</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">f2_m =</span> <span class="fu">mean</span>(f2)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(f2_m, f1_m)) <span class="sc">+</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> ipa), <span class="at">colour=</span><span class="st">"#fff"</span>) <span class="sc">+</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_reverse</span>() <span class="sc">+</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_reverse</span>() </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-16-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="code_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Maintenant nous avons une base solide de verbes et fonctions de la visualisation. Tous ces éléments sont au cœur de la science des données. Dans la section suivante, nous ajoutons des fonctions de modélisation.</p>
+</section>
+<section id="les-modèles-statistiques" class="level2">
+<h2 class="anchored" data-anchor-id="les-modèles-statistiques">5. Les modèles statistiques</h2>
+<p>Voici, nous commençons par importer les données issues d’un enregistrement de frappes au clavier. Il s’agit d’un fichier compressé contenant des mesures temporelles pour chaque touche pressée. La fonction utilisée permet de lire un fichier CSV avec un séparateur particulier et de convertir automatiquement les valeurs manquantes. L’objectif ici est simplement de charger l’ensemble des observations et de vérifier que le tableau obtenu s’affiche correctement, afin de pouvoir ensuite sélectionner les variables utiles et préparer les analyses statistiques.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>touches <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"data/keylog-touches.csv.bz2"</span>, <span class="at">na=</span><span class="st">"NA"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>touches</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,145,874 × 7
+   id                    t0     t1   dur touche code  gap_apres
+   &lt;chr&gt;              &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;
+ 1 R_00RbUqO7jXLDItP 20914. 20978.  64.4 "I"    KeyI      232. 
+ 2 R_00RbUqO7jXLDItP 21146. 21226.  80.1 "f"    KeyF       88.1
+ 3 R_00RbUqO7jXLDItP 21234. 21290.  55.8 ""     Space     840. 
+ 4 R_00RbUqO7jXLDItP 22074. 22154.  80.2 "I"    KeyI      232. 
+ 5 R_00RbUqO7jXLDItP 22306. 22394.  88.2 ""     Space    1368. 
+ 6 R_00RbUqO7jXLDItP 23674. 23739.  64.3 "c"    KeyC      144. 
+ 7 R_00RbUqO7jXLDItP 23818. 23874.  56.1 "o"    KeyO      225. 
+ 8 R_00RbUqO7jXLDItP 24044. 24090.  46.6 "u"    KeyU     1023. 
+ 9 R_00RbUqO7jXLDItP 25066. 25130.  64   "l"    KeyL      104. 
+10 R_00RbUqO7jXLDItP 25170. 25250   79.8 "d"    KeyD      120  
+# ℹ 1,145,864 more rows</code></pre>
+</div>
+</div>
+<p>Une fois les données chargées, le bloc suivant réalise une première étape de préparation. Il consiste à filtrer les observations pour ne retenir que deux types précis de touches, ici l’espace et le point. Cette sélection permet de comparer plus facilement la durée d’appui de ces deux catégories, en évitant que d’autres touches avec des comportements très différents ne viennent brouiller l’interprétation. Le sous-ensemble obtenu servira directement aux premières analyses comparatives.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>touches_sub <span class="ot">&lt;-</span> touches <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(code <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Space"</span>, <span class="st">"Period"</span>))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Après cette préparation, nous appliquons un test statistique de comparaison de moyennes. Le test t permet d’évaluer si les durées d’appui mesurées diffèrent de manière significative entre les deux types de touches retenus. L’idée est de vérifier si l’espace et le point présentent des temps d’appui systématiquement différents, ce qui pourrait refléter des habitudes de frappe ou des contraintes mécaniques spécifiques.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(dur <span class="sc">~</span> code, <span class="at">data =</span> touches_sub)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Welch Two Sample t-test
+
+data:  dur by code
+t = 21.457, df = 12030, p-value &lt; 2.2e-16
+alternative hypothesis: true difference in means between group Period and group Space is not equal to 0
+95 percent confidence interval:
+ 6.621477 7.952885
+sample estimates:
+mean in group Period  mean in group Space 
+            85.73661             78.44943 </code></pre>
+</div>
+</div>
+<p>Le bloc suivant étend l’analyse à un autre angle. Cette fois, il s’agit d’un test ANOVA à un facteur qui utilise l’identifiant de la personne ou de la session comme variable explicative. L’objectif est d’estimer si la durée d’appui varie beaucoup d’un individu à l’autre. Si la variabilité est importante, cela peut indiquer que les différences interpersonnelles jouent un rôle déterminant dans la vitesse ou le style de frappe.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">oneway.test</span>(dur <span class="sc">~</span> id, <span class="at">data =</span> touches)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    One-way analysis of means (not assuming equal variances)
+
+data:  dur and id
+F = 318.92, num df = 822, denom df = 349910, p-value &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Enfin, le dernier bloc propose une analyse par régression linéaire. Il s’agit ici de comprendre comment la durée d’appui d’une touche pourrait être associée à l’écart temporel qui suit immédiatement cette frappe. Le modèle construit cherche à déterminer si, lorsque l’on appuie plus ou moins longtemps sur une touche, cela influence la rapidité avec laquelle on enchaîne la frappe suivante. La sortie résumée du modèle permet d’interpréter la force de la relation et la signification statistique des coefficients estimés.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(gap_apres <span class="sc">~</span> dur, <span class="at">data =</span> touches))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = gap_apres ~ dur, data = touches)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+ -17926    -433    -353    -230 2577214 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 309.2731     9.6365   32.09   &lt;2e-16 ***
+dur           2.9320     0.1121   26.14   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4494 on 1145049 degrees of freedom
+  (823 observations effacées parce que manquantes)
+Multiple R-squared:  0.0005966, Adjusted R-squared:  0.0005957 
+F-statistic: 683.5 on 1 and 1145049 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="plusieurs-tableaux" class="level2">
+<h2 class="anchored" data-anchor-id="plusieurs-tableaux">6. Plusieurs tableaux</h2>
+<p>Dans cette nouvelle section, nous commençons par charger un second tableau de données contenant des informations descriptives sur les utilisateurs ou les sessions de frappe. Ce fichier regroupe généralement des métadonnées telles que la langue, le niveau déclaré ou d’autres caractéristiques permettant de mieux contextualiser les mesures. L’affichage immédiat du tableau permet de se familiariser avec sa structure avant de le combiner à d’autres sources d’information.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>meta <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"data/keylog-meta.csv.bz2"</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>meta</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 823 × 4
+   id                  age lang    cefr 
+   &lt;chr&gt;             &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;
+ 1 R_2EGIsZARLydD3Uc    25 Italian C1/C2
+ 2 R_1obCaysaZCWZXoG    22 Spanish B1/B2
+ 3 R_3fqTek829k38iCk    22 Polish  B1/B2
+ 4 R_brxD7Q5ZnPW8Gn7    43 English C1/C2
+ 5 R_1k1RE78cBbZyZMA    23 Polish  B1/B2
+ 6 R_1NwuZMzRkVIR0WT    32 English C1/C2
+ 7 R_2t8LOS9nQDBQPA8    24 Spanish C1/C2
+ 8 R_239Q0X5YLwB7U6Z    28 English C1/C2
+ 9 R_10xbkjEmnsusfb1    32 Polish  B1/B2
+10 R_10CbLBzAnYKgWxB    21 Polish  B1/B2
+# ℹ 813 more rows</code></pre>
+</div>
+</div>
+<p>Nous importons ensuite un troisième tableau, cette fois centré sur des mesures liées aux mots eux-mêmes. Il peut s’agir, par exemple, de durées de frappe associées à chaque mot tapé, ce qui fournit une information plus synthétique que l’analyse touche par touche. De la même façon, on affiche les données brutes afin de repérer les variables disponibles et vérifier que le chargement s’est déroulé correctement.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>mots <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"data/keylog-mots.csv.bz2"</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>mots</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 210,335 × 5
+   id                mot    dur_mot    d1    d2
+   &lt;chr&gt;             &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 R_00RbUqO7jXLDItP If       312.   928.  848.
+ 2 R_00RbUqO7jXLDItP I         80.2 1600. 1520 
+ 3 R_00RbUqO7jXLDItP could   1576.  2168. 2088.
+ 4 R_00RbUqO7jXLDItP choose   945.   976.  904.
+ 5 R_00RbUqO7jXLDItP to       200.   930.  849.
+ 6 R_00RbUqO7jXLDItP be       151    528.  456.
+ 7 R_00RbUqO7jXLDItP any      440.   264   168.
+ 8 R_00RbUqO7jXLDItP animal  1560    976.  888 
+ 9 R_00RbUqO7jXLDItP for      264.   248   176.
+10 R_00RbUqO7jXLDItP one      312   1120. 1048.
+# ℹ 210,325 more rows</code></pre>
+</div>
+</div>
+<p>Une fois ces deux tableaux disponibles, nous effectuons une jonction entre eux à partir d’un identifiant commun. Cette opération permet de combiner les caractéristiques présentes dans les métadonnées avec les observations relatives aux mots, enrichissant ainsi chaque ligne d’information contextuelle supplémentaire. Le résultat est une table fusionnée où les durées ou autres mesures des mots peuvent être interprétées en fonction des profils utilisateurs.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"id"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 210,335 × 8
+   id                mot    dur_mot    d1    d2   age lang    cefr 
+   &lt;chr&gt;             &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;
+ 1 R_00RbUqO7jXLDItP If       312.   928.  848.    28 Italian C1/C2
+ 2 R_00RbUqO7jXLDItP I         80.2 1600. 1520     28 Italian C1/C2
+ 3 R_00RbUqO7jXLDItP could   1576.  2168. 2088.    28 Italian C1/C2
+ 4 R_00RbUqO7jXLDItP choose   945.   976.  904.    28 Italian C1/C2
+ 5 R_00RbUqO7jXLDItP to       200.   930.  849.    28 Italian C1/C2
+ 6 R_00RbUqO7jXLDItP be       151    528.  456.    28 Italian C1/C2
+ 7 R_00RbUqO7jXLDItP any      440.   264   168.    28 Italian C1/C2
+ 8 R_00RbUqO7jXLDItP animal  1560    976.  888     28 Italian C1/C2
+ 9 R_00RbUqO7jXLDItP for      264.   248   176.    28 Italian C1/C2
+10 R_00RbUqO7jXLDItP one      312   1120. 1048.    28 Italian C1/C2
+# ℹ 210,325 more rows</code></pre>
+</div>
+</div>
+<p>Le bloc suivant exploite cette jonction pour procéder à un regroupement selon une variable décrivant le niveau de compétence linguistique. Après avoir regroupé les observations selon ce critère, on calcule la médiane d’une mesure temporelle spécifique, ce qui permet d’obtenir un indicateur robuste de la performance typographique pour chaque niveau. Le tri final met en évidence les niveaux pour lesquels la médiane est la plus élevée, facilitant la comparaison globale.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cefr) <span class="sc">|&gt;</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mu =</span> <span class="fu">median</span>(d1)) <span class="sc">|&gt;</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mu))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  cefr     mu
+  &lt;chr&gt; &lt;dbl&gt;
+1 A1/A2  789.
+2 B1/B2  592 
+3 C1/C2  448 </code></pre>
+</div>
+</div>
+<p>Enfin, sur un principe similaire, l’analyse est répétée en regroupant cette fois les données selon la langue déclarée. L’objectif est d’examiner si la performance sur les mots varie sensiblement d’une langue à l’autre. En calculant la médiane des durées et en triant les résultats, on obtient une vue d’ensemble des différences éventuelles liées à la langue de saisie, ce qui peut éclairer des interprétations sur les rythmes de frappe ou sur des effets d’habitude linguistique.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lang) <span class="sc">|&gt;</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mu =</span> <span class="fu">median</span>(d1)) <span class="sc">|&gt;</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mu))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 2
+  lang          mu
+  &lt;chr&gt;      &lt;dbl&gt;
+1 Greek       608.
+2 Polish      520 
+3 Portuguese  503.
+4 Spanish     499 
+5 Italian     486.
+6 French      447.
+7 German      441 
+8 English     435 </code></pre>
+</div>
+</div>
+</section>
+<section id="les-fonctions-de-fenêtre" class="level2">
+<h2 class="anchored" data-anchor-id="les-fonctions-de-fenêtre">7. Les fonctions de fenêtre</h2>
+<p>Dans cette section, nous commençons par créer un tableau simplifié contenant uniquement les variables essentielles pour illustrer l’usage des fonctions de fenêtre. Cette réduction permet de se concentrer sur les éléments temporels fondamentaux comme les instants de début et de fin des frappes, la durée d’appui ainsi que les identifiants des touches et des utilisateurs. L’objectif est de disposer d’une version plus légère des données afin de faciliter les manipulations ultérieures et de rendre l’exemple plus clair pour un lecteur découvrant ces techniques.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>touches_min</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,145,874 × 6
+   id                    t0     t1   dur touche code 
+   &lt;chr&gt;              &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;
+ 1 R_00RbUqO7jXLDItP 20914. 20978.  64.4 "I"    KeyI 
+ 2 R_00RbUqO7jXLDItP 21146. 21226.  80.1 "f"    KeyF 
+ 3 R_00RbUqO7jXLDItP 21234. 21290.  55.8 ""     Space
+ 4 R_00RbUqO7jXLDItP 22074. 22154.  80.2 "I"    KeyI 
+ 5 R_00RbUqO7jXLDItP 22306. 22394.  88.2 ""     Space
+ 6 R_00RbUqO7jXLDItP 23674. 23739.  64.3 "c"    KeyC 
+ 7 R_00RbUqO7jXLDItP 23818. 23874.  56.1 "o"    KeyO 
+ 8 R_00RbUqO7jXLDItP 24044. 24090.  46.6 "u"    KeyU 
+ 9 R_00RbUqO7jXLDItP 25066. 25130.  64   "l"    KeyL 
+10 R_00RbUqO7jXLDItP 25170. 25250   79.8 "d"    KeyD 
+# ℹ 1,145,864 more rows</code></pre>
+</div>
+</div>
+<p>Après cette sélection ciblée, nous affichons simplement le tableau obtenu pour permettre une vérification visuelle du contenu. Cette étape est utile pour confirmer que les variables conservées correspondent bien aux besoins de l’analyse et que les transformations précédentes n’ont pas introduit d’erreur.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>touches_min <span class="sc">|&gt;</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(id, t0) <span class="sc">|&gt;</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">diff_avant =</span> t0 <span class="sc">-</span> <span class="fu">lag</span>(t0, <span class="at">n=</span><span class="dv">1</span>),</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">diff_apres =</span> <span class="fu">lead</span>(t0, <span class="at">n=</span><span class="dv">1</span>) <span class="sc">-</span> t0,</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">gap_avant =</span> t0 <span class="sc">-</span> <span class="fu">lag</span>(t1, <span class="at">n=</span><span class="dv">1</span>),</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">gap_apres =</span> <span class="fu">lead</span>(t0, <span class="at">n=</span><span class="dv">1</span>) <span class="sc">-</span> t1,    </span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,145,874 × 10
+# Groups:   id [823]
+   id               t0     t1   dur touche code  diff_avant diff_apres gap_avant
+   &lt;chr&gt;         &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
+ 1 R_00RbUqO7j… 20914. 20978.  64.4 "I"    KeyI        NA        232.       NA  
+ 2 R_00RbUqO7j… 21146. 21226.  80.1 "f"    KeyF       232.        88.1     168. 
+ 3 R_00RbUqO7j… 21234. 21290.  55.8 ""     Space       88.1      840.        8  
+ 4 R_00RbUqO7j… 22074. 22154.  80.2 "I"    KeyI       840.       232.      784  
+ 5 R_00RbUqO7j… 22306. 22394.  88.2 ""     Space      232.      1368.      152. 
+ 6 R_00RbUqO7j… 23674. 23739.  64.3 "c"    KeyC      1368.       144.     1280. 
+ 7 R_00RbUqO7j… 23818. 23874.  56.1 "o"    KeyO       144.       225.       79.8
+ 8 R_00RbUqO7j… 24044. 24090.  46.6 "u"    KeyU       225.      1023.      169. 
+ 9 R_00RbUqO7j… 25066. 25130.  64   "l"    KeyL      1023.       104.      976  
+10 R_00RbUqO7j… 25170. 25250   79.8 "d"    KeyD       104.       120        39.9
+# ℹ 1,145,864 more rows
+# ℹ 1 more variable: gap_apres &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>Le bloc suivant illustre l’usage de plusieurs fonctions de fenêtre classiques comme lag et lead, fréquemment utilisées dans l’analyse de séries temporelles ou de séquences ordonnées. Après avoir trié les observations par utilisateur puis par ordre chronologique, nous calculons différents écarts temporels entre une frappe et ses voisines immédiates. Ces différences permettent, par exemple, d’évaluer la fluidité de la frappe, la rapidité avec laquelle les touches s’enchaînent et la manière dont les pauses se répartissent dans le temps. Les nouvelles colonnes ainsi créées offrent une perspective plus dynamique sur le comportement de frappe que les seules durées individuelles.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>touches_min <span class="sc">|&gt;</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(id <span class="sc">==</span> <span class="st">"R_00RbUqO7jXLDItP"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(t0) <span class="sc">|&gt;</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">dur_moyenne10 =</span> <span class="fu">slide_mean</span>(dur, <span class="at">before=</span><span class="dv">10</span>),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">dur_moyenne100 =</span> <span class="fu">slide_mean</span>(dur, <span class="at">before=</span><span class="dv">100</span>),</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">dur_moyenne1000 =</span> <span class="fu">slide_mean</span>(dur, <span class="at">before=</span><span class="dv">1000</span>) </span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(t0, dur_moyenne10)) <span class="sc">+</span></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">colour =</span> <span class="st">"#fa8072"</span>) <span class="sc">+</span></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y=</span>dur_moyenne100), <span class="at">colour =</span> <span class="st">"#808000"</span>) <span class="sc">+</span></span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y=</span>dur_moyenne1000), <span class="at">colour =</span> <span class="st">"#6fa8dc"</span>)     </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-30-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="code_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Enfin, le dernier bloc explore l’utilisation de fenêtres glissantes plus larges permettant de calculer des moyennes mobiles sur différents horizons. Après avoir filtré un utilisateur particulier, nous ordonnons ses frappes puis appliquons plusieurs tailles de fenêtre afin de lisser progressivement les durées observées. Cela donne des courbes plus ou moins réactives aux variations locales : une petite fenêtre suit de près les changements instantanés, tandis qu’une grande fenêtre met en évidence des tendances plus globales. Le graphique obtenu superpose ces différentes moyennes, offrant une visualisation intuitive de l’évolution du rythme de frappe au cours du temps.</p>
+</section>
+<section id="expressions-régulières" class="level2">
+<h2 class="anchored" data-anchor-id="expressions-régulières">8. Expressions régulières</h2>
+<p>Dans cette section, nous introduisons l’usage des expressions régulières pour analyser le contenu textuel des mots enregistrés. Le premier bloc montre comment ajouter une variable indiquant la longueur de chaque mot. La fonction utilisée permet de compter le nombre de caractères avec précision, y compris dans des contextes multilingues. Disposer de cette information est essentiel pour comprendre comment les propriétés internes d’un mot influencent les temps de frappe ou d’autres mesures liées à la saisie.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nchar =</span> <span class="fu">stri_length</span>(mot))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 210,335 × 6
+   id                mot    dur_mot    d1    d2 nchar
+   &lt;chr&gt;             &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+ 1 R_00RbUqO7jXLDItP If       312.   928.  848.     2
+ 2 R_00RbUqO7jXLDItP I         80.2 1600. 1520      1
+ 3 R_00RbUqO7jXLDItP could   1576.  2168. 2088.     5
+ 4 R_00RbUqO7jXLDItP choose   945.   976.  904.     6
+ 5 R_00RbUqO7jXLDItP to       200.   930.  849.     2
+ 6 R_00RbUqO7jXLDItP be       151    528.  456.     2
+ 7 R_00RbUqO7jXLDItP any      440.   264   168.     3
+ 8 R_00RbUqO7jXLDItP animal  1560    976.  888      6
+ 9 R_00RbUqO7jXLDItP for      264.   248   176.     3
+10 R_00RbUqO7jXLDItP one      312   1120. 1048.     3
+# ℹ 210,325 more rows</code></pre>
+</div>
+</div>
+<p>Le bloc suivant combine cette nouvelle information à celle provenant du tableau des métadonnées. Après avoir joint les deux tables selon l’identifiant utilisateur, nous regroupons les mots par langue, puis calculons la longueur moyenne des mots pour chaque groupe. Ce type de résumé aide à comparer les différentes langues présentes dans le corpus, en examinant si certaines présentent systématiquement des mots plus longs, ce qui pourrait influencer la dynamique de frappe observée. L’ordre décroissant permet de visualiser rapidement les langues associées aux longueurs les plus élevées.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nchar =</span> <span class="fu">stri_length</span>(mot)) <span class="sc">|&gt;</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lang) <span class="sc">|&gt;</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mu =</span> <span class="fu">mean</span>(nchar)) <span class="sc">|&gt;</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mu))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 2
+  lang          mu
+  &lt;chr&gt;      &lt;dbl&gt;
+1 German      4.47
+2 Greek       4.47
+3 French      4.45
+4 Portuguese  4.43
+5 Italian     4.42
+6 Polish      4.39
+7 Spanish     4.38
+8 English     4.38</code></pre>
+</div>
+</div>
+<p>Nous introduisons ensuite une expression régulière simple servant à détecter la présence de lettres majuscules dans chaque mot. Cette étape crée une nouvelle variable booléenne qui indique si un mot comporte au moins un caractère majuscule. Une telle transformation peut être utile pour distinguer des catégories lexicales (comme les noms propres) ou pour repérer des variations dans la manière dont les participants ont saisi le texte.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nombre_maj =</span> <span class="fu">stri_detect</span>(mot, <span class="at">regex =</span> <span class="st">"[A-Z]"</span>))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 210,335 × 6
+   id                mot    dur_mot    d1    d2 nombre_maj
+   &lt;chr&gt;             &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;     
+ 1 R_00RbUqO7jXLDItP If       312.   928.  848. TRUE      
+ 2 R_00RbUqO7jXLDItP I         80.2 1600. 1520  TRUE      
+ 3 R_00RbUqO7jXLDItP could   1576.  2168. 2088. FALSE     
+ 4 R_00RbUqO7jXLDItP choose   945.   976.  904. FALSE     
+ 5 R_00RbUqO7jXLDItP to       200.   930.  849. FALSE     
+ 6 R_00RbUqO7jXLDItP be       151    528.  456. FALSE     
+ 7 R_00RbUqO7jXLDItP any      440.   264   168. FALSE     
+ 8 R_00RbUqO7jXLDItP animal  1560    976.  888  FALSE     
+ 9 R_00RbUqO7jXLDItP for      264.   248   176. FALSE     
+10 R_00RbUqO7jXLDItP one      312   1120. 1048. FALSE     
+# ℹ 210,325 more rows</code></pre>
+</div>
+</div>
+<p>Le bloc suivant combine plusieurs opérations pour mieux comprendre l’influence de la présence de majuscules sur les temps de frappe. Après avoir détecté les majuscules et recalculé la longueur du mot, nous filtrons les cas les plus courts afin de faciliter la visualisation. Les données sont ensuite regroupées par longueur et par présence ou absence de majuscule, avant de calculer une médiane des durées associées à la frappe du mot. Le graphique produit illustre ces tendances en représentant, pour chaque longueur, les différences éventuelles entre les deux types de mots, ce qui fournit un aperçu visuel clair des variations liées à la mise en forme du texte.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">has_maj =</span> <span class="fu">stri_detect</span>(mot, <span class="at">regex =</span> <span class="st">"[A-Z]"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nchar =</span> <span class="fu">stri_length</span>(mot)) <span class="sc">|&gt;</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(nchar <span class="sc">&lt;</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(nchar, has_maj) <span class="sc">|&gt;</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mu =</span> <span class="fu">median</span>(dur_mot)) <span class="sc">|&gt;</span></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="fu">factor</span>(nchar), mu)) <span class="sc">+</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> has_maj))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-34-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="code_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Enfin, le dernier bloc propose une autre utilisation des expressions régulières, cette fois pour estimer le nombre approximatif de syllabes dans chaque mot. La règle mise en œuvre compte les groupes successifs de voyelles, ce qui fournit une estimation simple mais informative de la structure phonétique du mot. De telles mesures peuvent être mobilisées pour relier la complexité linguistique à la vitesse de frappe ou à d’autres paramètres comportementaux.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nsyl =</span> <span class="fu">stri_count</span>(mot, <span class="at">regex =</span> <span class="st">"[aeiouyAEIOUY]+"</span>))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 210,335 × 6
+   id                mot    dur_mot    d1    d2  nsyl
+   &lt;chr&gt;             &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+ 1 R_00RbUqO7jXLDItP If       312.   928.  848.     1
+ 2 R_00RbUqO7jXLDItP I         80.2 1600. 1520      1
+ 3 R_00RbUqO7jXLDItP could   1576.  2168. 2088.     1
+ 4 R_00RbUqO7jXLDItP choose   945.   976.  904.     2
+ 5 R_00RbUqO7jXLDItP to       200.   930.  849.     1
+ 6 R_00RbUqO7jXLDItP be       151    528.  456.     1
+ 7 R_00RbUqO7jXLDItP any      440.   264   168.     2
+ 8 R_00RbUqO7jXLDItP animal  1560    976.  888      3
+ 9 R_00RbUqO7jXLDItP for      264.   248   176.     1
+10 R_00RbUqO7jXLDItP one      312   1120. 1048.     2
+# ℹ 210,325 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="textgrid" class="level2">
+<h2 class="anchored" data-anchor-id="textgrid">9. TextGrid</h2>
+<p>Dans cette partie, nous travaillons avec des fichiers TextGrid, un format couramment utilisé en phonétique pour annoter des enregistrements audio. Le premier bloc consiste à charger un fichier TextGrid contenant plusieurs niveaux d’annotation, chacun représentant des informations différentes comme des segments phonétiques, des contours prosodiques ou d’autres repères temporels. L’affichage de l’objet chargé permet d’examiner la structure du fichier et de vérifier que les tiers et leurs champs temporels ont été lus correctement, ce qui est essentiel pour pouvoir ensuite croiser l’information contenue dans les différentes couches d’annotation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>tg <span class="ot">&lt;-</span> <span class="fu">read_textgrid</span>(<span class="st">"data/tg/Rhap-M0018-Pro.TextGrid"</span>)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>tg</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,731 × 10
+   file       tier_num tier_name tier_type tier_xmin tier_xmax  xmin  xmax text 
+   &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+ 1 Rhap-M001…        1 phone     Interval…         0      89.7 0     0.695 _    
+ 2 Rhap-M001…        1 phone     Interval…         0      89.7 0.695 0.735 e    
+ 3 Rhap-M001…        1 phone     Interval…         0      89.7 0.735 0.845 s    
+ 4 Rhap-M001…        1 phone     Interval…         0      89.7 0.845 0.875 a    
+ 5 Rhap-M001…        1 phone     Interval…         0      89.7 0.875 0.935 a~   
+ 6 Rhap-M001…        1 phone     Interval…         0      89.7 0.935 1.01  S    
+ 7 Rhap-M001…        1 phone     Interval…         0      89.7 1.01  1.06  E    
+ 8 Rhap-M001…        1 phone     Interval…         0      89.7 1.06  1.10  n    
+ 9 Rhap-M001…        1 phone     Interval…         0      89.7 1.10  1.16  s    
+10 Rhap-M001…        1 phone     Interval…         0      89.7 1.16  1.22  y    
+# ℹ 2,721 more rows
+# ℹ 1 more variable: annotation_num &lt;int&gt;</code></pre>
+</div>
+</div>
+<p>Le bloc suivant extrait spécifiquement le tier correspondant aux phonèmes, généralement appelé « phone ». Ce niveau contient une segmentation fine de la parole où chaque entrée représente un segment phonétique délimité dans le temps. Extraire ce tier isolément permet de se concentrer sur les unités les plus courtes et d’effectuer des mesures précises, comme les durées phonémiques, indépendamment des autres niveaux d’annotation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>tg_phone <span class="ot">&lt;-</span> tg <span class="sc">|&gt;</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(tier_name <span class="sc">==</span> <span class="st">"phone"</span>)</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>tg_phone</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 734 × 10
+   file       tier_num tier_name tier_type tier_xmin tier_xmax  xmin  xmax text 
+   &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+ 1 Rhap-M001…        1 phone     Interval…         0      89.7 0     0.695 _    
+ 2 Rhap-M001…        1 phone     Interval…         0      89.7 0.695 0.735 e    
+ 3 Rhap-M001…        1 phone     Interval…         0      89.7 0.735 0.845 s    
+ 4 Rhap-M001…        1 phone     Interval…         0      89.7 0.845 0.875 a    
+ 5 Rhap-M001…        1 phone     Interval…         0      89.7 0.875 0.935 a~   
+ 6 Rhap-M001…        1 phone     Interval…         0      89.7 0.935 1.01  S    
+ 7 Rhap-M001…        1 phone     Interval…         0      89.7 1.01  1.06  E    
+ 8 Rhap-M001…        1 phone     Interval…         0      89.7 1.06  1.10  n    
+ 9 Rhap-M001…        1 phone     Interval…         0      89.7 1.10  1.16  s    
+10 Rhap-M001…        1 phone     Interval…         0      89.7 1.16  1.22  y    
+# ℹ 724 more rows
+# ℹ 1 more variable: annotation_num &lt;int&gt;</code></pre>
+</div>
+</div>
+<p>Nous procédons ensuite à une analyse descriptive des durées phonémiques. En éliminant les segments marqués par un symbole de remplissage, nous regroupons les phonèmes par type et calculons la durée moyenne correspondante. Cela permet de visualiser, sous forme de nuage de points, les phonèmes les plus courts et les plus longs, révélant ainsi des tendances phonétiques naturelles comme la brièveté des voyelles réduites ou la relative lenteur de certains consonnes. L’ordonnancement automatique facilite la comparaison en présentant les phonèmes du plus court au plus long.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>tg_phone <span class="sc">|&gt;</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(text <span class="sc">!=</span> <span class="st">"_"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(text) <span class="sc">|&gt;</span></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">dur_moyenne =</span> <span class="fu">mean</span>(xmax <span class="sc">-</span> xmin)) <span class="sc">|&gt;</span></span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(dur_moyenne) <span class="sc">|&gt;</span></span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="fu">fct_inorder</span>(text), dur_moyenne)) <span class="sc">+</span></span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-38-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="code_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Le bloc suivant extrait un autre tier, ici appelé « contour », qui peut représenter des catégories prosodiques ou des niveaux mélodiques associés à la parole. En filtrant ce tier pour ne conserver que certains symboles choisis, on se concentre sur les principales catégories d’annotation nécessaires à l’analyse. Afficher le tableau obtenu permet de vérifier que les entrées retenues sont bien celles attendues avant de les utiliser comme éléments de référence pour une fusion avec les phonèmes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>tg_contour <span class="ot">&lt;-</span> tg <span class="sc">|&gt;</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(tier_name <span class="sc">==</span> <span class="st">"contour"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(text <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"C"</span>, <span class="st">"H"</span>, <span class="st">"L"</span>))</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>tg_contour</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 191 × 10
+   file       tier_num tier_name tier_type tier_xmin tier_xmax  xmin  xmax text 
+   &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+ 1 Rhap-M001…        5 contour   Interval…         0      89.8 0.695 0.735 L    
+ 2 Rhap-M001…        5 contour   Interval…         0      89.8 0.735 0.875 L    
+ 3 Rhap-M001…        5 contour   Interval…         0      89.8 0.875 0.935 L    
+ 4 Rhap-M001…        5 contour   Interval…         0      89.8 0.935 1.10  H    
+ 5 Rhap-M001…        5 contour   Interval…         0      89.8 1.22  1.36  L    
+ 6 Rhap-M001…        5 contour   Interval…         0      89.8 1.36  1.52  H    
+ 7 Rhap-M001…        5 contour   Interval…         0      89.8 4.08  4.49  C    
+ 8 Rhap-M001…        5 contour   Interval…         0      89.8 6.04  6.14  C    
+ 9 Rhap-M001…        5 contour   Interval…         0      89.8 6.79  7.43  C    
+10 Rhap-M001…        5 contour   Interval…         0      89.8 8.99  9.14  H    
+# ℹ 181 more rows
+# ℹ 1 more variable: annotation_num &lt;int&gt;</code></pre>
+</div>
+</div>
+<p>Le bloc suivant illustre une opération plus avancée : il s’agit de joindre les informations phonémiques et prosodiques en fonction de leurs chevauchements temporels. Cette jonction exploite une condition où un phonème est associé à une catégorie prosodique si ses bornes temporelles se trouvent incluses dans l’intervalle correspondant du contour. Le résultat est un tableau enrichi où chaque phonème porte, en plus de son étiquette propre, l’annotation prosodique qui lui correspond. Ce type de fusion temporelle est courant en traitement de la parole pour relier différents niveaux d’analyse.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>tg_join <span class="ot">&lt;-</span> tg_phone <span class="sc">|&gt;</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(tg_contour, xmin, xmax, text),</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="fu">join_by</span>(</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>      xmin <span class="sc">&gt;=</span> xmin,</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>      xmax <span class="sc">&lt;=</span> xmax</span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"_contour"</span>)</span>
+<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb64-10"><a href="#cb64-10" aria-hidden="true" tabindex="-1"></a>tg_join</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 734 × 13
+   file       tier_num tier_name tier_type tier_xmin tier_xmax  xmin  xmax text 
+   &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+ 1 Rhap-M001…        1 phone     Interval…         0      89.7 0     0.695 _    
+ 2 Rhap-M001…        1 phone     Interval…         0      89.7 0.695 0.735 e    
+ 3 Rhap-M001…        1 phone     Interval…         0      89.7 0.735 0.845 s    
+ 4 Rhap-M001…        1 phone     Interval…         0      89.7 0.845 0.875 a    
+ 5 Rhap-M001…        1 phone     Interval…         0      89.7 0.875 0.935 a~   
+ 6 Rhap-M001…        1 phone     Interval…         0      89.7 0.935 1.01  S    
+ 7 Rhap-M001…        1 phone     Interval…         0      89.7 1.01  1.06  E    
+ 8 Rhap-M001…        1 phone     Interval…         0      89.7 1.06  1.10  n    
+ 9 Rhap-M001…        1 phone     Interval…         0      89.7 1.10  1.16  s    
+10 Rhap-M001…        1 phone     Interval…         0      89.7 1.16  1.22  y    
+# ℹ 724 more rows
+# ℹ 4 more variables: annotation_num &lt;int&gt;, xmin_contour &lt;dbl&gt;,
+#   xmax_contour &lt;dbl&gt;, text_contour &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>Enfin, nous terminons par un tableau croisé qui récapitule la distribution des phonèmes selon les catégories prosodiques associées. Ce tableau permet de repérer rapidement quelles combinaisons apparaissent fréquemment et lesquelles sont rares ou absentes. Une telle vue d’ensemble peut aider à détecter des structures prosodiques typiques ou à identifier d’éventuelles incohérences dans l’annotation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(tg_join<span class="sc">$</span>text, tg_join<span class="sc">$</span>text_contour)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    
+      C  H  L  M
+  _   0  0  0  0
+  @   6  5 10  1
+  2   0  0  0  2
+  9   7  1  1  0
+  9~  0  1  5  1
+  a  10  4 27  4
+  a~  3  3  7  5
+  b   0  1  5  5
+  d   1  1  7  6
+  e   3  0 16  4
+  E   1  1  7  3
+  e~  0  1  0  2
+  f   0  1  2  1
+  g   1  0  1  0
+  H   0  0  1  0
+  i   1  5  5  1
+  j   1  0  2  3
+  k   3  3  3  0
+  l   7  3 20  2
+  m   1  4  3  2
+  n   1  2  6  0
+  o   2  2  1  0
+  O   1  1  5  2
+  o~  0  0  1  2
+  p   2  6  5  5
+  R   6  3 11  5
+  s   6  5 15  3
+  S   0  1  3  0
+  t   4  5  5  5
+  u   1  1  6  3
+  v   3  1  4  1
+  w   3  0  4  2
+  y   2  2  3  3
+  z   0  0  1  1
+  Z   2  0  1  4</code></pre>
+</div>
+</div>
+</section>
+<section id="analyse-grammaticale" class="level2">
+<h2 class="anchored" data-anchor-id="analyse-grammaticale">10. Analyse grammaticale</h2>
+<p>Dans cette section, nous explorons l’analyse grammaticale automatique à l’aide du modèle UDPipe, un outil qui permet d’annoter du texte de manière détaillée : identification des mots, lemmatisation, catégorisation grammaticale et détection de traits morphologiques. Le premier bloc charge un modèle de langue pré-entraîné pour le français. Ce modèle, dérivé du corpus Universal Dependencies, contient les informations nécessaires pour reconnaître la structure interne des phrases françaises. Son chargement est une étape indispensable avant de pouvoir annoter du texte.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>udmodel_fr <span class="ot">&lt;-</span> <span class="fu">udpipe_load_model</span>(<span class="at">file =</span> <span class="st">"data/french-gsd-ud-2.5-191206.udpipe"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Le bloc suivant applique ce modèle à un texte littéraire classique, la « tirade du nez ». Le texte est lu depuis un fichier brut puis passé au moteur d’annotation qui segmente les mots, identifie leur catégorie grammaticale, leur lemme et leurs traits morphologiques. Le résultat, converti en tibble, permet d’inspecter les annotations ligne par ligne. Cette représentation est utile pour comprendre en détail comment un outil d’analyse grammaticale automatique décompose une phrase, surtout pour un public qui découvre ces méthodes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>txt_tirade <span class="ot">&lt;-</span> <span class="fu">read_lines</span>(<span class="st">"data/tirade_du_nez.txt"</span>)</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>df_tirade <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">udpipe_annotate</span>(</span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  udmodel_fr, <span class="at">x =</span> txt_tirade</span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>df_tirade</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 625 × 14
+   doc_id paragraph_id sentence_id sentence     token_id token lemma upos  xpos 
+   &lt;chr&gt;         &lt;int&gt;       &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+ 1 doc1              1           1 C'est tout ? 1        C'    ce    PRON  &lt;NA&gt; 
+ 2 doc1              1           1 C'est tout ? 2        est   être  AUX   &lt;NA&gt; 
+ 3 doc1              1           1 C'est tout ? 3        tout  tout  ADJ   &lt;NA&gt; 
+ 4 doc1              1           1 C'est tout ? 4        ?     ?     PUNCT &lt;NA&gt; 
+ 5 doc2              1           1 Ah ! non !   1        Ah    ah    INTJ  &lt;NA&gt; 
+ 6 doc2              1           1 Ah ! non !   2        !     !     PUNCT &lt;NA&gt; 
+ 7 doc2              1           1 Ah ! non !   3        non   non   ADV   &lt;NA&gt; 
+ 8 doc2              1           1 Ah ! non !   4        !     !     PUNCT &lt;NA&gt; 
+ 9 doc2              1           2 c'est un pe… 1        c'    ce    PRON  &lt;NA&gt; 
+10 doc2              1           2 c'est un pe… 2        est   être  AUX   &lt;NA&gt; 
+# ℹ 615 more rows
+# ℹ 5 more variables: feats &lt;chr&gt;, head_token_id &lt;chr&gt;, dep_rel &lt;chr&gt;,
+#   deps &lt;chr&gt;, misc &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>Ensuite, nous chargeons un corpus tiré de Wikipédia, déjà prétraité pour inclure des annotations grammaticales. Ce corpus volumineux permet d’étudier les habitudes grammaticales de milliers de phrases, ce qui ouvre la voie à des analyses quantitatives plus ambitieuses. L’affichage du tableau permet de vérifier la présence des colonnes clés, notamment les catégories grammaticales et les traits morphologiques.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>wikifr <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"data/wiki_parsed.csv.bz2"</span>)</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>wikifr</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,431,081 × 11
+   doc_id           sid   tid token lemma pos   xpos  dep   dep_head head  morph
+   &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;
+ 1 Arabie saoudi…     1     1 L     l     NOUN  NOUN  nsubj       10 mona… &lt;NA&gt; 
+ 2 Arabie saoudi…     1     2 ,     ,     PUNCT PUNCT punct        1 L     &lt;NA&gt; 
+ 3 Arabie saoudi…     1     3 en    en    ADP   ADP   case         4 forme &lt;NA&gt; 
+ 4 Arabie saoudi…     1     4 forme forme NOUN  NOUN  nmod         1 L     Gend…
+ 5 Arabie saoudi…     1     5 long… long  ADJ   ADJ   amod         4 forme Gend…
+ 6 Arabie saoudi…     1     6 le    le    DET   DET   det         10 mona… Defi…
+ 7 Arabie saoudi…     1     7 ,     ,     PUNCT PUNCT punct       10 mona… &lt;NA&gt; 
+ 8 Arabie saoudi…     1     8 est   être  AUX   AUX   cop         10 mona… Mood…
+ 9 Arabie saoudi…     1     9 une   un    DET   DET   det         10 mona… Defi…
+10 Arabie saoudi…     1    10 mona… mona… NOUN  NOUN  ROOT         0 ROOT  Gend…
+# ℹ 2,431,071 more rows</code></pre>
+</div>
+</div>
+<p>Le bloc suivant effectue une analyse centrée sur les verbes et leurs temps conjugués. Nous filtrons d’abord les entrées pour ne conserver que les verbes qui portent un trait morphologique indiquant un temps verbal. Ensuite, nous détectons la présence de plusieurs temps — présent, imparfait et passé — en comptant combien de fois chaque trait apparaît dans les annotations. En regroupant les occurrences par lemme, nous obtenons une estimation de la fréquence moyenne des temps verbaux utilisés pour chaque verbe. Après filtrage des lemmes suffisamment fréquents, nous trions les résultats pour mettre en avant ceux dont le présent apparaît le moins souvent. Cette approche montre comment extraire des tendances grammaticales générales à partir d’un grand corpus.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>wikifr <span class="sc">|&gt;</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pos <span class="sc">==</span> <span class="st">"VERB"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">stri_detect</span>(morph, <span class="at">fixed =</span> <span class="st">"Tense="</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">pres =</span> <span class="fu">stri_count</span>(morph, <span class="at">fixed =</span> <span class="st">"Tense=Pres"</span>),</span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">imp =</span> <span class="fu">stri_count</span>(morph, <span class="at">fixed =</span> <span class="st">"Tense=Imp"</span>),</span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">passe =</span> <span class="fu">stri_count</span>(morph, <span class="at">fixed =</span> <span class="st">"Tense=Past"</span>)</span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lemma) <span class="sc">|&gt;</span></span>
+<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb73-11"><a href="#cb73-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">pres_moyenne =</span> <span class="fu">mean</span>(pres),</span>
+<span id="cb73-12"><a href="#cb73-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">imp_moyenne =</span> <span class="fu">mean</span>(imp),</span>
+<span id="cb73-13"><a href="#cb73-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">passe_moyenne =</span> <span class="fu">mean</span>(passe),</span>
+<span id="cb73-14"><a href="#cb73-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
+<span id="cb73-15"><a href="#cb73-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb73-16"><a href="#cb73-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">800</span>) <span class="sc">|&gt;</span></span>
+<span id="cb73-17"><a href="#cb73-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(pres_moyenne) <span class="sc">|&gt;</span></span>
+<span id="cb73-18"><a href="#cb73-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="cn">Inf</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 21 × 5
+   lemma      pres_moyenne imp_moyenne passe_moyenne     n
+   &lt;chr&gt;             &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt; &lt;int&gt;
+ 1 situer            0.191     0.0237         0.783   1012
+ 2 utiliser          0.220     0.0637         0.705   1020
+ 3 appeler           0.273     0.0317         0.688    882
+ 4 créer             0.275     0.00581        0.713    861
+ 5 connaître         0.280     0.0201         0.695    995
+ 6 réaliser          0.304     0.0242         0.669    869
+ 7 considérer        0.328     0.0536         0.614    839
+ 8 mettre            0.399     0.0134         0.584   1415
+ 9 dire              0.427     0.0239         0.535    836
+10 faire             0.608     0.0563         0.308   2893
+11 voir              0.660     0.0317         0.304   1041
+12 passer            0.661     0.0289         0.305    935
+13 avoir             0.677     0.127          0.171   3391
+14 devoir            0.682     0.177          0.111   1716
+15 prendre           0.686     0.0163         0.287   1351
+16 devenir           0.687     0.0166         0.289   1445
+17 permettre         0.767     0.0509         0.171   1532
+18 trouver           0.789     0.0699         0.135   1316
+19 pouvoir           0.834     0.0537         0.0939  3484
+20 aller             0.885     0.0680         0.0403   868
+21 être              0.928     0.0261         0.0301  1228</code></pre>
+</div>
+</div>
+<p>Nous chargeons ensuite un corpus au format CoNLL-U, structure standard utilisée dans le projet Universal Dependencies pour représenter des annotations linguistiques complètes. Ce fichier contient des exemples annotés manuellement, ce qui en fait une ressource précieuse pour entraîner ou évaluer des modèles. La conversion en tibble permet d’en inspecter facilement les colonnes, notamment les mots, les lemmes, les étiquettes grammaticales et les dépendances syntaxiques.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>ud <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">udpipe_read_conllu</span>(<span class="st">"data/fr_sequoia-ud-train.conllu"</span>))</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>ud</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 51,862 × 14
+   doc_id paragraph_id sentence_id     sentence token_id token lemma upos  xpos 
+   &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;           &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+ 1 &lt;NA&gt;              0 annodis.er_000… Gutenbe… 1        Gute… Gute… PROPN &lt;NA&gt; 
+ 2 &lt;NA&gt;              0 annodis.er_000… Cette e… 1        Cette ce    DET   &lt;NA&gt; 
+ 3 &lt;NA&gt;              0 annodis.er_000… Cette e… 2        expo… expo… NOUN  &lt;NA&gt; 
+ 4 &lt;NA&gt;              0 annodis.er_000… Cette e… 3        nous  nous  PRON  &lt;NA&gt; 
+ 5 &lt;NA&gt;              0 annodis.er_000… Cette e… 4        appr… appr… VERB  &lt;NA&gt; 
+ 6 &lt;NA&gt;              0 annodis.er_000… Cette e… 5        que   que   SCONJ &lt;NA&gt; 
+ 7 &lt;NA&gt;              0 annodis.er_000… Cette e… 6        dès   dès   ADP   &lt;NA&gt; 
+ 8 &lt;NA&gt;              0 annodis.er_000… Cette e… 7        le    le    DET   &lt;NA&gt; 
+ 9 &lt;NA&gt;              0 annodis.er_000… Cette e… 8        XIIe  XIIe  ADJ   &lt;NA&gt; 
+10 &lt;NA&gt;              0 annodis.er_000… Cette e… 9        sièc… sièc… NOUN  &lt;NA&gt; 
+# ℹ 51,852 more rows
+# ℹ 5 more variables: feats &lt;chr&gt;, head_token_id &lt;chr&gt;, dep_rel &lt;chr&gt;,
+#   deps &lt;chr&gt;, misc &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>Le bloc suivant, qui n’est pas exécuté, montre comment entraîner son propre modèle UDPipe à partir d’un corpus annoté. L’entraînement consiste à apprendre un tokenizer, un étiqueteur morphosyntaxique et un analyseur en dépendances. Même si le code n’est pas évalué ici, il illustre la possibilité de construire un modèle adapté à un domaine ou à un style particulier, ce qui peut produire de meilleures performances dans des contextes spécialisés.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">udpipe_train</span>(</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"data/exemple_fr.udpipe"</span>,</span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">files_conllu_training =</span> <span class="st">"data/fr_sequoia-ud-train.conllu"</span>, </span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">annotation_tokenizer =</span> <span class="st">"default"</span>,</span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">annotation_tagger =</span> <span class="st">"default"</span>,</span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">annotation_parser =</span> <span class="st">"default"</span></span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Enfin, le dernier bloc charge ce modèle nouvellement entraîné, puis l’applique au texte de la tirade afin de comparer les résultats avec ceux du modèle standard. Cette étape permet d’évaluer les différences d’annotation, d’observer les éventuelles améliorations ou divergences, et d’illustrer concrètement l’importance du choix du modèle dans une chaîne d’analyse grammaticale automatisée.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>udmodel_fr_nouv <span class="ot">&lt;-</span> <span class="fu">udpipe_load_model</span>(</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"data/exemple_fr.udpipe"</span></span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>df_tirade_nouv <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">udpipe_annotate</span>(</span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>  udmodel_fr_nouv, <span class="at">x =</span> txt_tirade</span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>df_tirade_nouv</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 617 × 14
+   doc_id paragraph_id sentence_id sentence     token_id token lemma upos  xpos 
+   &lt;chr&gt;         &lt;int&gt;       &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+ 1 doc1              1           1 C'est tout ? 1        C'    ce    PRON  &lt;NA&gt; 
+ 2 doc1              1           1 C'est tout ? 2        est   être  AUX   &lt;NA&gt; 
+ 3 doc1              1           1 C'est tout ? 3        tout  tout  ADJ   &lt;NA&gt; 
+ 4 doc1              1           1 C'est tout ? 4        ?     ?     PUNCT &lt;NA&gt; 
+ 5 doc2              1           1 Ah !         1        Ah    Ah    NOUN  &lt;NA&gt; 
+ 6 doc2              1           1 Ah !         2        !     !     PUNCT &lt;NA&gt; 
+ 7 doc2              1           2 non !        1        non   non   ADV   &lt;NA&gt; 
+ 8 doc2              1           2 non !        2        !     !     PUNCT &lt;NA&gt; 
+ 9 doc2              1           3 c'est un pe… 1        c'    ce    PRON  &lt;NA&gt; 
+10 doc2              1           3 c'est un pe… 2        est   être  AUX   &lt;NA&gt; 
+# ℹ 607 more rows
+# ℹ 5 more variables: feats &lt;chr&gt;, head_token_id &lt;chr&gt;, dep_rel &lt;chr&gt;,
+#   deps &lt;chr&gt;, misc &lt;chr&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="pca-umap" class="level2">
+<h2 class="anchored" data-anchor-id="pca-umap">11. PCA + UMAP</h2>
+<p>Dans cette section, nous explorons deux méthodes très répandues de réduction de dimensionnalité, la PCA (analyse en composantes principales) et UMAP, qui permettent de représenter des données complexes dans un espace de faible dimension tout en conservant autant que possible leur structure. Le contexte ici est l’analyse de représentations vectorielles de mots obtenues par un modèle de type fastText, qui génère pour chaque mot un vecteur de grande dimension reflétant ses similarités sémantiques dans de vastes corpus textuels. Réduire ces vecteurs à deux dimensions permet de visualiser les relations entre mots d’un simple coup d’œil. <a href="https://fasttext.cc/docs/en/crawl-vectors.html">fasttext</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>fl <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"data/fruitlegumes.csv"</span>)</span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>fl</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 119 × 2
+   nom       type 
+   &lt;chr&gt;     &lt;chr&gt;
+ 1 abricot   fruit
+ 2 açaï      fruit
+ 3 agrumes   fruit
+ 4 amande    fruit
+ 5 ananas    fruit
+ 6 argousier fruit
+ 7 avocat    fruit
+ 8 banane    fruit
+ 9 bergamote fruit
+10 bigarreau fruit
+# ℹ 109 more rows</code></pre>
+</div>
+</div>
+<p>Le premier bloc charge un tableau contenant une liste de fruits et légumes ainsi qu’une indication de leur catégorie. Ce tableau servira de référence pour associer chaque mot (par exemple « pomme », « carotte ») à sa classe (« fruit » ou « légume »), ce qui facilitera la visualisation et l’interprétation des résultats produits par les méthodes de réduction de dimensionnalité.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>embed <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/embed.rds"</span>)</span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">match</span>(fl<span class="sc">$</span>nom, <span class="fu">rownames</span>(embed))</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> embed[idx, ]</span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(X)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 119 300</code></pre>
+</div>
+</div>
+<p>Nous chargeons ensuite une matrice de vecteurs d’embedding, c’est-à-dire une représentation numérique du sens des mots. Chaque mot correspond à une ligne de la matrice et chaque colonne à une dimension latente. En faisant correspondre les noms du tableau de fruits/légumes aux lignes de cette matrice, nous extrayons les vecteurs utiles pour notre analyse. L’affichage de la dimension de la matrice résultante permet de vérifier que la sélection s’est déroulée correctement et que les vecteurs utilisés correspondent bien à la liste initiale.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(X, <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale. =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>fl<span class="sc">$</span>pca1 <span class="ot">&lt;-</span> pca<span class="sc">$</span>x[, <span class="dv">1</span>]</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>fl<span class="sc">$</span>pca2 <span class="ot">&lt;-</span> pca<span class="sc">$</span>x[, <span class="dv">2</span>]</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>fl</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 119 × 4
+   nom       type    pca1   pca2
+   &lt;chr&gt;     &lt;chr&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1 abricot   fruit  7.13  -4.45 
+ 2 açaï      fruit  3.51   8.55 
+ 3 agrumes   fruit  3.90  -0.761
+ 4 amande    fruit  3.89  -5.05 
+ 5 ananas    fruit  2.72  -0.415
+ 6 argousier fruit  2.94   3.95 
+ 7 avocat    fruit -0.166 -1.45 
+ 8 banane    fruit  4.12  -3.87 
+ 9 bergamote fruit  6.16  -1.93 
+10 bigarreau fruit  3.78   0.289
+# ℹ 109 more rows</code></pre>
+</div>
+</div>
+<p>Le bloc suivant applique la PCA aux vecteurs. Cette méthode linéaire vise à projeter les données dans un espace de plus faible dimension en conservant la direction de variance maximale. Nous retenons ici les deux premières composantes principales et les ajoutons au tableau initial afin de pouvoir les utiliser directement pour l’affichage. Cela permet de visualiser, de manière simplifiée, comment les représentations des mots se distribuent dans l’espace.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>fl <span class="sc">|&gt;</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(pca1, pca2)) <span class="sc">+</span></span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> type)) <span class="sc">+</span></span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">label =</span> nom, <span class="at">colour =</span> type),</span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">nudge_y =</span> <span class="sc">-</span><span class="fl">0.25</span></span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-52-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="code_files/figure-html/unnamed-chunk-52-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Une fois les deux composantes extraites, nous les représentons graphiquement. Chaque point correspond à un fruit ou un légume, la couleur désigne la catégorie, et les étiquettes textuelles facilitent l’identification individuelle. Cette visualisation met généralement en évidence des regroupements naturels : par exemple, les fruits tendent à se rassembler dans une zone du plan, les légumes dans une autre, ce qui illustre la capacité des embeddings à capturer des dimensions sémantiques pertinentes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">umap</span>(X)</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>fl<span class="sc">$</span>umap1 <span class="ot">&lt;-</span> obj<span class="sc">$</span>layout[, <span class="dv">1</span>]</span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>fl<span class="sc">$</span>umap2 <span class="ot">&lt;-</span> obj<span class="sc">$</span>layout[, <span class="dv">2</span>]</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Le bloc suivant applique UMAP, une méthode non linéaire beaucoup plus flexible que la PCA. UMAP cherche à préserver la structure locale des données et est particulièrement efficace pour faire apparaître des groupes compacts ainsi que des relations sémantiques fines. Les coordonnées résultantes sont ajoutées au tableau principal afin de pouvoir les visualiser de la même manière que les composantes PCA.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>fl <span class="sc">|&gt;</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(umap1, umap2)) <span class="sc">+</span></span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> type)) <span class="sc">+</span></span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">label =</span> nom, <span class="at">colour =</span> type),</span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">nudge_y =</span> <span class="sc">-</span><span class="fl">0.1</span></span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-54-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="code_files/figure-html/unnamed-chunk-54-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>La dernière visualisation montre le résultat d’UMAP dans un plan à deux dimensions. Ce type de projection peut révéler des structures que la PCA ne met pas en évidence, comme des sous-groupes plus subtils ou des distances sémantiques plus cohérentes à petite échelle. La combinaison des couleurs et des étiquettes rend la lecture intuitive et facilite la comparaison des deux approches de réduction de dimensionnalité.</p>
+</section>
+<section id="modèles-prédictifs" class="level2">
+<h2 class="anchored" data-anchor-id="modèles-prédictifs">12. Modèles prédictifs</h2>
+<p>Dans cette dernière section, nous abordons la construction d’un modèle prédictif à partir des données textuelles issues des mots tapés par les utilisateurs. L’objectif est d’illustrer comment transformer des données brutes en un ensemble de caractéristiques exploitables par un algorithme d’apprentissage supervisé. Le premier bloc commence par créer une matrice sparse (creuse) représentant la fréquence des mots pour chaque utilisateur. Pour cela, les mots sont d’abord mis en minuscules afin d’uniformiser les formes, puis regroupés pour sélectionner uniquement les termes suffisamment fréquents. La fonction cast_sparse transforme alors ces occurrences en une matrice de grande dimension où chaque ligne correspond à un utilisateur et chaque colonne à un token. Ensuite, un tableau contenant les métadonnées est joint selon les identifiants, afin de récupérer la langue déclarée. La variable cible y est définit comme une variable binaire : elle vaut 1 pour les utilisateurs dont la langue est l’anglais, et 0 sinon. Cette préparation constitue une étape importante, car un modèle prédictif dépend fortement de la qualité de ses variables d’entrée.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> mots <span class="sc">|&gt;</span></span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">token =</span> <span class="fu">stri_trans_tolower</span>(mot)) <span class="sc">|&gt;</span></span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(token) <span class="sc">|&gt;</span></span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">&gt;</span> <span class="dv">25</span>) <span class="sc">|&gt;</span></span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_sparse</span>(id, token)</span>
+<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a>df_meta <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">id =</span> <span class="fu">rownames</span>(X)) <span class="sc">|&gt;</span></span>
+<span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"id"</span>)</span>
+<span id="cb89-9"><a href="#cb89-9" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(df_meta<span class="sc">$</span>lang <span class="sc">==</span> <span class="st">"English"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Nous construisons ensuite un modèle de régression logistique pénalisée à l’aide de glmnet. Ce type de modèle est particulièrement adapté aux données textuelles, car il peut gérer un très grand nombre de variables, souvent bien plus nombreuses que les observations, tout en évitant le surapprentissage grâce à la régularisation. L’utilisation de <code>cv.glmnet</code> permet de choisir automatiquement la valeur optimale du paramètre de pénalisation via une validation croisée. La courbe affichée montre comment l’erreur de validation évolue en fonction du niveau de régularisation, ce qui aide à comprendre où se situe le compromis optimal entre complexité du modèle et performance prédictive.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(X, y, <span class="at">family=</span><span class="st">"binomial"</span>)</span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(model)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><a href="code_files/figure-html/unnamed-chunk-56-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="code_files/figure-html/unnamed-chunk-56-1.png" class="img-fluid figure-img" width="672"></a></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Une fois le modèle entraîné, nous produisons des prédictions sur les mêmes données utilisées pour l’entraînement. Bien qu’il s’agisse ici d’une évaluation interne et non d’un test sur un ensemble indépendant, ce tableau permet d’illustrer comment traduire les probabilités prédites en décisions binaires, en fixant un seuil simple. Le tableau de contingence indique combien de cas sont correctement ou incorrectement prédits, ce qui donne une première idée des capacités discriminantes du modèle dans ce contexte.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, <span class="at">newx=</span>X)</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">pred=</span>(pred <span class="sc">&gt;</span> <span class="dv">0</span>), <span class="at">y=</span>y)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       y
+pred      0   1
+  FALSE 651 136
+  TRUE    3  33</code></pre>
+</div>
+</div>
+<p>Enfin, nous inspectons les coefficients du modèle pour identifier quels termes jouent un rôle dans la prédiction. Comme la régression logistique pénalisée effectue une sélection automatique de variables, beaucoup de coefficients sont ramenés à zéro. En affichant uniquement ceux qui ne sont pas nuls, nous mettons en évidence les mots dont la présence est particulièrement indicative de la langue anglaise ou, au contraire, de la langue opposée. Cette étape est précieuse pour interpréter le modèle, car elle révèle les indices linguistiques sur lesquels il s’appuie pour trancher entre les classes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>cf <span class="ot">&lt;-</span> <span class="fu">coef</span>(model)</span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>cf[cf[,<span class="dv">1</span>] <span class="sc">!=</span> <span class="dv">0</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>] </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>50 x 1 sparse Matrix of class "dgCMatrix"
+             lambda.1se
+(Intercept) -2.97481956
+would        0.23076321
+who          0.10500637
+has          0.02309470
+up           0.80215343
+on           0.01543133
+explore      0.28507656
+an           0.14673921
+being        0.08046550
+as           0.33138843
+lots         0.03016372
+which        0.15562016
+been         0.06254165
+is           0.07531342
+many         0.15171766
+needs        0.01726784
+due          0.22061984
+get          0.10509703
+life         0.23319484
+by           0.17486235
+there        0.04635737
+right        0.04276575
+well         0.07241433
+away         0.24241436
+into         0.45108681
+too          0.27157916
+way          0.11990167
+anywhere     0.09280364
+.,          -0.01557956
+used         0.07524509
+others       0.22663830
+off          0.41748812
+they         0.01108921
+their        0.01009871
+then         0.30846939
+children     0.51731933
+often        0.02589184
+cold         0.57414362
+over         0.23798971
+perhaps      0.53891072
+th           0.10211126
+done         0.06210461
+local        0.19872455
+through      0.02145032
+set          0.21841233
+sort         0.39843131
+currently    0.26812004
+sound        0.55711706
+eyes         0.24653259
+school       0.09412221</code></pre>
+</div>
+</div>
+</section>
+<section id="conclusions" class="level2">
+<h2 class="anchored" data-anchor-id="conclusions">13. Conclusions</h2>
+<p>Ce parcours à travers diverses techniques de traitement et d’analyse des données textuelles et temporelles a montré la richesse des outils disponibles en R pour explorer des corpus linguistiques, qu’ils proviennent de frappes clavier, d’annotations phonétiques, de textes littéraires ou de grands ensembles issus du web. En partant de transformations simples de tableaux et de statistiques descriptives, nous avons progressivement étendu la palette d’analyses vers des modèles plus sophistiqués : fonctions de fenêtre pour décrire des dynamiques, expressions régulières pour extraire de l’information fine au sein des mots, annotation grammaticale automatique pour comprendre la structure des phrases, réduction de dimensionnalité pour visualiser des représentations sémantiques, et enfin modèles prédictifs pour relier des caractéristiques textuelles à des propriétés externes.</p>
+<p>L’ensemble de ces approches montre comment des données très hétérogènes — temps d’appui sur les touches, phonèmes, traits morphologiques, vecteurs d’embedding ou encore fréquences lexicales — peuvent être articulées pour éclairer des questions linguistiques ou comportementales. Les exemples présentés ne constituent qu’un point de départ : ils ouvrent la voie à des analyses plus fines, des comparaisons plus larges et des modèles plus ambitieux. L’essentiel est de comprendre que chaque étape, du prétraitement aux modèles prédictifs, contribue à transformer des données brutes en connaissances interprétables. Ces techniques offrent ainsi un ensemble puissant et flexible pour explorer empiriquement la langue et les usages qu’en font les locuteurs.</p>
+</section>
+
+</main>
+<!-- /main column -->
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copié");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copié");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>
