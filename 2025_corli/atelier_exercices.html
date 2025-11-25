@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2025-11-23">
+
+<title>Exercices pour atelier : R pour la linguistique</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="atelier_exercices_files/libs/clipboard/clipboard.min.js"></script>
+<script src="atelier_exercices_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="atelier_exercices_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="atelier_exercices_files/libs/quarto-html/popper.min.js"></script>
+<script src="atelier_exercices_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="atelier_exercices_files/libs/quarto-html/anchor.min.js"></script>
+<link href="atelier_exercices_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="atelier_exercices_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="atelier_exercices_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="atelier_exercices_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="atelier_exercices_files/libs/bootstrap/bootstrap-81267100e462c21b3d6c0d5bf76a3417.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Exercices pour atelier : R pour la linguistique</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 23, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">warning =</span> <span class="cn">FALSE</span>, <span class="at">message =</span> <span class="cn">FALSE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="configuration" class="level2">
+<h2 class="anchored" data-anchor-id="configuration">2. Configuration</h2>
+<p>Vous devez exécuter le code ci-dessous pour vérifier, puis si nécessaire télécharger et charger, les packages nécessaires aux exercices.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"funs.R"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">verifier_packages</span>(<span class="fu">c</span>(<span class="st">"tidyverse"</span>, <span class="st">"glmnet"</span>, <span class="st">"tuneR"</span>, <span class="st">"phonTools"</span>, <span class="st">"umap"</span>, <span class="st">"dtw"</span>, <span class="st">"udpipe"</span>, <span class="st">"readtextgrid"</span>, <span class="st">"stringi"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Le code ci-dessous configure les paramètres nécessaires à notre travail.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">dplyr.summarise.inform =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>())</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">LANG =</span> <span class="st">"fr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="données-tabulaires" class="level2">
+<h2 class="anchored" data-anchor-id="données-tabulaires">3. Données tabulaires</h2>
+<p>Dans le «bloc» de code ci-dessous, télécharchez des données <code>donnees/peterson_barney_voyelle_eng.csv</code> sauvegardez le tibble dans l’objet <code>phone</code> et regardez les données. Comparez ce tableau avec le tableau figurant dans les notes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>phone <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/peterson_barney_voyelle_eng.csv"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>phone</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,520 × 9
+      id groupe genre    api   xsampa    f0    f1    f2    f3
+   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1     1 homme  masculin i     i        160   240  2280  2850
+ 2     1 homme  masculin i     i        186   280  2400  2790
+ 3     1 homme  masculin ɪ     I        203   390  2030  2640
+ 4     1 homme  masculin ɪ     I        192   310  1980  2550
+ 5     1 homme  masculin ɛ     E        161   490  1870  2420
+ 6     1 homme  masculin ɛ     E        155   570  1700  2600
+ 7     1 homme  masculin æ     {        140   560  1820  2660
+ 8     1 homme  masculin æ     {        180   630  1700  2550
+ 9     1 homme  masculin ʌ     V        144   590  1250  2620
+10     1 homme  masculin ʌ     V        148   620  1300  2530
+# ℹ 1,510 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="visualiser" class="level2">
+<h2 class="anchored" data-anchor-id="visualiser">4. Visualiser</h2>
+<p>Créez une visualisation de tibble <code>phone</code> de F2 et F1 dans la même forme que dans les notes, mais appliquez les couleur pour indiquer la groupe. Si vouz avez des problèmes avec les symboles sur votre ordinateur, utilisez la colonne <code>xsampa</code> au lieu d’API.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x=</span>f2, <span class="at">y=</span>f1, <span class="at">label=</span>api, <span class="at">colour=</span>groupe)) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_reverse</span>() <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reverse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Creez un « boites à moustaches » (boxplot en anglais) pour les valeurs F1 selon les symboles API avec la géométrie <code>geom_boxplot</code>. Donnez simplement des esthétiques <code>x</code> et <code>y</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>api, <span class="at">y=</span>f1))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Posez vos questions si vous ne comprenez pas la signification de chaque partie d’un «boxplot» !</p>
+<p>Créez une visualization d’un «boxplot» comme ci-dessus, mais cette fois ajoutez une esthétique de la couleur associée à la colonne <code>groupe</code>. Faites attention aux résultats.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>api, <span class="at">y=</span>f1, <span class="at">colour=</span>groupe))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Copiez le code ci-dessus, puis remplacez l’estétique «colour» par «fill».</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>api, <span class="at">y=</span>f1, <span class="at">fill=</span>groupe))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>C’est quoi la différence entre «colour» et «fill» dans la grammaire des graphiques?</p>
+</section>
+<section id="manipuler-un-tableau" class="level2">
+<h2 class="anchored" data-anchor-id="manipuler-un-tableau">5. Manipuler un tableau</h2>
+<p>Sélectionnez les 5 lignes ayant les valeurs F1 les plus élevées.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(f1) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 9
+     id groupe genre    api   xsampa    f0    f1    f2    f3
+  &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1    19 homme  masculin i     i        129   190  2650  3280
+2    19 homme  masculin i     i        135   190  2700  3170
+3     8 homme  masculin ɪ     I        103   206  2130  2570
+4     2 homme  masculin i     i        148   210  2360  3250
+5    18 homme  masculin i     i        124   210  2100  3090</code></pre>
+</div>
+</div>
+<p>Sélectionnez les 5 lignes ayant les valeurs F1 les plus basses.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(f1)) <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 9
+     id groupe genre    api   xsampa    f0    f1    f2    f3
+  &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1    62 enfant &lt;NA&gt;     ɑ     A        200  1300  1800  3450
+2    74 enfant masculin æ     {        260  1300  2280  3130
+3    74 enfant masculin æ     {        260  1300  2160  3300
+4    67 enfant &lt;NA&gt;     æ     {        214  1240  2700  3640
+5    74 enfant masculin ɑ     A        250  1230  1300  3200</code></pre>
+</div>
+</div>
+<p>Selectionez les lignes qui <em>ne sont pas</em> associées aux hommes en appliquons le symbole <code>!=</code> au lieu de <code>==</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(groupe <span class="sc">!=</span> <span class="st">"homme"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 860 × 9
+      id groupe genre api   xsampa    f0    f1    f2    f3
+   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1    34 femme  &lt;NA&gt;  i     i        230   370  2670  3100
+ 2    34 femme  &lt;NA&gt;  i     i        234   390  2760  3060
+ 3    34 femme  &lt;NA&gt;  ɪ     I        234   468  2330  2930
+ 4    34 femme  &lt;NA&gt;  ɪ     I        205   410  2380  2950
+ 5    34 femme  &lt;NA&gt;  ɛ     E        190   550  2200  2880
+ 6    34 femme  &lt;NA&gt;  ɛ     E        191   570  2100  3040
+ 7    34 femme  &lt;NA&gt;  æ     {        200   800  1980  2810
+ 8    34 femme  &lt;NA&gt;  æ     {        192   860  1920  2850
+ 9    34 femme  &lt;NA&gt;  ʌ     V        227   635  1200  3250
+10    34 femme  &lt;NA&gt;  ʌ     V        200   700  1200  3100
+# ℹ 850 more rows</code></pre>
+</div>
+</div>
+<p>Créez de nouvelles variables qui donnent la différence entre F1 et F0 et entre F2 et F1. Elles sont parfois utiles pour comprendre les qualités perçues des voyelles.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(groupe <span class="sc">!=</span> <span class="st">"homme"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 860 × 9
+      id groupe genre api   xsampa    f0    f1    f2    f3
+   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1    34 femme  &lt;NA&gt;  i     i        230   370  2670  3100
+ 2    34 femme  &lt;NA&gt;  i     i        234   390  2760  3060
+ 3    34 femme  &lt;NA&gt;  ɪ     I        234   468  2330  2930
+ 4    34 femme  &lt;NA&gt;  ɪ     I        205   410  2380  2950
+ 5    34 femme  &lt;NA&gt;  ɛ     E        190   550  2200  2880
+ 6    34 femme  &lt;NA&gt;  ɛ     E        191   570  2100  3040
+ 7    34 femme  &lt;NA&gt;  æ     {        200   800  1980  2810
+ 8    34 femme  &lt;NA&gt;  æ     {        192   860  1920  2850
+ 9    34 femme  &lt;NA&gt;  ʌ     V        227   635  1200  3250
+10    34 femme  &lt;NA&gt;  ʌ     V        200   700  1200  3100
+# ℹ 850 more rows</code></pre>
+</div>
+</div>
+<p><code>quantile</code> est une autre fonction qu’on applique souvent dans la fonction <code>summarise</code>. On donne un argument <code>probs</code>, qui est un nombre entre 0 et 1. Le résultat est la valeur pour laquelle <code>probs</code> pour cent des données sont inférieures et <code>1-probs</code> pour cent des données sont supérieures. Par example, <code>quantile(f1, probs=0.5)</code> donne la même chose que la fonction <code>median()</code>. Dans le code ci-dessous, créez un tableau avec une colonne <code>f1_q1</code> qui donne le quantile avec probabilité 0.25 selon chaque symbole API.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>phone <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(api) <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">f1_q1 =</span> <span class="fu">quantile</span>(f1, <span class="at">probs=</span><span class="fl">0.25</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 2
+   api   f1_q1
+   &lt;chr&gt; &lt;dbl&gt;
+ 1 i      260 
+ 2 u      310.
+ 3 æ      668.
+ 4 ɑ      724.
+ 5 ɔ      540 
+ 6 ɛ      525 
+ 7 ɜ˞     460 
+ 8 ɪ      398.
+ 9 ʊ      430 
+10 ʌ      630 </code></pre>
+</div>
+</div>
+<p>Continuez de créer les colonnes <code>f1_q1</code>, <code>f1_q2</code>, <code>f1_q3</code>, <code>f2_q1</code>, <code>f2_q2</code>, <code>f2_q3</code> avec les probs 0.25, 0.50 et 0.75. Sauvgardez les résultats dans un nouveau object <code>phone_quant</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>phone_quant <span class="ot">&lt;-</span> phone <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(api) <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">f1_q1 =</span> <span class="fu">quantile</span>(f1, <span class="at">probs=</span><span class="fl">0.25</span>),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">f1_q2 =</span> <span class="fu">quantile</span>(f1, <span class="at">probs=</span><span class="fl">0.50</span>),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">f1_q3 =</span> <span class="fu">quantile</span>(f1, <span class="at">probs=</span><span class="fl">0.75</span>),</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">f2_q1 =</span> <span class="fu">quantile</span>(f2, <span class="at">probs=</span><span class="fl">0.25</span>),</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">f2_q2 =</span> <span class="fu">quantile</span>(f2, <span class="at">probs=</span><span class="fl">0.50</span>),</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">f2_q3 =</span> <span class="fu">quantile</span>(f2, <span class="at">probs=</span><span class="fl">0.75</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>phone_quant</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 7
+   api   f1_q1 f1_q2 f1_q3 f2_q1 f2_q2 f2_q3
+   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 i      260   300   337. 2305  2700  2872.
+ 2 u      310.  350   400   808.  952. 1092.
+ 3 æ      668.  772.  940  1720  1935  2160 
+ 4 ɑ      724.  800   936. 1092. 1178. 1292.
+ 5 ɔ      540   584   660   820.  900  1000 
+ 6 ɛ      525   580.  640  1870  2200  2440 
+ 7 ɜ˞     460   506   544  1350  1515  1706.
+ 8 ɪ      398.  427   475. 2000  2308. 2584.
+ 9 ʊ      430   462   500  1000  1120  1274.
+10 ʌ      630   705   790. 1200  1335  1500 </code></pre>
+</div>
+</div>
+<p><strong>Pour aller plus loin</strong> Il y a une géométrie <code>geom_segment</code> qui a quatre esthétiques obligatoires: <code>x</code>, <code>xend</code>, <code>y</code> et <code>yend</code>. Cette géométrie crée des segments de ligne. Créez une visualisation des valeurs F1 et F2 en utilisant les quantiles.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>phone_quant <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x=</span>f2_q2, <span class="at">xend=</span>f2_q2, <span class="at">y=</span>f1_q1, <span class="at">yend=</span>f1_q3)) <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x=</span>f2_q1, <span class="at">xend=</span>f2_q3, <span class="at">y=</span>f1_q2, <span class="at">yend=</span>f1_q2)) <span class="sc">+</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x=</span>f2_q2 <span class="sc">-</span> <span class="dv">50</span>, <span class="at">y=</span>f1_q2 <span class="sc">-</span> <span class="dv">25</span>, <span class="at">label=</span>api)) <span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_reverse</span>() <span class="sc">+</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reverse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="les-modèles-statistiques" class="level2">
+<h2 class="anchored" data-anchor-id="les-modèles-statistiques">6. Les modèles statistiques</h2>
+<p>Télécharger les données avec le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>mots <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/keylog-mots.csv.bz2"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>mots</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 210,337 × 6
+   id                mot    char_mot dur_mot    d1    d2
+   &lt;chr&gt;             &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 R_00RbUqO7jXLDItP If            2   312.   928.  848.
+ 2 R_00RbUqO7jXLDItP I             1    80.2 1600. 1520 
+ 3 R_00RbUqO7jXLDItP could         5  1576.  2168. 2088.
+ 4 R_00RbUqO7jXLDItP choose        6   945.   976.  904.
+ 5 R_00RbUqO7jXLDItP to            2   200.   930.  849.
+ 6 R_00RbUqO7jXLDItP be            2   151    528.  456.
+ 7 R_00RbUqO7jXLDItP any           3   440.   264   168.
+ 8 R_00RbUqO7jXLDItP animal        6  1560    976.  888 
+ 9 R_00RbUqO7jXLDItP for           3   264.   248   176.
+10 R_00RbUqO7jXLDItP one           3   312   1120. 1048.
+# ℹ 210,327 more rows</code></pre>
+</div>
+</div>
+<p>Creéz un object <code>mots_sub</code> de <code>mot</code> qui ne contient que les mots “the” et “and”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mots_sub <span class="ot">&lt;-</span> mots <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mot <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"the"</span>, <span class="st">"and"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Faites un «test de Student» qui teste la différence de durée entre taper “the” et taper “and”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(dur_mot <span class="sc">~</span> mot, <span class="at">data =</span> mots_sub)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Welch Two Sample t-test
+
+data:  dur_mot by mot
+t = 5.737, df = 11711, p-value = 9.875e-09
+alternative hypothesis: true difference in means between group and and group the is not equal to 0
+95 percent confidence interval:
+ 30.80760 62.78572
+sample estimates:
+mean in group and mean in group the 
+         399.9284          353.1317 </code></pre>
+</div>
+</div>
+<p>Faites un «régression linéaire» qui prédit la durée d’un mot en fonction de sa longueur en caractères.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(dur_mot <span class="sc">~</span> char_mot, <span class="at">data =</span> mots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = dur_mot ~ char_mot, data = mots)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+ -11151    -851    -236     268 2575323 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -1154.388     34.892  -33.09   &lt;2e-16 ***
+char_mot      557.574      6.727   82.89   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 8453 on 210335 degrees of freedom
+Multiple R-squared:  0.03163,   Adjusted R-squared:  0.03162 
+F-statistic:  6870 on 1 and 210335 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Interprétez les résultats. Sont-ils statistiquement significatifs ?</p>
+</section>
+<section id="plusieurs-tableaux" class="level2">
+<h2 class="anchored" data-anchor-id="plusieurs-tableaux">7. Plusieurs tableaux</h2>
+<p>Télécharger les données avec le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>meta <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/keylog-meta.csv.bz2"</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>meta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 823 × 4
+   id                  age lang    cefr 
+   &lt;chr&gt;             &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;
+ 1 R_2EGIsZARLydD3Uc    25 Italian C1/C2
+ 2 R_1obCaysaZCWZXoG    22 Spanish B1/B2
+ 3 R_3fqTek829k38iCk    22 Polish  B1/B2
+ 4 R_brxD7Q5ZnPW8Gn7    43 English C1/C2
+ 5 R_1k1RE78cBbZyZMA    23 Polish  B1/B2
+ 6 R_1NwuZMzRkVIR0WT    32 English C1/C2
+ 7 R_2t8LOS9nQDBQPA8    24 Spanish C1/C2
+ 8 R_239Q0X5YLwB7U6Z    28 English C1/C2
+ 9 R_10xbkjEmnsusfb1    32 Polish  B1/B2
+10 R_10CbLBzAnYKgWxB    21 Polish  B1/B2
+# ℹ 813 more rows</code></pre>
+</div>
+</div>
+<p>Télécharger un autre tableau avec :</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>langs <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/langs.csv"</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>langs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 2
+  lang       groupe    
+  &lt;chr&gt;      &lt;chr&gt;     
+1 Polish     slaves    
+2 English    germanique
+3 German     germanique
+4 Greek      hellénique
+5 French     romane    
+6 Italian    romane    
+7 Portuguese romane    
+8 Spanish    romane    </code></pre>
+</div>
+</div>
+<p>Combinez les données <code>meta</code> et <code>langs</code> à l’aide de la fonction <code>left_join</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>meta <span class="sc">|&gt;</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(langs, <span class="at">by =</span> <span class="st">"lang"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 823 × 5
+   id                  age lang    cefr  groupe    
+   &lt;chr&gt;             &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;     
+ 1 R_2EGIsZARLydD3Uc    25 Italian C1/C2 romane    
+ 2 R_1obCaysaZCWZXoG    22 Spanish B1/B2 romane    
+ 3 R_3fqTek829k38iCk    22 Polish  B1/B2 slaves    
+ 4 R_brxD7Q5ZnPW8Gn7    43 English C1/C2 germanique
+ 5 R_1k1RE78cBbZyZMA    23 Polish  B1/B2 slaves    
+ 6 R_1NwuZMzRkVIR0WT    32 English C1/C2 germanique
+ 7 R_2t8LOS9nQDBQPA8    24 Spanish C1/C2 romane    
+ 8 R_239Q0X5YLwB7U6Z    28 English C1/C2 germanique
+ 9 R_10xbkjEmnsusfb1    32 Polish  B1/B2 slaves    
+10 R_10CbLBzAnYKgWxB    21 Polish  B1/B2 slaves    
+# ℹ 813 more rows</code></pre>
+</div>
+</div>
+<p>Comme décrit dans les notes, combinez <code>mots</code> et <code>meta</code>. Puis, combinez avec <code>langs</code> et calculez la médiane de <code>d1</code>. Sortez les lignes par les médianes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(langs, <span class="at">by =</span> <span class="st">"lang"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(groupe) <span class="sc">|&gt;</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mu =</span> <span class="fu">median</span>(d1)) <span class="sc">|&gt;</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mu))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 2
+  groupe        mu
+  &lt;chr&gt;      &lt;dbl&gt;
+1 hellénique  608.
+2 slaves      520 
+3 romane      496.
+4 germanique  436 </code></pre>
+</div>
+</div>
+</section>
+<section id="fenêtres-glissantes" class="level2">
+<h2 class="anchored" data-anchor-id="fenêtres-glissantes">8. Fenêtres glissantes</h2>
+<p>Télécharger les données avec le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>touches <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/keylog-touches.csv.bz2"</span>, <span class="at">na=</span><span class="st">"NA"</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>touches</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,145,051 × 7
+   id                    t0     t1   dur dur_apres touche code 
+   &lt;chr&gt;              &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;
+ 1 R_00RbUqO7jXLDItP 20914. 20978.  64.4      80.1 "I"    KeyI 
+ 2 R_00RbUqO7jXLDItP 21146. 21226.  80.1      55.8 "f"    KeyF 
+ 3 R_00RbUqO7jXLDItP 21234. 21290.  55.8      80.2 ""     Space
+ 4 R_00RbUqO7jXLDItP 22074. 22154.  80.2      88.2 "I"    KeyI 
+ 5 R_00RbUqO7jXLDItP 22306. 22394.  88.2      64.3 ""     Space
+ 6 R_00RbUqO7jXLDItP 23674. 23739.  64.3      56.1 "c"    KeyC 
+ 7 R_00RbUqO7jXLDItP 23818. 23874.  56.1      46.6 "o"    KeyO 
+ 8 R_00RbUqO7jXLDItP 24044. 24090.  46.6      64   "u"    KeyU 
+ 9 R_00RbUqO7jXLDItP 25066. 25130.  64        79.8 "l"    KeyL 
+10 R_00RbUqO7jXLDItP 25170. 25250   79.8      72.3 "d"    KeyD 
+# ℹ 1,145,041 more rows</code></pre>
+</div>
+</div>
+<p>Utilisez la fonction <code>lead</code> de creer un nouvelle colonne <code>space_apres</code> qui indique si le prochain touche et un espace. Puis, utilisez <code>filter</code> pour sélectionner les lignes qui ne sont pas des espaces elle-mêmes. Calculez la durée médiane d’une frappe selon la présence d’un espace après celui-ci.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>touches <span class="sc">|&gt;</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">space_apres =</span> <span class="fu">lead</span>(code) <span class="sc">==</span> <span class="st">"Space"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(code <span class="sc">!=</span> <span class="st">"Space"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(space_apres)) <span class="sc">|&gt;</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(space_apres) <span class="sc">|&gt;</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">dur_moyenne =</span> <span class="fu">median</span>(dur_apres)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  space_apres dur_moyenne
+  &lt;lgl&gt;             &lt;dbl&gt;
+1 FALSE              75.1
+2 TRUE               79  </code></pre>
+</div>
+</div>
+</section>
+<section id="chaînes-de-caractères" class="level2">
+<h2 class="anchored" data-anchor-id="chaînes-de-caractères">9. Chaînes de caractères</h2>
+<p>Télécharger les données avec le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>noms <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/lexique_noms.csv"</span>)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>noms</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 27,318 × 3
+   lemme genre  freq
+   &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt;
+ 1 homme m     1399.
+ 2 jour  m     1342.
+ 3 temps m     1289.
+ 4 oeil  m     1235.
+ 5 fois  f     1140 
+ 6 chose f     1058.
+ 7 peu   m     1023.
+ 8 femme f      996.
+ 9 heure f      924.
+10 tête  f      923.
+# ℹ 27,308 more rows</code></pre>
+</div>
+</div>
+<p>Utilisez la fonction <code>stri_extract</code> pour créer une nouvelle colonne <code>ter</code> qui a le dernier caractère de chaque mot. Calculez la proportion de noms féminins pour chaque lettre terminale, filtrez en fonction des lettres comportant au moins 10 mots et classez les résultats par ordre décroissant de la proportion de noms féminins.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>noms <span class="sc">|&gt;</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ter =</span> <span class="fu">stri_extract</span>(lemme, <span class="at">regex=</span><span class="st">"</span><span class="sc">\\</span><span class="st">w</span><span class="sc">\\</span><span class="st">Z"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ter) <span class="sc">|&gt;</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">prop_f =</span> <span class="fu">mean</span>(genre <span class="sc">==</span> <span class="st">"f"</span>),</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(prop_f))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 24 × 3
+   ter   prop_f     n
+   &lt;chr&gt;  &lt;dbl&gt; &lt;int&gt;
+ 1 é     0.675   1233
+ 2 e     0.625  11635
+ 3 n     0.529   3507
+ 4 a     0.399    637
+ 5 w     0.182     11
+ 6 p     0.152     99
+ 7 y     0.149    121
+ 8 x     0.122    229
+ 9 s     0.0944  1102
+10 b     0.0943    53
+# ℹ 14 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="textgrid" class="level2">
+<h2 class="anchored" data-anchor-id="textgrid">10. TextGrid</h2>
+<p>Télécharger un fichier de rhapsodie avec le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>tg <span class="ot">&lt;-</span> <span class="fu">read_textgrid</span>(</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"donnees/rhapsodie/tg/Rhap-D0001-Pro.TextGrid"</span>,</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">encoding=</span><span class="st">"UTF-8"</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>tg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,546 × 10
+   file       tier_num tier_name tier_type tier_xmin tier_xmax  xmin  xmax text 
+   &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+ 1 Rhap-D000…        1 phone     Interval…         0      330.  0     2.23 _    
+ 2 Rhap-D000…        1 phone     Interval…         0      330.  2.23  2.27 e    
+ 3 Rhap-D000…        1 phone     Interval…         0      330.  2.27  2.42 s    
+ 4 Rhap-D000…        1 phone     Interval…         0      330.  2.42  2.45 k    
+ 5 Rhap-D000…        1 phone     Interval…         0      330.  2.45  2.48 @    
+ 6 Rhap-D000…        1 phone     Interval…         0      330.  2.48  2.54 v    
+ 7 Rhap-D000…        1 phone     Interval…         0      330.  2.54  2.65 u    
+ 8 Rhap-D000…        1 phone     Interval…         0      330.  2.65  2.68 p    
+ 9 Rhap-D000…        1 phone     Interval…         0      330.  2.68  2.74 u    
+10 Rhap-D000…        1 phone     Interval…         0      330.  2.74  2.82 R    
+# ℹ 10,536 more rows
+# ℹ 1 more variable: annotation_num &lt;int&gt;</code></pre>
+</div>
+</div>
+<p>Créez un object <code>locuteur</code> qui ne contient que le «tier» “locuteur”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>locuteur <span class="ot">&lt;-</span> tg <span class="sc">|&gt;</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(tier_name <span class="sc">==</span> <span class="st">"locuteur"</span>) </span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>locuteur</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 91 × 10
+   file       tier_num tier_name tier_type tier_xmin tier_xmax  xmin  xmax text 
+   &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+ 1 Rhap-D000…        9 locuteur  Interval…         0      330.  0     9.92 $L1  
+ 2 Rhap-D000…        9 locuteur  Interval…         0      330.  9.92 11.0  $L2  
+ 3 Rhap-D000…        9 locuteur  Interval…         0      330. 11.0  11.6  $L2-…
+ 4 Rhap-D000…        9 locuteur  Interval…         0      330. 11.6  16.9  $L2  
+ 5 Rhap-D000…        9 locuteur  Interval…         0      330. 16.9  18.2  $L2-…
+ 6 Rhap-D000…        9 locuteur  Interval…         0      330. 18.2  21.1  $L2  
+ 7 Rhap-D000…        9 locuteur  Interval…         0      330. 21.1  21.9  $L2-…
+ 8 Rhap-D000…        9 locuteur  Interval…         0      330. 21.9  36.9  $L2  
+ 9 Rhap-D000…        9 locuteur  Interval…         0      330. 36.9  37.5  $L3-…
+10 Rhap-D000…        9 locuteur  Interval…         0      330. 37.5  38.3  $L3  
+# ℹ 81 more rows
+# ℹ 1 more variable: annotation_num &lt;int&gt;</code></pre>
+</div>
+</div>
+<p>Faites un sommaire qui compter les nombre de lignes pour chaque valeur de locuteur.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>locuteur <span class="sc">|&gt;</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(text) <span class="sc">|&gt;</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 2
+  text        n
+  &lt;chr&gt;   &lt;int&gt;
+1 $L1        12
+2 $L1-$L2    10
+3 $L1-$L3     1
+4 $L2        28
+5 $L2-$L1    11
+6 $L2-$L3     6
+7 $L3        10
+8 $L3-$L1     4
+9 $L3-$L2     9</code></pre>
+</div>
+</div>
+<p>En utilisant la fonction <code>stri_count</code>, créez une nouvelle colonne <code>locuteur_nombre</code> dans locuteur qui compte le nombre des signes “$”. Enregistrez les résultats à l’aide du symbole fléché</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>locuteur <span class="ot">&lt;-</span> locuteur <span class="sc">|&gt;</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">locuteur_nombre =</span> <span class="fu">stri_count</span>(text, <span class="at">fixed =</span> <span class="st">"$"</span>))</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>locuteur</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 91 × 11
+   file       tier_num tier_name tier_type tier_xmin tier_xmax  xmin  xmax text 
+   &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+ 1 Rhap-D000…        9 locuteur  Interval…         0      330.  0     9.92 $L1  
+ 2 Rhap-D000…        9 locuteur  Interval…         0      330.  9.92 11.0  $L2  
+ 3 Rhap-D000…        9 locuteur  Interval…         0      330. 11.0  11.6  $L2-…
+ 4 Rhap-D000…        9 locuteur  Interval…         0      330. 11.6  16.9  $L2  
+ 5 Rhap-D000…        9 locuteur  Interval…         0      330. 16.9  18.2  $L2-…
+ 6 Rhap-D000…        9 locuteur  Interval…         0      330. 18.2  21.1  $L2  
+ 7 Rhap-D000…        9 locuteur  Interval…         0      330. 21.1  21.9  $L2-…
+ 8 Rhap-D000…        9 locuteur  Interval…         0      330. 21.9  36.9  $L2  
+ 9 Rhap-D000…        9 locuteur  Interval…         0      330. 36.9  37.5  $L3-…
+10 Rhap-D000…        9 locuteur  Interval…         0      330. 37.5  38.3  $L3  
+# ℹ 81 more rows
+# ℹ 2 more variables: annotation_num &lt;int&gt;, locuteur_nombre &lt;int&gt;</code></pre>
+</div>
+</div>
+<p>Calculez la durée totale selon chaque nombre de locuteur.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>locuteur <span class="sc">|&gt;</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(locuteur_nombre) <span class="sc">|&gt;</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">duree =</span> <span class="fu">sum</span>(xmax <span class="sc">-</span> xmin)</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  locuteur_nombre duree
+            &lt;int&gt; &lt;dbl&gt;
+1               1 274. 
+2               2  55.7</code></pre>
+</div>
+</div>
+</section>
+<section id="programmer" class="level2">
+<h2 class="anchored" data-anchor-id="programmer">11. Programmer</h2>
+<p>Le code ci-dessous crée un objet répertoriant tous les fichiers contenant des dialogues tirés de Rhapsodie.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>dir_nom <span class="ot">&lt;-</span> <span class="st">"donnees/rhapsodie/tg/"</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">dir</span>(dir_nom, <span class="at">pattern=</span><span class="st">"TextGrid$"</span>)</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d[<span class="fu">stri_sub</span>(d, <span class="dv">1</span>, <span class="dv">6</span>) <span class="sc">==</span> <span class="st">"Rhap-D"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>En modifiant le code ci-dessous, enregistrez les informations relatives aux locuteurs de chaque fichier, y compris le nombre de locuteurs dans chaque point de données.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">"vector"</span>, <span class="fu">length</span>(d))</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="fu">seq_along</span>(d)) {</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  tg <span class="ot">&lt;-</span> <span class="fu">read_textgrid</span>(<span class="fu">file.path</span>(dir_nom, d[j]), <span class="at">encoding=</span><span class="st">"UTF-8"</span>)</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>  tg<span class="sc">$</span>id <span class="ot">&lt;-</span> j</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ↓↓↓ cette partie ci-dessous fonctionne de traiter une seule</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ↓↓↓ fiche ; vous pouvez la changer </span></span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>  locuteur <span class="ot">&lt;-</span> tg <span class="sc">|&gt;</span></span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(tier_name <span class="sc">==</span> <span class="st">"locuteur"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">locuteur_nombre =</span> <span class="fu">stri_count</span>(text, <span class="at">fixed =</span> <span class="st">"$"</span>))</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> locuteur</span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ↑↑↑</span></span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>  df[[j]] <span class="ot">&lt;-</span> res</span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(df)</span>
+<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,260 × 12
+   file       tier_num tier_name tier_type tier_xmin tier_xmax  xmin  xmax text 
+   &lt;chr&gt;         &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+ 1 Rhap-D000…        9 locuteur  Interval…         0      330.  0     9.92 $L1  
+ 2 Rhap-D000…        9 locuteur  Interval…         0      330.  9.92 11.0  $L2  
+ 3 Rhap-D000…        9 locuteur  Interval…         0      330. 11.0  11.6  $L2-…
+ 4 Rhap-D000…        9 locuteur  Interval…         0      330. 11.6  16.9  $L2  
+ 5 Rhap-D000…        9 locuteur  Interval…         0      330. 16.9  18.2  $L2-…
+ 6 Rhap-D000…        9 locuteur  Interval…         0      330. 18.2  21.1  $L2  
+ 7 Rhap-D000…        9 locuteur  Interval…         0      330. 21.1  21.9  $L2-…
+ 8 Rhap-D000…        9 locuteur  Interval…         0      330. 21.9  36.9  $L2  
+ 9 Rhap-D000…        9 locuteur  Interval…         0      330. 36.9  37.5  $L3-…
+10 Rhap-D000…        9 locuteur  Interval…         0      330. 37.5  38.3  $L3  
+# ℹ 1,250 more rows
+# ℹ 3 more variables: annotation_num &lt;int&gt;, id &lt;int&gt;, locuteur_nombre &lt;int&gt;</code></pre>
+</div>
+</div>
+<p>Calculez la durée totale pour chaque nombre d’intervenants dans l’ensemble de la collection.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(locuteur_nombre) <span class="sc">|&gt;</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">duree =</span> <span class="fu">sum</span>(xmax <span class="sc">-</span> xmin)</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  locuteur_nombre   duree
+            &lt;int&gt;   &lt;dbl&gt;
+1               0    3.96
+2               1 6848.  
+3               2  422.  </code></pre>
+</div>
+</div>
+</section>
+<section id="données-audio" class="level2">
+<h2 class="anchored" data-anchor-id="données-audio">12. Données audio</h2>
+<p>Télécharger un fichier de format «wav» avec le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">readWave</span>(<span class="st">"donnees/phrase.wav"</span>)</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>snd <span class="ot">&lt;-</span> <span class="fu">makesound</span>(w<span class="sc">@</span>left, <span class="at">fs =</span> w<span class="sc">@</span>samp.rate)</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>snd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+      Sound Object
+
+   Read from file:         w@left.wav
+   Sampling frequency:     44100  Hz
+   Duration:               2844.966  ms
+   Number of Samples:      125463 </code></pre>
+</div>
+</div>
+<p>Créez un ensemble de données <code>formants</code> à l’aide de la fonction <code>formanttrack</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>formants <span class="ot">&lt;-</span> <span class="fu">formanttrack</span>(snd, <span class="at">fs =</span> fs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Convertissez les données formants en tibble.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>formants <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(formants)</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>formants</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 383 × 6
+    time    f1    f2    f3    f4    f5
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1  30.1  565. 1454. 2295. 3097. 3870.
+ 2  40.1 2092. 3018. 3823. 4607.    0 
+ 3 100.     0     0     0     0     0 
+ 4 200.  1891. 2600. 3983. 4507.    0 
+ 5 205.   219. 1892. 2606. 3988. 4473.
+ 6 210.   266. 1961. 2540. 3998. 4429.
+ 7 215.   306. 1944. 2512. 3980. 4462.
+ 8 220.   311. 1881. 2504. 3983. 4486.
+ 9 225.   299. 1870. 2521. 3976. 4508.
+10 230.   292. 1878. 2539. 3966. 4515.
+# ℹ 373 more rows</code></pre>
+</div>
+</div>
+<p>J’ai utilisé Praat pour localiser la première voyelle. Elle apparaît entre 300 et 350 millisecondes. Visualisez toutes les valeurs de formants de cette voyelle (un /a/) en utilisant le code similaire des premières sections.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>formants <span class="sc">|&gt;</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time <span class="sc">&gt;</span> <span class="dv">300</span> <span class="sc">&amp;</span> time <span class="sc">&lt;</span> <span class="dv">350</span>) <span class="sc">|&gt;</span></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(f2, f1)) <span class="sc">+</span></span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_reverse</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">500</span>, <span class="dv">3500</span>)) <span class="sc">+</span></span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reverse</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">250</span>, <span class="dv">1400</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="analyse-grammaticale" class="level2">
+<h2 class="anchored" data-anchor-id="analyse-grammaticale">13. Analyse grammaticale</h2>
+<p>Télécharger les données avec le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>wikifr <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/wiki_parsed.csv.bz2"</span>)</span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>wikifr</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,431,081 × 11
+   doc_id           sid   tid token lemma pos   xpos  dep   dep_head head  morph
+   &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;
+ 1 Arabie saoudi…     1     1 L     l     NOUN  NOUN  nsubj       10 mona… &lt;NA&gt; 
+ 2 Arabie saoudi…     1     2 ,     ,     PUNCT PUNCT punct        1 L     &lt;NA&gt; 
+ 3 Arabie saoudi…     1     3 en    en    ADP   ADP   case         4 forme &lt;NA&gt; 
+ 4 Arabie saoudi…     1     4 forme forme NOUN  NOUN  nmod         1 L     Gend…
+ 5 Arabie saoudi…     1     5 long… long  ADJ   ADJ   amod         4 forme Gend…
+ 6 Arabie saoudi…     1     6 le    le    DET   DET   det         10 mona… Defi…
+ 7 Arabie saoudi…     1     7 ,     ,     PUNCT PUNCT punct       10 mona… &lt;NA&gt; 
+ 8 Arabie saoudi…     1     8 est   être  AUX   AUX   cop         10 mona… Mood…
+ 9 Arabie saoudi…     1     9 une   un    DET   DET   det         10 mona… Defi…
+10 Arabie saoudi…     1    10 mona… mona… NOUN  NOUN  ROOT         0 ROOT  Gend…
+# ℹ 2,431,071 more rows</code></pre>
+</div>
+</div>
+<p>Sélectionnez uniquement les lignes dont la relation de dépendance (<code>dep</code>) est égale à “det” (déterminant). Sélectionnez uniquement celles dont les lemmes commencent par “le” et “un”. Ensuite, en fonction du mot principal (<code>head</code>), résumez la proportion moyenne de lemmes égale à “le”. Filtrez uniquement les mots principaux qui apparaissent au moins 600 fois et triez les résultats par ordre croissant.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>wikifr <span class="sc">|&gt;</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(dep <span class="sc">==</span> <span class="st">"det"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(lemma <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"le"</span>, <span class="st">"un"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(head) <span class="sc">|&gt;</span></span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">prop_le =</span> <span class="fu">mean</span>(lemma <span class="sc">==</span> <span class="st">"le"</span>),</span>
+<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
+<span id="cb69-8"><a href="#cb69-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb69-9"><a href="#cb69-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">600</span>) <span class="sc">|&gt;</span></span>
+<span id="cb69-10"><a href="#cb69-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(prop_le))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 15 × 3
+   head    prop_le     n
+   &lt;chr&gt;     &lt;dbl&gt; &lt;int&gt;
+ 1 fin       0.981  1079
+ 2 suite     0.968   968
+ 3 année     0.957   789
+ 4 ville     0.945  1289
+ 5 commune   0.939   979
+ 6 époque    0.919   607
+ 7 guerre    0.918   661
+ 8 nom       0.918   645
+ 9 région    0.914   709
+10 années    0.871   821
+11 place     0.778   720
+12 période   0.756   620
+13 fois      0.701   916
+14 «         0.654  1359
+15 partie    0.502   819</code></pre>
+</div>
+</div>
+</section>
+<section id="acp-umap" class="level2">
+<h2 class="anchored" data-anchor-id="acp-umap">14. ACP + UMAP</h2>
+<p>Télécharger les données avec le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>pays <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/pays.csv"</span>)</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>pays</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 187 × 5
+   pays        code2 code3 region    sous_region       
+   &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;             
+ 1 Afghanistan AF    AFG   Asie      Asie du Sud       
+ 2 Albanie     AL    ALB   Europe    Europe du Sud     
+ 3 Algérie     DZ    DZA   Afrique   Afrique du Nord   
+ 4 Allemagne   DE    DEU   Europe    Europe occidentale
+ 5 Andorre     AD    AND   Europe    Europe du Sud     
+ 6 Angola      AO    AGO   Afrique   Afrique centrale  
+ 7 Anguilla    AI    AIA   Amériques Caraïbes          
+ 8 Argentine   AR    ARG   Amériques Amérique du Sud   
+ 9 Arménie     AM    ARM   Asie      Asie occidentale  
+10 Aruba       AW    ABW   Amériques Caraïbes          
+# ℹ 177 more rows</code></pre>
+</div>
+</div>
+<p>Télécharger les plongements avec :</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>embed <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"donnees/fasttext_embed.rds"</span>)</span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">match</span>(pays<span class="sc">$</span>pays, <span class="fu">rownames</span>(embed))</span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> embed[idx, ]</span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 187 300</code></pre>
+</div>
+</div>
+<p>Creéz les ACP et les ajoutez à l’objet <code>pays</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>apc <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(X, <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale. =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>pays<span class="sc">$</span>apc1 <span class="ot">&lt;-</span> apc<span class="sc">$</span>x[, <span class="dv">1</span>]</span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>pays<span class="sc">$</span>apc2 <span class="ot">&lt;-</span> apc<span class="sc">$</span>x[, <span class="dv">2</span>]</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>pays</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 187 × 7
+   pays        code2 code3 region    sous_region           apc1   apc2
+   &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;                &lt;dbl&gt;  &lt;dbl&gt;
+ 1 Afghanistan AF    AFG   Asie      Asie du Sud          2.45   1.43 
+ 2 Albanie     AL    ALB   Europe    Europe du Sud        4.13  -4.87 
+ 3 Algérie     DZ    DZA   Afrique   Afrique du Nord      4.80   0.313
+ 4 Allemagne   DE    DEU   Europe    Europe occidentale   8.19  -6.66 
+ 5 Andorre     AD    AND   Europe    Europe du Sud        0.381 -6.73 
+ 6 Angola      AO    AGO   Afrique   Afrique centrale     2.11   3.25 
+ 7 Anguilla    AI    AIA   Amériques Caraïbes           -10.6   -4.88 
+ 8 Argentine   AR    ARG   Amériques Amérique du Sud      4.29  -2.75 
+ 9 Arménie     AM    ARM   Asie      Asie occidentale     2.71  -3.92 
+10 Aruba       AW    ABW   Amériques Caraïbes            -7.15  -4.14 
+# ℹ 177 more rows</code></pre>
+</div>
+</div>
+<p>Visualizez les ACP comme dans les notes avec couleur associé avec <code>region</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>pays <span class="sc">|&gt;</span></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(apc1, apc2)) <span class="sc">+</span></span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> region)) <span class="sc">+</span></span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">label =</span> pays, <span class="at">colour =</span> region),</span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">nudge_y =</span> <span class="sc">-</span><span class="fl">0.25</span></span>
+<span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-45-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Créez un nouveau tableau <code>europe</code> qui contient les pays en Europe. Puis, créez les APC, ajoutez au tableau et visualisez avec la colonne <code>sous_region</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>europe <span class="ot">&lt;-</span> pays <span class="sc">|&gt;</span></span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(region <span class="sc">==</span> <span class="st">"Europe"</span>)</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>embed <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"donnees/fasttext_embed.rds"</span>)</span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">match</span>(europe<span class="sc">$</span>pays, <span class="fu">rownames</span>(embed))</span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> embed[idx, ]</span>
+<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  47 300</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>apc <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(X, <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale. =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>europe<span class="sc">$</span>apc1 <span class="ot">&lt;-</span> apc<span class="sc">$</span>x[, <span class="dv">1</span>]</span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>europe<span class="sc">$</span>apc2 <span class="ot">&lt;-</span> apc<span class="sc">$</span>x[, <span class="dv">2</span>]</span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>europe <span class="sc">|&gt;</span></span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(apc1, apc2)) <span class="sc">+</span></span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> sous_region)) <span class="sc">+</span></span>
+<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
+<span id="cb80-9"><a href="#cb80-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">label =</span> pays, <span class="at">colour =</span> sous_region),</span>
+<span id="cb80-10"><a href="#cb80-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb80-11"><a href="#cb80-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">nudge_y =</span> <span class="sc">-</span><span class="fl">0.25</span></span>
+<span id="cb80-12"><a href="#cb80-12" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Créez les plongement UMAP et les ajoutez au tableau <code>europe</code>. Visulisez encore dans la même façon.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">umap</span>(X)</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>europe<span class="sc">$</span>umap1 <span class="ot">&lt;-</span> obj<span class="sc">$</span>layout[, <span class="dv">1</span>]</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>europe<span class="sc">$</span>umap2 <span class="ot">&lt;-</span> obj<span class="sc">$</span>layout[, <span class="dv">2</span>]</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>europe <span class="sc">|&gt;</span></span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(umap1, umap2)) <span class="sc">+</span></span>
+<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> sous_region)) <span class="sc">+</span></span>
+<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
+<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">label =</span> pays, <span class="at">colour =</span> sous_region),</span>
+<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">nudge_y =</span> <span class="sc">-</span><span class="fl">0.1</span></span>
+<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="modèles-prédictifs" class="level2">
+<h2 class="anchored" data-anchor-id="modèles-prédictifs">15. Modèles prédictifs</h2>
+<p>Télécharger les données avec le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>parse <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/polarity_parse.csv.bz2"</span>)</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>meta <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/polarity_meta.csv.bz2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Créez un object <code>X</code> comme dans les notes mais utilisez la colonne <code>pos</code> au lieu de <code>lemma</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> parse <span class="sc">|&gt;</span></span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">to_sparse</span>(doc_id, pos)</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 160000     16</code></pre>
+</div>
+</div>
+<p>Créez des objets <code>df_meta</code>, <code>ind_train</code> et <code>ind_valid</code> en utilisant le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>df_meta <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">doc_id =</span> <span class="fu">as.numeric</span>(<span class="fu">rownames</span>(X))) <span class="sc">|&gt;</span></span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"doc_id"</span>)</span>
+<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a>df_meta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 160,000 × 2
+   doc_id polarity
+    &lt;dbl&gt;    &lt;dbl&gt;
+ 1      0        0
+ 2      1        0
+ 3      2        0
+ 4      3        0
+ 5      4        1
+ 6      5        0
+ 7      6        1
+ 8      7        1
+ 9      8        1
+10      9        0
+# ℹ 159,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>ind_train <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">sample</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(X)), <span class="dv">10000</span>))</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>ind_valid <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(X)), ind_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Créez un modèle prédictif avec les données.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  X[ind_train,], df_meta<span class="sc">$</span>polarity[ind_train], <span class="at">family=</span><span class="st">"binomial"</span></span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Évaluez les taux de classification sur les données validations.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, <span class="at">newx=</span>X[ind_valid,], <span class="at">type =</span> <span class="st">"class"</span>)</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(pred <span class="sc">==</span> df_meta<span class="sc">$</span>polarity[ind_valid])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6159133</code></pre>
+</div>
+</div>
+<p>Créez une matrice de confusion.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">pred=</span>pred, <span class="at">y=</span>df_meta<span class="sc">$</span>polarity[ind_valid])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    y
+pred     0     1
+   0 49568 32780
+   1 24833 42819</code></pre>
+</div>
+</div>
+<p>Régardez les coefficients du modèle. Vous pouvez donner l’argument <code>s = model$lambda.1se</code> à la fonction <code>coef</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>cf <span class="ot">&lt;-</span> <span class="fu">coef</span>(model, <span class="at">s =</span> model<span class="sc">$</span>lambda<span class="fl">.1</span>se)</span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>cf <span class="ot">&lt;-</span> cf[cf[,<span class="dv">1</span>] <span class="sc">!=</span> <span class="dv">0</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>][<span class="sc">-</span><span class="dv">1</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>cf[<span class="fu">order</span>(cf[,<span class="dv">1</span>]),,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>14 x 1 sparse Matrix of class "dgCMatrix"
+      s=0.002934966
+INTJ  -1.1688783939
+SYM   -0.5414372573
+ADV   -0.0859389617
+SCONJ -0.0718171092
+NUM   -0.0643632430
+VERB  -0.0216020432
+X     -0.0180941782
+PUNCT -0.0084461177
+PRON  -0.0039273688
+ADP   -0.0009441389
+PROPN  0.0350494345
+ADJ    0.0351787932
+DET    0.0576269756
+CCONJ  0.0740959470</code></pre>
+</div>
+</div>
+</section>
+<section id="llm" class="level2">
+<h2 class="anchored" data-anchor-id="llm">16. LLM</h2>
+<p>Télécharger les données avec le code ci-dessous et créez les objets <code>X</code>, <code>df_meta</code>, <code>ind_train</code> et <code>ind_valid</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>llm <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/polarity_llm.csv.bz2"</span>)</span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>llm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 953 × 7
+   doc_id input                        polarity raw   conviction certain positif
+    &lt;dbl&gt; &lt;chr&gt;                           &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1     39 "Petit film amateur réalisé…        0 "{\"…          6       7       5
+ 2    132 "Une comédie romantique bie…        1 "{\"…          7       8       9
+ 3    618 "Le sujet est d'une sensibi…        1 "{\"…          9       9      10
+ 4    720 "Structure narrative classi…        0 "{\"…          8       7       2
+ 5    859 "Un film énigmatique dans s…        1 "{\"…          5       4       7
+ 6    989 "Fortunata n'a pas la vie f…        0 "{\"…          6       8       2
+ 7   1781 "j'ai vu les deux films et …        1 "{\"…          8       7       9
+ 8   1817 "Très déçue. Comme trop sou…        0 "{\"…          8       7       2
+ 9   1852 "Antonio Banderas s'investi…        0 "{\"…          9       9       1
+10   1982 "Mais qu est ce que c est n…        0 "{\"…          6       8       2
+# ℹ 943 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> parse <span class="sc">|&gt;</span></span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lemma =</span> <span class="fu">stri_trans_tolower</span>(lemma)) <span class="sc">|&gt;</span></span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lemma) <span class="sc">|&gt;</span></span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">&gt;</span> <span class="dv">200</span>) <span class="sc">|&gt;</span></span>
+<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">to_sparse</span>(doc_id, lemma)</span>
+<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a>df_meta <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">doc_id =</span> <span class="fu">as.numeric</span>(<span class="fu">rownames</span>(X))) <span class="sc">|&gt;</span></span>
+<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"doc_id"</span>)</span>
+<span id="cb97-8"><a href="#cb97-8" aria-hidden="true" tabindex="-1"></a>ind_train <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">sample</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(X)), <span class="dv">10000</span>))</span>
+<span id="cb97-9"><a href="#cb97-9" aria-hidden="true" tabindex="-1"></a>ind_valid <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(X)), ind_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Créez un modèle prédictif pour les valeurs <code>certain</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>X_nouv <span class="ot">&lt;-</span> X[<span class="fu">as.character</span>(llm<span class="sc">$</span>doc_id),]</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(X_nouv, llm<span class="sc">$</span>certain)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Régardez les coefficients du modèle.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>cf <span class="ot">&lt;-</span> <span class="fu">coef</span>(model, <span class="at">s =</span> model<span class="sc">$</span>lambda[<span class="dv">12</span>])</span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>cf <span class="ot">&lt;-</span> cf[cf[,<span class="dv">1</span>] <span class="sc">!=</span> <span class="dv">0</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>][<span class="sc">-</span><span class="dv">1</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>cf[<span class="fu">order</span>(cf[,<span class="dv">1</span>]),,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>23 x 1 sparse Matrix of class "dgCMatrix"
+            s=0.1556286
+jet       -1.069501e+00
+vieillot  -1.006177e+00
+euro      -9.973597e-01
+obséder   -8.847892e-01
+remarqu   -6.467856e-01
+inaperçu  -5.262346e-01
+vaste     -4.777187e-01
+camion    -4.625296e-01
+j.        -1.767389e-01
+liam      -1.332088e-01
+définitif -1.223710e-01
+document  -6.979123e-02
+ninja     -6.950074e-02
+pauvreté  -6.936393e-02
+tete      -6.366322e-02
+côtè      -5.873196e-02
+?         -3.036391e-02
+grain     -1.442076e-04
+neeson    -4.364034e-06
+aucun      5.749573e-02
+film       6.370499e-02
+acteur     1.136914e-01
+ridicule   2.119578e-01</code></pre>
+</div>
+</div>
+<p>Vous pouvez répéter avec les autres colonnes de <code>llm</code>.</p>
+</section>
+<section id="whisper" class="level2">
+<h2 class="anchored" data-anchor-id="whisper">17. Whisper</h2>
+<p>Télécharger les données avec le code ci-dessous.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>whisper_mots <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/whisper_mots.csv"</span>)</span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>whisper_mots</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 905 × 3
+   word     start   end
+   &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;
+ 1 C         0     0.32
+ 2 est       0.32  0.32
+ 3 pas       0.32  1.52
+ 4 mal       1.52  1.74
+ 5 disons    1.74  2.2 
+ 6 est       2.4   2.46
+ 7 ce        2.46  2.46
+ 8 que       2.46  2.48
+ 9 vous      2.48  2.66
+10 pourriez  2.66  3.34
+# ℹ 895 more rows</code></pre>
+</div>
+</div>
+<p>Nous allons étudier ce tableau dans section 19.</p>
+</section>
+<section id="plongement-de-textes" class="level2">
+<h2 class="anchored" data-anchor-id="plongement-de-textes">18. Plongement de textes</h2>
+<p>Télécharger les données avec le code ci-dessous et créez les objets <code>ind_train</code> et <code>ind_valid</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"donnees/polarity_embed.rds"</span>)</span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>ind_train <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">sample</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(X)), <span class="dv">700</span>))</span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>ind_valid <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(X)), ind_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Créez un modèle pour <code>certain</code> comme dans les notes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(</span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>  X[ind_train,], llm<span class="sc">$</span>certain[ind_train], <span class="at">alpha=</span><span class="dv">0</span></span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Éxecutez le code ci-dessous de créer des prédictions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">certain =</span> llm<span class="sc">$</span>certain[ind_valid],</span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">pred =</span> <span class="fu">as.numeric</span>(<span class="fu">predict</span>(model, <span class="at">newx=</span>X[ind_valid,], <span class="at">type =</span> <span class="st">"class"</span>))</span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 253 × 2
+   certain  pred
+     &lt;dbl&gt; &lt;dbl&gt;
+ 1       8  6.88
+ 2       2  6.72
+ 3       8  6.84
+ 4       4  6.49
+ 5       6  6.43
+ 6       8  6.31
+ 7       8  6.70
+ 8       8  7.95
+ 9       4  6.93
+10       8  7.03
+# ℹ 243 more rows</code></pre>
+</div>
+</div>
+<p>Visualiser la relation entre les valeurs <code>certain</code> et les prédictions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="fu">factor</span>(certain), pred))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atelier_exercices_files/figure-html/unnamed-chunk-62-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="alignement-des-textes" class="level2">
+<h2 class="anchored" data-anchor-id="alignement-des-textes">19. Alignement des textes</h2>
+<p>Télécharger les données avec le code ci-dessous et créer un tableau <code>tg_mots</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keep</span></span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>tg <span class="ot">&lt;-</span> <span class="fu">read_textgrid</span>(</span>
+<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"donnees/rhapsodie/tg/Rhap-D0001-Pro.TextGrid"</span>,</span>
+<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">encoding=</span><span class="st">"UTF-8"</span></span>
+<span id="cb108-5"><a href="#cb108-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb108-6"><a href="#cb108-6" aria-hidden="true" tabindex="-1"></a>tg_mots <span class="ot">&lt;-</span> tg <span class="sc">|&gt;</span></span>
+<span id="cb108-7"><a href="#cb108-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(tier_name <span class="sc">==</span> <span class="st">"words"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb108-8"><a href="#cb108-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(text <span class="sc">!=</span> <span class="st">"_"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb108-9"><a href="#cb108-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(text, xmin, xmax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Utiliser la fonction <code>alignement_des_textes</code> pour aligner <code>tg_mots</code> et <code>whisper_mots</code>. Sauvgarder les données dans un objet <code>df_comb</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>df_comb <span class="ot">&lt;-</span> <span class="fu">alignement_des_textes</span>(</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>  tg_mots,</span>
+<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a>  whisper_mots,</span>
+<span id="cb109-4"><a href="#cb109-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">col1 =</span> text,</span>
+<span id="cb109-5"><a href="#cb109-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">col2 =</span> word,</span>
+<span id="cb109-6"><a href="#cb109-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">suffix_y =</span> <span class="st">"_whisper"</span></span>
+<span id="cb109-7"><a href="#cb109-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb109-8"><a href="#cb109-8" aria-hidden="true" tabindex="-1"></a>df_comb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 597 × 8
+      id  id_y text          xmin  xmax word_whisper start_whisper end_whisper
+   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                &lt;dbl&gt;       &lt;dbl&gt;
+ 1     2     9 vous          2.48  2.65 vous                  2.48        2.66
+ 2     3    10 pourriez      2.65  3.30 pourriez              2.66        3.34
+ 3     4    11 décrire       3.48  4.32 décrire               3.34        4.2 
+ 4     6    12 les           5.73  5.88 les                   4.2         5.98
+ 5     7    13 déplacements  5.88  6.62 déplacements          5.98        6.52
+ 6     8    14 avec          6.62  6.88 avec                  6.52        6.88
+ 7     9    15 précision     6.88  7.48 précision             6.88        8.5 
+ 8    10    16 une           9.21  9.36 une                   9.14        9.48
+ 9    11    17 journée       9.36  9.92 journée               9.48        9.78
+10    16    22 on           10.8  11.0  on                   10.8        11.0 
+# ℹ 587 more rows</code></pre>
+</div>
+</div>
+<p>Terminez par calculer les differences moyenne de <code>xmin</code> et <code>xmax</code> pour les deux données. Vous pouvez ajouter la fonction <code>abs()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>df_comb <span class="sc">|&gt;</span></span>
+<span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb111-3"><a href="#cb111-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">diff_min =</span> xmin <span class="sc">-</span> start_whisper,</span>
+<span id="cb111-4"><a href="#cb111-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">diff_max =</span> xmax <span class="sc">-</span> end_whisper</span>
+<span id="cb111-5"><a href="#cb111-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb111-6"><a href="#cb111-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb111-7"><a href="#cb111-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">diff_min_moyenne =</span> <span class="fu">mean</span>(<span class="fu">abs</span>(diff_min)),</span>
+<span id="cb111-8"><a href="#cb111-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">diff_max_moyenne =</span> <span class="fu">mean</span>(<span class="fu">abs</span>(diff_max))   </span>
+<span id="cb111-9"><a href="#cb111-9" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  diff_min_moyenne diff_max_moyenne
+             &lt;dbl&gt;            &lt;dbl&gt;
+1            0.212            0.175</code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

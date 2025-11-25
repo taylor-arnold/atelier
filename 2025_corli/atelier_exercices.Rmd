@@ -1,0 +1,526 @@
+---
+title: "Exercices pour atelier : R pour la linguistique"
+date: "2025-11-23"
+format: 
+  html
+---
+
+```{r, message=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+## 2. Configuration 
+
+Vous devez exécuter le code ci-dessous pour vérifier, puis si nécessaire télécharger et charger, les packages nécessaires aux exercices.
+
+```{r, message=FALSE}
+source("funs.R")
+
+verifier_packages(c("tidyverse", "glmnet", "tuneR", "phonTools", "umap", "dtw", "udpipe", "readtextgrid", "stringi"))
+```
+
+Le code ci-dessous configure les paramètres nécessaires à notre travail.
+
+```{r, message=FALSE}
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_minimal())
+Sys.setenv(LANG = "fr")
+```
+
+## 3. Données tabulaires
+
+Dans le «bloc» de code ci-dessous, télécharchez des données
+`donnees/peterson_barney_voyelle_eng.csv` sauvegardez le tibble dans
+l'objet `phone` et  regardez les données. Comparez ce tableau avec le
+tableau figurant dans les notes.
+
+```{r, message=FALSE}
+
+```
+
+## 4. Visualiser
+
+Créez une visualisation de tibble `phone` de F2 et F1 dans la même forme que
+dans les notes, mais appliquez les couleur pour indiquer la groupe. Si vouz
+avez des problèmes avec les symboles sur votre ordinateur, utilisez la
+colonne `xsampa` au lieu d'API.
+
+```{r}
+
+```
+
+Creez un « boites à moustaches » (boxplot en anglais) pour les valeurs
+F1 selon les symboles API avec la géométrie `geom_boxplot`. Donnez simplement
+des esthétiques `x` et `y`. 
+
+```{r}
+
+```
+
+Posez vos questions si vous ne comprenez pas la signification de chaque partie
+d'un «boxplot» !
+
+Créez une visualization d'un «boxplot» comme ci-dessus, mais cette fois ajoutez
+une esthétique de la couleur associée à la colonne `groupe`. Faites attention
+aux résultats.
+
+```{r}
+
+```
+
+Copiez le code ci-dessus, puis remplacez l'estétique «colour» par «fill».
+
+```{r}
+
+```
+
+C'est quoi la différence entre «colour» et «fill» dans la grammaire des
+graphiques? 
+  
+## 5. Manipuler un tableau
+
+Sélectionnez les 5 lignes ayant les valeurs F1 les plus élevées.
+
+```{r}
+
+```
+
+Sélectionnez les 5 lignes ayant les valeurs F1 les plus basses.
+
+```{r}
+
+```
+
+Selectionez les lignes qui *ne sont pas* associées aux hommes en appliquons
+le symbole `!=` au lieu de `==`.
+
+```{r}
+
+```
+
+Créez de nouvelles variables qui donnent la différence entre F1 et F0 et
+entre F2 et F1. Elles sont parfois utiles pour comprendre les qualités
+perçues des voyelles.
+
+```{r}
+
+```
+
+`quantile` est une autre fonction qu'on applique souvent dans la fonction
+`summarise`. On donne un argument `probs`, qui est un nombre entre 0 et 1.
+Le résultat est la valeur pour laquelle `probs` pour cent des données sont inférieures et `1-probs` pour cent des données sont supérieures. Par example,
+`quantile(f1, probs=0.5)` donne la même chose que la fonction `median()`. Dans
+le code ci-dessous, créez un tableau avec une colonne `f1_q1` qui donne le
+quantile avec probabilité 0.25 selon chaque symbole API.
+
+```{r}
+
+```
+
+Continuez de créer les colonnes `f1_q1`, `f1_q2`, `f1_q3`, `f2_q1`, `f2_q2`, `f2_q3` avec les probs 0.25, 0.50 et 0.75. Sauvgardez les résultats dans un 
+nouveau object `phone_quant`. 
+
+```{r}
+
+```
+
+**Pour aller plus loin** Il y a une géométrie `geom_segment` qui a quatre
+esthétiques obligatoires: `x`, `xend`, `y` et `yend`. Cette géométrie crée des
+segments de ligne. Créez une visualisation des valeurs F1 et F2 en utilisant 
+les quantiles. 
+
+```{r}
+
+```
+
+## 6. Les modèles statistiques
+
+Télécharger les données avec le code ci-dessous.
+
+```{r, message=FALSE}
+mots <- read_csv2("donnees/keylog-mots.csv.bz2")
+mots
+```
+
+Creéz un object `mots_sub` de `mot` qui ne contient que les mots "the" et "and".
+
+```{r}
+
+```
+
+Faites un «test de Student» qui teste la différence de durée entre taper "the" et taper "and".
+
+```{r}
+
+```
+
+Faites un «régression linéaire» qui prédit la durée d'un mot en fonction de sa longueur en caractères.
+
+```{r}
+
+```
+
+Interprétez les résultats. Sont-ils statistiquement significatifs ?
+
+## 7. Plusieurs tableaux
+
+Télécharger les données avec le code ci-dessous.
+
+```{r, message=FALSE}
+
+```
+
+Télécharger un autre tableau avec :
+
+```{r}
+
+```
+
+Combinez les données `meta` et `langs` à l'aide de la fonction `left_join`.
+
+```{r}
+
+```
+
+Comme décrit dans les notes, combinez `mots` et `meta`. Puis, combinez avec `langs` et calculez la médiane de `d1`. Sortez les lignes par les médianes. 
+
+```{r}
+
+```
+
+## 8. Fenêtres glissantes
+
+Télécharger les données avec le code ci-dessous.
+
+```{r, message=FALSE}
+
+```
+
+Utilisez la fonction `lead` de creer un nouvelle colonne `space_apres` qui indique si le prochain touche et un espace. Puis, utilisez `filter` pour sélectionner les lignes qui ne sont pas des espaces elle-mêmes. Calculez la durée médiane d'une frappe selon la présence d'un espace après celui-ci.
+
+```{r}
+
+```
+
+## 9. Chaînes de caractères
+
+Télécharger les données avec le code ci-dessous.
+
+```{r, message=FALSE}
+
+```
+
+Utilisez la fonction `stri_extract` pour créer une nouvelle colonne `ter` qui a
+le dernier caractère de chaque mot. Calculez la proportion de noms féminins pour chaque lettre terminale, filtrez en fonction des lettres comportant au moins 10 mots et classez les résultats par ordre décroissant de la proportion de noms féminins.
+
+```{r}
+
+```
+
+## 10. TextGrid
+
+Télécharger un fichier de rhapsodie avec le code ci-dessous.
+
+```{r}
+tg <- read_textgrid(
+  "donnees/rhapsodie/tg/Rhap-D0001-Pro.TextGrid",
+  encoding="UTF-8"
+)
+tg
+```
+
+Créez un object `locuteur` qui ne contient que le «tier» "locuteur".
+
+```{r}
+
+```
+
+Faites un sommaire qui compter les nombre de lignes pour chaque valeur de
+locuteur.
+
+```{r}
+
+```
+
+En utilisant la fonction `stri_count`, créez une nouvelle colonne 
+`locuteur_nombre` dans locuteur qui compte le nombre des signes "$". Enregistrez les résultats à l'aide du symbole fléché 
+
+```{r}
+
+```
+
+Calculez la durée totale selon chaque nombre de locuteur.
+
+```{r}
+
+```
+
+## 11. Programmer
+
+Le code ci-dessous crée un objet répertoriant tous les fichiers contenant des dialogues tirés de Rhapsodie.
+
+```{r}
+dir_nom <- "donnees/rhapsodie/tg/"
+d <- dir(dir_nom, pattern="TextGrid$")
+d <- d[stri_sub(d, 1, 6) == "Rhap-D"]
+```
+
+En modifiant le code ci-dessous, enregistrez les informations relatives aux locuteurs de chaque fichier, y compris le nombre de locuteurs dans chaque point de données.
+
+```{r}
+
+```
+
+Calculez la durée totale pour chaque nombre d'intervenants dans l'ensemble de la collection.
+
+```{r}
+
+```
+
+## 12. Données audio
+
+Télécharger un fichier de format «wav» avec le code ci-dessous.
+
+```{r}
+w <- readWave("donnees/phrase.wav")
+snd <- makesound(w@left, fs = w@samp.rate)
+snd
+```
+
+Créez un ensemble de données `formants` à l'aide de la fonction `formanttrack`.
+
+```{r}
+
+```
+
+Convertissez les données formants en tibble.
+
+```{r}
+
+```
+
+J'ai utilisé Praat pour localiser la première voyelle. Elle apparaît entre 300 et 350 millisecondes. Visualisez toutes les valeurs de formants de cette voyelle (un /a/) en utilisant le code similaire des premières sections.
+
+```{r}
+
+```
+
+## 13. Analyse grammaticale
+
+Télécharger les données avec le code ci-dessous.
+
+```{r}
+wikifr <- read_csv2("donnees/wiki_parsed.csv.bz2")
+wikifr
+```
+
+Sélectionnez uniquement les lignes dont la relation de dépendance (`dep`) est égale à "det" (déterminant). Sélectionnez uniquement celles dont les lemmes commencent par "le" et "un". Ensuite, en fonction du mot principal (`head`), résumez la proportion moyenne de lemmes égale à "le". Filtrez uniquement les mots principaux qui apparaissent au moins 600 fois et triez les résultats par ordre croissant. 
+
+```{r}
+
+```
+
+## 14. ACP + UMAP
+
+Télécharger les données avec le code ci-dessous.
+
+```{r}
+pays <- read_csv2("donnees/pays.csv")
+pays
+```
+
+Télécharger les plongements avec :
+
+```{r}
+embed <- read_rds("donnees/fasttext_embed.rds")
+idx <- match(pays$pays, rownames(embed))
+X <- embed[idx, ]
+dim(X)
+```
+
+Creéz les ACP et les ajoutez à l'objet `pays`
+
+```{r}
+
+```
+
+Visualizez les ACP comme dans les notes avec couleur associé avec `region`.
+
+```{r}
+
+```
+
+Créez un nouveau tableau `europe` qui contient les pays en Europe. Puis, créez
+les APC, ajoutez au tableau et visualisez avec la colonne `sous_region`.
+
+```{r}
+
+```
+
+Créez les plongement UMAP et les ajoutez au tableau `europe`. Visulisez encore
+dans la même façon.
+
+```{r}
+
+```
+
+## 15. Modèles prédictifs
+
+Télécharger les données avec le code ci-dessous.
+
+```{r}
+parse <- read_csv2("donnees/polarity_parse.csv.bz2")
+meta <- read_csv2("donnees/polarity_meta.csv.bz2")
+```
+
+Créez un object `X` comme dans les notes mais utilisez la colonne `pos` au lieu
+de `lemma`.
+
+```{r}
+
+```
+
+Créez des objets `df_meta`, `ind_train` et `ind_valid` en utilisant le code ci-dessous.
+
+```{r}
+df_meta <- tibble(doc_id = as.numeric(rownames(X))) |>
+  left_join(meta, by = "doc_id")
+df_meta
+
+ind_train <- sort(sample(seq_len(nrow(X)), 10000))
+ind_valid <- setdiff(seq_len(nrow(X)), ind_train)
+```
+
+Créez un modèle prédictif avec les données.
+
+```{r}
+
+```
+
+Évaluez les taux de classification sur les données validations.
+
+```{r}
+
+```
+
+Créez une matrice de confusion.
+
+```{r}
+
+```
+
+Régardez les coefficients du modèle. Vous pouvez donner l'argument
+`s = model$lambda.1se` à la fonction `coef`.
+
+```{r}
+
+```
+
+## 16. LLM
+
+Télécharger les données avec le code ci-dessous et créez les objets `X`,
+`df_meta`, `ind_train` et `ind_valid`.
+
+```{r}
+llm <- read_csv2("donnees/polarity_llm.csv.bz2")
+llm
+
+X <- parse |>
+  mutate(lemma = stri_trans_tolower(lemma)) |>
+  group_by(lemma) |>
+  filter(n() > 200) |>
+  to_sparse(doc_id, lemma)
+df_meta <- tibble(doc_id = as.numeric(rownames(X))) |>
+  left_join(meta, by = "doc_id")
+ind_train <- sort(sample(seq_len(nrow(X)), 10000))
+ind_valid <- setdiff(seq_len(nrow(X)), ind_train)
+```
+
+Créez un modèle prédictif pour les valeurs `certain`.
+
+```{r}
+
+```
+
+Régardez les coefficients du modèle. 
+
+```{r}
+
+```
+
+Vous pouvez répéter avec les autres colonnes de `llm`.
+
+## 17. Whisper
+
+Télécharger les données avec le code ci-dessous.
+
+```{r}
+whisper_mots <- read_csv2("donnees/whisper_mots.csv")
+whisper_mots
+```
+
+Nous allons étudier ce tableau dans section 19.
+
+## 18. Plongement de textes
+
+Télécharger les données avec le code ci-dessous et créez les objets
+`ind_train` et `ind_valid`.
+
+```{r}
+X <- read_rds("donnees/polarity_embed.rds")
+ind_train <- sort(sample(seq_len(nrow(X)), 700))
+ind_valid <- setdiff(seq_len(nrow(X)), ind_train)
+```
+
+Créez un modèle pour `certain` comme dans les notes.
+
+```{r}
+
+```
+
+Éxecutez le code ci-dessous de créer des prédictions.
+
+```{r}
+df <- tibble(
+  certain = llm$certain[ind_valid],
+  pred = as.numeric(predict(model, newx=X[ind_valid,], type = "class"))
+)
+df
+```
+
+Visualiser la relation entre les valeurs `certain` et les prédictions. 
+
+```{r}
+
+```
+
+
+## 19. Alignement des textes
+
+Télécharger les données avec le code ci-dessous et créer un tableau
+`tg_mots`.
+
+```{r}
+tg <- read_textgrid(
+  "donnees/rhapsodie/tg/Rhap-D0001-Pro.TextGrid",
+  encoding="UTF-8"
+)
+tg_mots <- tg |>
+  filter(tier_name == "words") |>
+  filter(text != "_") |>
+  select(text, xmin, xmax)
+```
+
+Utiliser la fonction `alignement_des_textes` pour aligner `tg_mots` et
+`whisper_mots`. Sauvgarder les données dans un objet `df_comb`.
+
+```{r}
+
+```
+
+Terminez par calculer les differences moyenne de `xmin` et `xmax` pour les deux
+données. Vous pouvez ajouter la fonction `abs()`.
+
+```{r}
+
+```

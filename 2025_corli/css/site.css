@@ -60,3 +60,50 @@ li {
   width: auto !important;
 }
 
+.buttons-container {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.0rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.button.is-primary {
+  background-color: #94cac0;
+}
+
+.button.is-primary:hover {
+  background-color: #6daba0;
+}
+
+.button.is-info {
+  background-color: #d18da1;
+}
+
+.button.is-info:hover {
+  background-color: #b3657c;
+}
+
+.button .icon {
+  margin-right: 0.5rem; 
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  padding-left: 1rem;
+  font-weight: 400;
+}
+

@@ -6,7 +6,7 @@ author:
     orcid: "0000-0003-0576-0669"
     url: "https://taylorarnold.org/"
 
-date: "2025-11-16"
+date: "2025-11-23"
 format:
   html:
 
@@ -17,6 +17,8 @@ format:
     code-copy: hover
     link-external-newwindow: true
     lightbox: true
+    bibliography: references.bib
+    csl: vancouver.csl
 
 lang: fr
 language: 
@@ -29,31 +31,20 @@ language:
 #| echo: false
 Sys.setenv(LANG = "fr")
 
-library(dtw)
-library(glmnet)
-library(httr)
-library(jsonlite)
-library(phonTools)
-library(readtextgrid)
-library(slider)
-library(stringi)
-library(tidyverse)
-library(tidytext)
-library(tuneR)
-library(udpipe)
-library(umap)
-library(xgboost)
-
 source("funs.R")
 set.seed(1L)
 
+library(dplyr)
+library(ggplot2)
+library(forcats)
 options(dplyr.summarise.inform = FALSE)
 theme_set(theme_minimal())
 ```
 
-Dans cet atelier, je vous présente une introduction complète au langage R
-pour l'étude de la linguistique. R est un langage de programmation libre avec
-le code source ouvert qui est particulièrement populaire dans les sciences
+Dans cet atelier, je vous présente une introduction au langage R
+pour l'étude de la linguistique. R est un langage de
+programmation libre avec le code source ouvert qui est particulièrement
+populaire dans les sciences
 naturelles et sociales. Nous commençons par une introduction générale aux
 fonctions permettant de télécharger, visualiser et manipuler des
 données structurées sous forme de tableau. Ensuite, nous continuons à étudier
@@ -62,13 +53,24 @@ l'application des interfaces de programmation d'application (API) pour
 l'usage des grands modèles de langage. Dans tous les exemples, nous employons
 les données qui proviennent de diverses parties de la linguistique.
 
+Bien que nous présentions les principaux concepts dans les notes suivantes, nous vous suggérons de consulter les ressources supplémentaires suivantes pour approfondir le sujet :
+
+- [*R for Data Science (2e)*](https://r4ds.hadley.nz/) Livre en libre accès en anglais qui développe directement les fonctions essentielles de visualisation, de manipulation et de programmation des données dans R.
+- [*Humanities Data in R (2e)*](https://humanitiesdata.org/text/) Livre accèsible en anglais (nom d'utilisateur et mot de passe son "hdir") qui donne les méthodes plus avancées pour traiter des données complexes et multimodales.
+- Les aides-mémoirs :
+[les graphiques](https://raw.githubusercontent.com/rstudio/cheatsheets/main/translations/french/data-visualization_fr.pdf),
+[remaniement de données](https://raw.githubusercontent.com/rstudio/cheatsheets/main/translations/french/data-wrangling_fr.pdf), et
+[expressions régulières](https://raw.githubusercontent.com/rstudio/cheatsheets/main/translations/french/regex_fr.pdf)
+
+Vous trouverez également une documentation complète sur les différentes fonctions et les différents «packages» sur le site de [The Comprehensive R Archive Network (CRAN)](https://cran.r-project.org/web/packages/available_packages_by_name.html).
+
 ## 1. Philosophie 
 
 Ma philosophie en matière d'enseignement de la science des données est motivée
 par l'objectif de fournir les outils nécessaires à l'exploration libre des
-données, plutôt que de simplement encourager l'utilisation de pipelines et de
+données, plutôt que de simplement encourager l'utilisation de chaînes de traitement et de
 modèles statiques existants. Pour atteindre cet objectif, je vous présente cet
-atelier organisé selon quatre principes :
+atelier organisé selon trois principes :
 
 - **des données tabulaires** : Je privilégie les données tabulaires
 parce qu'elles nous permettent de baser nos analyses sur des structures
@@ -77,11 +79,11 @@ mathématiques, les statistiques et la philosophie.
 - **des fonctions générales et basées sur les théories** :
 Je privilégie les fonctions qui viennent des « packages »
 comme `dplyr` et ggplot2 au lieu des fonctions anciennes ou fonctions qui
-ne marchent qu'un seul type de donnée. Cela nous aide également à nous adapter
+ne marchent qu'avec une seul type de donnée.
+Cela nous aide également à nous adapter
 vers d'autres langages de programmation comme Python, SQL ou JavaScript.
 - **une base solide** : Nous nous concentrerons sur les opérations de
 base avant de passer à des tâches plus complexes.
-- **LLMs augment l'importance** : Je m'adapte à l'idée que les LLM peuvent nous aider à créer du code, ce qui rend encore plus important de comprendre ce que nous faisons et pourquoi nous le faisons plutôt que d'apprendre un grand nombre de fonctions personnalisées.
 
 Ces principes nous obligent à nous concentrer fortement sur les fonctions
 générales pour visualiser et manipuler des données relativement simples dans
@@ -94,11 +96,39 @@ Comme toutes les compétences, la seule façon d'apprendre le langage R est de
 pratiquer en produisant du code vous-même. Pour vous aider à le faire, je vous
 fournis des exercices qui correspondent à chaque section ci-dessous. Pour les
 suivre, vous pouvez soit exécuter le code dans Google Colab, soit
-télécharger R, RStudio, et les exemples dans votre propre
-ordinateur. Les exercices appliquent et approfondissent les thèmes abordés à
-l'aide de données supplémentaires.
+[télécharger R](https://cran.r-project.org/), [RStudio](https://posit.co/downloads/), et les exemples et données ci-dessous dans votre propre ordinateur. 
 
-**Notez : Je vais ajouter les liens après avoir fini les notes.**
+```{=html}
+<div class="buttons-container">
+  <a href="" class="button is-primary" target="_blank">
+    <span>Télécharger le code</span>
+  </a> 
+  <a href="" class="button is-info" target="_blank">
+    <span>Exécuter sur Colab</span>
+  </a>
+</div>
+```
+
+Les exercices appliquent et approfondissent les thèmes abordés à l'aide de
+données supplémentaires.
+
+Il y a des collections de fonctions supplementaires dans les *packages*. Il
+existe des milliers de paquets open source. Au cours de cet atelier, nous en utiliserons plusieurs. La méthode la plus courante pour télécharger un package depuis R est donnée par le code suivant, dans lequel nous téléchargeons le package
+**ggplot2**.
+
+```{r}
+#| eval: false
+install.packages("ggplot2")
+```
+
+Après avoir téléchargé le package, ce qui ne doit être fait qu'une seule fois, nous devons le charger à l'aide du code suivant, qui est exécuté à chaque fois que nous démarrons une nouvelle session dans R.
+
+```{r}
+#| eval: false
+library(ggplot2)
+```
+
+Le code permettant de télécharger tous les paquets nécessaires à l'atelier est fourni dans les documents liés ci-dessus. Nous utiliserons la fonction `library` pour charger chaque bibliothèque requise avant sa première utilisation dans notre code.
 
 ## 3. Données tabulaires
 
@@ -111,26 +141,32 @@ intéressantes.
 J'ai préparé cette collection dans un fichier CSV. Vous pouvez également
 enregistrer vos données au format CSV en utilisant tous les tableurs comme
 LibreOffice, Google Sheets ou Excel. Afin de charger ces données dans R, on peut
-utiliser la fonction `read_csv2`. Cette fonction nécessite un argument qui
+utiliser la fonction `read_csv2` du package **readr**.
+Cette fonction nécessite un argument qui
 spécifie le chemin d'accès au fichier par rapport au code. Voici un exemple
-de charger les données de la production des voyelles anglaises :
+de charger les données de la production des voyelles anglaises.
 
 ```{r}
 #| message: false
+library(readr)
+
 read_csv2("donnees/hillenbrand_voyelle_eng.csv")
 ```
 
 Nous voyons que cette fonction renvoie un objet qui s'appelle un « tibble ».
 Dans R, un tibble est la structure dans laquelle on charge les données
-structurées sous forme de tableau. L'objet au-dessus a 1668 lignes et 8 colonnes.
-Chaque ligne montre les démographiques d'un locuteur et les mesures phonétiques
+structurées sous forme de tableau. L'objet ci-dessus a 1668 lignes et 8 colonnes.
+Chaque ligne montre les métadonnées d'un locuteur et les mesures phonétiques
 d'une voyelle. Par défaut, nous ne voyons que les dix premières lignes. Pour
 chaque colonne, il y a un nom (id, groupe, etc.) et un type de données. Les
-colonnes numériques ont le type <dbl> (« double ») et les colonnes catégoriques
-« caractère »). Nous allons voir que ces structures sont
-essentielles pour toutes les étapes de l'analyse de données en R.
+colonnes numériques ont le type <dbl>, une abréviation de « double »
+dans l'expression 
+« nombre flottante à virgule double précision ». Les colonnes
+qui contiennent des chaines de caractères ont le type \<chr\>, une abréviation de
+mot « caractère » en anglais. Nous allons voir que ces structures
+sont essentielles pour toutes les étapes de l'analyse de données en R.
 
-Dans le code au-dessus, nous avons créé et imprimé un tibble. Cependant, après
+Dans le code ci-dessus, nous avons créé et imprimé un tibble. Cependant, après
 l'exécution du code le tibble n'existe plus dans R. Afin de le sauvegarder, nous
 devons attribuer la sortie de la fonction à un nom à l'aide d'une flèche
 (signe inférieur et signe moins). Ici, nous sauvegardons le tibble
@@ -170,26 +206,32 @@ fondamentale (`f0`) et une position verticale indiquée par la durée de la voye
 (`dur`).
 
 ```{r}
+library(ggplot2)
+
 phone |>
   ggplot() +
   geom_point(aes(x = f0, y = dur))
 ```
 
-Dans cet exemple, nous commençons avec le nom d'un tibble (phone) suivi par
-le symbole `|>`. Ce symbole s'appelle une « pipe ». Il passe le tibble aux
-prochaines étapes. Nous continuons avec la fonction `ggplot()` pour indiquer
+Dans cet exemple, nous commençons avec le nom d'un tibble (`phone`) suivi par
+le symbole `|>`. Ce symbole s'appelle un « pipe ». Il passe le
+tibble aux prochaines étapes. Cette construction nous permettre d'adapter
+l'order des fonctions et de les rendre plus facile à lire :
+`p(h(g(f(x))))` devient `x |> f() |> g() |> h() |> p()`.
+
+Nous continuons avec la fonction `ggplot()` pour indiquer
 que nous voulons créer une visualisation. Dans la dernière ligne, nous appliquons
 la fonction geom_point pour spécifier la géométrie. À l'intérieur de la
 fonction, nous mettons la fonction `aes()` (pour *aesthetic*, esthétique en
 anglais) avec les associations entre les noms de colonnes et les positions
-horizontale et verticale. Comme convention, la grammaire des graphiques utilise
+horizontale et verticale. Par convention, la grammaire des graphiques utilise
 la lettre `x` pour la dimension horizontale et `y` pour la dimension verticale.
 
-Comme l'exemple au-dessus, la géométrie des points a deux esthétiques requises
+Comme l'exemple ci-dessus, la géométrie des points a deux esthétiques requises
 (`x` et `y`). Il y a d'autres esthétiques facultatives qu'on peut ajouter pour
 améliorer l'information portée par la visualisation. Par exemple, il y a une
 esthétique de la couleur qui permet de changer la couleur de chaque point
-selon une colonne du tibble. Voici un exemple où la couleur indique le
+en fonction d'une colonne du tibble. Voici un exemple où la couleur indique le
 groupe du locuteur ou de la locutrice.
 
 ```{r}
@@ -199,20 +241,20 @@ phone |>
 ```
 
 Déjà, cette visualisation montre certaines correspondances entre les colonnes.
-Nous voyons que les différences entre les fréquences fondamentales correspondent
-à une séparation des hommes et des autres. Et, qu'il peut exister une
+Nous voyons que la différence de la fréquence fondamentale correspond
+à une séparation les hommes et les autres. Et, qu'il peut exister une
 correspondance où les hommes ont des durées légèrement plus petites que les
 femmes et les enfants.
 
-Les connexions entre chaque couleur et chaque groupe ne sont pas explicites
+Le lien entre les couleurs et les groupes n'est pas explicit
 dans notre code. Le système de la grammaire de graphiques peut choisir les
 couleurs automatiquement. C'était la même chose pour les positions horizontale
-et verticale : nous n'indiquions ni leurs amplitudes ni leurs étiquettes. Mais,
+et verticale. Mais,
 souvent on a besoin de les changer. Pour spécifier la relation entre les
 esthétiques et les éléments réels d'un graphique, on peut appliquer les
-*scales*. Les scales peuvent être ajoutées comme une autre ligne de notre code.
-Voici un exemple où nous modifions les couleurs à l'aide d'une palette adaptée
-aux personnes atteintes de daltonisme.
+*échelles*. Les échelles peuvent être ajoutées comme une autre ligne de
+notre code. Voici un exemple où nous modifions les couleurs à l'aide d'une
+palette adaptée aux personnes atteintes de daltonisme.
 
 ```{r}
 phone |>
@@ -227,7 +269,7 @@ Ce graphique est au fond la même chose : les points avec les noms `f2` et `f1`,
 respectivement, attribués aux esthétiques `x` et `y`. Mais, il y a une
 complexité. Afin de correspondre à la forme de la langue pour quelqu'un
 qui regarde vers sa droite, nous devons inverser le sens des axes. Cela nécessite
-l'application des scales `scale_x_reverse()` et `scale_y_reverse()`. L'exemple
+l'application des échelles `scale_x_reverse()` et `scale_y_reverse()`. L'exemple
 suivant donne la forme correcte.
 
 ```{r}
@@ -238,26 +280,27 @@ phone |>
   scale_y_reverse()
 ```
 
-Cette visualisation montre la forme triangulaire classique de l'espace des
-voyelles. Supposons qu'on veuille voir quelles voyelles correspondent à ces points.
-Comment pourrions-nous faire cela ? Nous devons appliquer une nouvelle
-géométrie : `geom_text`. Elle ne crée pas de points pour chaque ligne de données.
-En revanche, la géométrie de texte place des caractères dans le graphique. Nous
-devons donner une esthétique nouvelle pour indiquer la colonne qui correspond à
-ces caractères. Voici la façon d'avoir une visualisation avec les symboles IPA
-à la place des points.
+Cette visualisation montre la forme triangulaire classique de l'espace
+vocalique. Supposons qu'on veuille voir quelles voyelles correspondent à
+ces points. Comment pourrions-nous faire cela ? Nous devons
+appliquer une nouvelle géométrie : `geom_text`. Elle ne crée
+pas de points pour chaque ligne de données. En revanche, la géométrie de
+texte place directement des caractères dans le graphique. Nous devons donner
+une esthétique nouvelle pour indiquer la colonne qui correspond à ces
+caractères. Voici la façon d'avoir une visualisation avec les symboles API à
+la place des points.
 
 ```{r}
 phone |>
   ggplot(aes(f2, f1)) +
-  geom_text(aes(label = ipa)) +
+  geom_text(aes(label = api)) +
   scale_x_reverse() +
   scale_y_reverse()
 ```
 
-Il existe beaucoup de géométries, d'esthétiques et de scales pour élargir
+Il existe beaucoup de géométries, d'esthétiques et d'échelles pour élargir
 les possibilités de visualisations dans la grammaire de graphiques. Vous pouvez
-consulter les liens suivants comme références : []() []().
+consulter les références suivants : [@wickham2023r ; @dplyr].
 
 Nous avons vu les éléments centraux de la grammaire de graphiques. Dans le but
 d'aller plus loin, nous continuons en étudiant les méthodes pour modifier les
@@ -271,14 +314,16 @@ avec une collection de fonctions qui s'appellent des « verbes ».
 Ces fonctions ont la même structure : on les donne un tibble puis
 on reçoit un nouveau tibble. Cette structure permet d'appliquer un nombre
 quelconque de fonctions à un tibble. Il existe environ 50 verbes. Heureusement,
-nous n'avons besoin d'apprendre que 12 pour effectuer toutes les opérations
+nous n'avons besoin d'en apprendre que 12 pour effectuer toutes les opérations
 possibles. Dans cette section, nous commençons avec les 8 premiers verbes.
 
-Le verbe slice_head retient les n premières lignes d'un tibble, où `n` est
-un argument dans la fonction. Comme tous les verbes, nous utilisons une pipe
+Le verbe `slice_head` tranche les `n` premières lignes d'un tibble, où `n` est
+un argument dans la fonction. Comme tous les verbes, nous utilisons un pipe
 (`|>`) pour donner l'objet de données à la fonction.
 
 ```{r}
+library(dplyr)
+
 phone |>
   slice_head(n = 4)
 ```
@@ -290,7 +335,7 @@ exemple pour trouver les lignes de la voyelle «u».
 
 ```{r}
 phone |>
-  filter(ipa == "u")
+  filter(api == "u")
 ```
 
 Pour réorganiser des lignes par les valeurs dans une ou plusieurs colonnes,
@@ -312,8 +357,8 @@ phone |>
 
 Afin de démontrer l'application de plusieurs verbes, notons qu'il est souvent
 efficace d'appliquer `arrange` puis `slice_head` pour trouver les lignes des
-valeurs extrêmes. Nous voyons que chaque ligne, sauf la dernière, a une pipe 
-à sa fin.
+valeurs extrêmes. Nous voyons que chaque ligne, sauf la dernière, a un pipe 
+à la fin.
 
 ```{r}
 phone |>
@@ -331,8 +376,8 @@ phone |>
   mutate(dur_s = dur / 1000)
 ```
 
-Le verbe `select` prend une sélection de colonnes par nom. Il est utile si
-la taille d'un tableau devient trop grande.
+Le verbe `select` fait une sélection de colonnes selon fonction de leur nom.
+Il est utile si la taille d'un tableau devient trop grande.
 
 ```{r}
 phone |>
@@ -344,13 +389,13 @@ souvent ensemble : `group_by` et `summarise`. Comme `mutate`, le verbe
 summarise permet de créer de nouvelles colonnes. Mais, il réduit les
 lignes à un sommaire avec l'application de fonctions comme `mean` (la moyenne)
 ou `sd` (l'écart-type). La fonction `group_by` indique par quelle colonne
-(ou colonnes) le sommaire est appliqué. Un exemple peut clarifier la relation
+(ou colonnes) le sommaire est appliqué. Cet exemple peut clarifier la relation
 entre les deux. Voici le code pour calculer les moyennes de F1 et F2 selon
-la voyelle.
+la voyelle. 
 
 ```{r}
 phone |>
-  group_by(ipa) |>
+  group_by(api) |>
   summarise(
     f1_m = mean(f1),
     f2_m = mean(f2)
@@ -364,14 +409,14 @@ dans les données.
 
 ```{r}
 phone |>
-  group_by(ipa) |>
+  group_by(api) |>
   summarise(
     f1_m = mean(f1),
     f2_m = mean(f2)
   ) |>
   ggplot(aes(f2_m, f1_m)) +
     geom_point(size = 8) +
-    geom_text(aes(label = ipa), colour="#fff") +
+    geom_text(aes(label = api), colour="#fff") +
     scale_x_reverse() +
     scale_y_reverse() 
 ```
@@ -382,14 +427,14 @@ par exemple (notez le symbole $ entre le nom de la table et le nom de la
 colonne) :
 
 ```{r}
-table(phone$ipa)
+table(phone$api)
 ```
 
 Ou bien, elle peut également compter les combinaisons de deux
 colonnes :
 
 ```{r}
-table(phone$ipa, phone$groupe)
+table(phone$api, phone$groupe)
 ```
 
 Maintenant, nous avons une base solide de verbes et de fonctions de visualisation.
@@ -401,8 +446,8 @@ suivante, nous ajoutons des fonctions de modélisation.
 Maintenant que nous savons comment manipuler les données, nous pouvons
 commencer à travailler avec de nouveaux ensembles de données. Ici, nous
 chargeons [un ensemble de données](https://huggingface.co/datasets/ALTACambridge/KUPA-KEYS) de
-[keylogging](https://aclanthology.org/2024.lrec-main.938.pdf)
-dans lequel chaque frappe effectuée lors d'une session d'écriture est
+[enregistreur de frappe](https://aclanthology.org/2024.lrec-main.938.pdf)
+dans lequel chaque saisi de texte effectuée lors d'une session d'écriture est
 enregistrée. 
 
 ```{r}
@@ -411,14 +456,14 @@ touches <- read_csv2("donnees/keylog-touches.csv.bz2", na="NA")
 touches
 ```
 
-Une fois les données chargées, le bloc suivant réalise une étape de préparation où nous filtrons les observations pour ne retenir que deux types précis de touches, ici l'espace et le point. Cette sélection permet de comparer plus facilement la durée d'appui de ces deux catégories.
+Une fois les données chargées, le bloc suivant réalise une étape de préparation où nous filtrons les observations pour ne retenir que deux types précis de touches, ici l'espace et le point. Cette sélection permet de comparer plus facilement la durée de frappe de ces deux catégories.
 
 ```{r}
 touches_sub <- touches |>
   filter(code %in% c("Space", "Period"))
 ```
 
-Après cette préparation, nous appliquons un test statistique de comparaison de moyennes. Le « test t » permet d'évaluer si les durées d'appui mesurées diffèrent de manière significative entre les deux types de touches retenus. L'idée est de vérifier si l'espace et le point présentent des temps d'appui systématiquement différents, ce qui pourrait refléter des habitudes de frappe ou des contraintes mécaniques spécifiques.
+Après cette préparation, nous appliquons un test statistique de comparaison de moyennes. Le « test de Student » permet d'évaluer si les durées de frappe mesurées diffèrent de manière significative entre les deux types de touches retenus. L'idée est de vérifier si l'espace et le point présentent des temps d'appui systématiquement différents, ce qui pourrait refléter des habitudes de frappe ou des contraintes mécaniques spécifiques.
 
 ```{r}
 t.test(dur ~ code, data = touches_sub)
@@ -430,7 +475,7 @@ durée moyenne d'un point (86.04 ms) est plus grande que celle d'un espace
 
 Le bloc suivant étend l'analyse à un autre angle. Cette fois, il s'agit d'un
 test ANOVA à un facteur qui utilise l'identifiant de la session comme variable
-explicative. L'objectif est d'estimer si la durée d'appui varie beaucoup d'un
+explicative. L'objectif est d'estimer si la durée de frappe varie beaucoup d'un
 individu à l'autre. Si la variabilité est importante, cela peut indiquer que
 les différences interpersonnelles jouent un rôle déterminant dans la vitesse
 ou le style de frappe.
@@ -439,19 +484,19 @@ ou le style de frappe.
 oneway.test(dur ~ id, data = touches)
 ```
 
-Et encore, nous voyons qu'il existe une différence de la moyenne de la durée selon la session.
+Là encore, nous voyons qu'il existe une différence de la moyenne de la durée selon la session.
 
-Enfin, le dernier bloc propose une analyse par régression linéaire. Il s'agit ici de comprendre comment la durée d'appui d'une touche pourrait être associée à la durée qui suit immédiatement cette frappe. Le modèle construit cherche à déterminer si, lorsque l'on appuie plus ou moins longtemps sur une touche, cela influence la rapidité avec laquelle on enchaîne la frappe suivante.
+Enfin, le dernier bloc propose une analyse par régression linéaire. Il s'agit ici de comprendre comment la durée de frappe d'une touche pourrait être associée à la durée qui suit immédiatement cette frappe. Le modèle construit cherche à déterminer si, lorsque l'on appuie plus ou moins longtemps sur une touche, cela influence la rapidité avec laquelle on enchaîne la frappe suivante.
 
 ```{r}
 summary(lm(dur_apres ~ dur, data = touches))
 ```
 
-Les résultats montrent qu'il existe une relation positive entre la durée d'une touche et la durée de la prochaine touche. Mais, le « Multiple R-squared » est très petit, ce qui indique que cette relation n'est pas trop forte.
+Les résultats montrent qu'il existe une relation positive entre la durée d'une touche et la durée de la prochaine touche. Mais, le *coefficient de détermination linéaire* (également connu sous le nom de « pourcentage de variance expliquée » ou, en anglais, « Multiple R-squared ») est très petit, ce qui indique que cette relation n'est pas trop forte.
 
 ## 7. Plusieurs tableaux
 
-Dans cette section, nous apprendrons les derniers verbes dont nous avons besoin. Ces verbes nous aident à combiner l'information dans plusieurs tableaux et complètent l'essentiel pour notre boîte d'outils des verbes.
+Dans cette section, nous apprendrons les derniers verbes dont nous avons besoin. Ces verbes nous aident à combiner l'information dans plusieurs tableaux et complètent l'essentiel pour notre boîte à outils des verbes.
 
 Nous commençons par charger un second tableau de données contenant des informations descriptives sur les utilisateurs dans les sessions de frappe. Ce fichier regroupe généralement des métadonnées telles que la langue, le niveau déclaré ou d'autres caractéristiques permettant de mieux contextualiser les mesures.
 
@@ -473,6 +518,8 @@ mots
 ```
 
 Une fois ces deux tableaux disponibles, nous effectuons une jonction entre eux à partir d'un identifiant commun. Cette opération permet de combiner les caractéristiques présentes dans les métadonnées avec les observations relatives aux mots, enrichissant ainsi chaque ligne d'information contextuelle supplémentaire. Le résultat est une table fusionnée où les durées ou autres mesures des mots peuvent être interprétées en fonction des profils utilisateurs.
+Voici un exemple où nous utilisons l'identifiant du participant (`id`) pour les
+fusionner.
 
 ```{r}
 #| message: false
@@ -480,14 +527,14 @@ mots |>
   left_join(meta, by = "id")
 ```
 
-Le bloc suivant exploite cette jonction pour procéder à un regroupement selon une variable décrivant le niveau de compétence linguistique. Après avoir regroupé les observations selon ce critère, on calcule la médiane d'une mesure temporelle spécifique, ce qui permet d'obtenir un indicateur robuste de la performance typographique pour chaque niveau. Le tri final met en évidence les niveaux pour lesquels la médiane est la plus élevée, facilitant la comparaison globale.
+Le bloc suivant exploite cette jonction pour procéder à un regroupement selon une variable décrivant le niveau de compétence linguistique. Après avoir regroupé les observations selon ce critère, on calcule la médiane d'une mesure temporelle spécifique, ce qui permet d'obtenir un indicateur robuste de la performance dactylographique pour chaque niveau. Le tri final met en évidence les niveaux pour lesquels la médiane est la plus élevée, facilitant la comparaison globale.
 
 ```{r}
 #| message: false
 mots |>
   left_join(meta, by = "id") |>
   group_by(cefr) |>
-  summarize(mu = median(d1)) |>
+  summarise(mu = median(d1)) |>
   arrange(desc(mu))
 ```
 
@@ -498,7 +545,7 @@ Enfin, sur un principe similaire, l'analyse est répétée en regroupant cette f
 mots |>
   left_join(meta, by = "id") |>
   group_by(lang) |>
-  summarize(mu = median(d1)) |>
+  summarise(mu = median(d1)) |>
   arrange(desc(mu))
 ```
 
@@ -506,7 +553,18 @@ Nous voyons que les étudiants anglais ont tapé le plus vite.
 
 ## 8. Fenêtres glissantes
 
-Dans cette section, nous commençons par créer un tableau simplifié contenant uniquement les variables essentielles pour illustrer l'usage des fonctions de fenêtre. 
+Nous avons traité les analyses horizontales dans lesquelles nous ne voyons 
+que les relations entres les valeurs d'une ligne. Avec `summarise` et les 
+fonctions pour les modèles statistiques, nous avons egalement traité les
+analyses verticales dans lesquelles nous traitons toutes les valeurs
+d'une colonne sur toutes les lignes, ou tous les groupes de lignes.
+Dans cette section, nous allons plus loin en utilisant ce que l'on appelle
+des fonctions à fenêtre glissante. Ces fonctions nous aident à trouver des
+relations entre les observations en fonction de l'ordre des lignes dans nos
+données. Des fonctions à fenêtre glissante sont très utiles lorsque l'on travaille avec des séries chronologiques, comme c'est souvent le cas en
+linguistique.
+
+Nous commençons par créer un tableau simplifié contenant uniquement les variables essentielles pour illustrer l'usage des fonctions de fenêtre. 
 
 ```{r}
 touches_min <- select(touches, id, t0, t1, dur, touche, code)
@@ -530,6 +588,8 @@ touches_min |>
 Il y a d'autres fonctions de fenêtre dans le package **slider** qui nous aident à calculer des résumés plus complexes. Par exemple, `slide_mean` donne la moyenne d'une fenêtre autour de chaque ligne d'une taille spécifiée.
 
 ```{r}
+library(slider)
+
 touches_min |>
   filter(id == "R_00RbUqO7jXLDItP") |>
   arrange(t0) |>
@@ -544,13 +604,15 @@ touches_min |>
     geom_line(aes(y=dur_moyenne1000), colour = "#6fa8dc")     
 ```
 
-Enfin, le dernier bloc explore l'utilisation de fenêtres glissantes plus larges permettant de calculer des moyennes mobiles sur différents horizons. Après avoir filtré un utilisateur particulier, nous ordonnons ses frappes puis appliquons plusieurs tailles de fenêtre afin de lisser progressivement les durées observées. Cela donne des courbes plus ou moins réactives aux variations locales : une petite fenêtre suit de près les changements instantanés, tandis qu'une grande fenêtre met en évidence des tendances plus globales. Le graphique obtenu superpose ces différentes moyennes, offrant une visualisation intuitive de l'évolution du rythme de frappe au cours du temps.
+Enfin, le dernier bloc explore l'utilisation de fenêtres glissantes plus larges permettant de calculer des moyennes mobiles sur différents horizons. Après avoir filtré un utilisateur particulier, nous ordonnons ses frappes puis appliquons plusieurs tailles de fenêtre afin de lisser progressivement les durées observées. Cela donne des courbes plus ou moins sensible aux variations locales : une petite fenêtre suit de près les changements instantanés, tandis qu'une grande fenêtre met en évidence des tendances plus globales. Le graphique obtenu superpose ces différentes moyennes, offrant une visualisation intuitive de l'évolution du rythme de frappe au cours du temps.
 
-## 9. Expressions régulières
+## 9. Chaînes de caractères
 
-Dans cette section, nous introduisons l'usage des fonctions provenant du package **stringi** pour manipuler les données textuelles. Ces fonctions ont la même forme : le nom commence avec `stri_` et le premier argument est une séquence de caractères. Par exemple, voici la fonction `stri_length` qui compte le nombre de caractères dans une séquence.
+Dans cette section, nous introduisons l'usage des fonctions provenant du package **stringi** pour manipuler les données textuelles \cite{stringi}. Ces fonctions ont la même forme : le nom commence avec `stri_` et le premier argument est une séquence de caractères. Par exemple, voici la fonction `stri_length` qui compte le nombre de caractères dans une séquence.
 
 ```{r}
+library(stringi)
+
 mots |>
   mutate(nchar = stri_length(mot))
 ```
@@ -562,18 +624,18 @@ mots |>
   mutate(nchar = stri_length(mot)) |>
   left_join(meta, by = "id") |>
   group_by(lang) |>
-  summarize(mu = mean(nchar, na.rm=TRUE)) |>
+  summarise(mu = mean(nchar, na.rm=TRUE)) |>
   arrange(desc(mu))
 ```
 
-La majorité des fonctions de stringi a besoin d'un argument figé pour spécifier ce qu'elles font. Par exemple, la fonction `stri_detect` indique la présence d'une séquence de caractères. Ici nous l'appliquons pour indiquer quels mots ont le caractère "a" en utilisant l'argument `fixed`.
+La majorité des fonctions de stringi a besoin d'un argument figé pour spécifier ce qu'elles font. Par exemple, la fonction `stri_detect` indique la présence d'une séquence de caractères. Ici nous l'appliquons pour indiquer quels mots ont le caractère \<a\> en utilisant l'argument `fixed`.
 
 ```{r}
 mots |>
   mutate(nombre_a = stri_detect(mot, fixed = "a"))
 ```
 
-Souvent, nous ne voulons pas seulement chercher une phrase figée. En revanche, nous avons besoin de trouver les lignes qui correspondent à un ensemble de phrases. Pour cela, nous appliquons les « expressions régulières », un langage pour décrire les motifs dans les séquences de caractères. Par exemple, l'expression `[A-Z]` indique les lettres latines majuscules.
+Souvent, nous ne voulons pas seulement chercher un sequence donné. En revanche, nous avons besoin de trouver les lignes qui correspondent à un ensemble des caractères. Pour cela, nous appliquons les « expressions régulières », langage pour décrire les motifs dans les séquences de caractères. Par exemple, l'expression `[A-Z]` indique les lettres latines majuscules.
 
 ```{r}
 mots |>
@@ -588,7 +650,7 @@ mots |>
   mutate(nchar = stri_length(mot)) |>
   filter(nchar < 10) |>
   group_by(nchar, has_maj) |>
-  summarize(mu = median(dur_mot)) |>
+  summarise(mu = median(dur_mot)) |>
   ggplot(aes(factor(nchar), mu)) +
     geom_point(aes(colour = has_maj))
 ```
@@ -607,18 +669,33 @@ Pour une référence de toutes les options, je vous recommande le [« Cheatsheet
 
 ## 10. TextGrid
 
-Dans cette partie, nous travaillons avec des fichiers TextGrid, un format couramment utilisé en phonétique pour annoter des enregistrements audio. Le premier bloc consiste à charger un fichier TextGrid contenant plusieurs niveaux d'annotation, chacun représentant des informations différentes comme des segments phonétiques, des contours prosodiques ou d'autres repères temporels. L'affichage de l'objet chargé permet d'examiner la structure du fichier et de vérifier que les tiers et leurs champs temporels ont été lus correctement, ce qui est essentiel pour pouvoir ensuite croiser l'information contenue dans les différentes couches d'annotation.
+Dans cette sections, nous travaillons avec des fichiers TextGrid, un format couramment utilisé en phonétique pour annoter des enregistrements audio qui
+qui provient du logiciel Pratt [@styler2013using]. Nous allons étudier les 
+donnée d'un corpus qui s'appelle [Rhapsodie](https://rhapsodie.modyco.fr/presentation/). Rhapsodie fournit une base de
+données syntaxique et prosodique pour le français parlé [@lacheret2014rhapsodie].
+Voici un exemple d'un TextGrid du corpus Rhapsodie dans Pratt .
 
-Voici, nous téléchargeons un fichier du corpus
-[Rhapsodie](https://rhapsodie.modyco.fr/presentation/).
+<img src="img/praat.png" style="width: 100%">
+
+Ce fichier TextGrid contenant plusieurs niveaux d'annotation, chacun
+représentant des informations différentes comme des segments phonétiques,
+des contours prosodiques ou d'autres repères temporels. Les niveaux d'annotation
+se sont appellés les «tiers». Dans Praat, les annotations sont organisées en différentes couches alignées selon leur temporalité.
+
+Voici nous téléchargeons un fichier du corpus Rhapsodie dans R en utilisons le
+package **readtextgrid** [@readtextgrid].
 
 ```{r}
 #| message: false
+library(readtextgrid)
+
 tg <- read_textgrid("donnees/rhapsodie/tg/Rhap-M0018-Pro.TextGrid")
 tg
 ```
 
-Le bloc suivant extrait spécifiquement le tier correspondant aux phonèmes, généralement appelé « phone ». Ce niveau contient une segmentation fine de la parole où chaque entrée représente un segment phonétique délimité dans le temps. Extraire ce tier isolément permet de se concentrer sur les unités les plus courtes et d'effectuer des mesures précises, comme les durées phonémiques, indépendamment des autres niveaux d'annotation.
+Le format dans R est très différent du format dans Praat. Dans R, les dimensions temporelles des niveaux ne sont pas directement reliées entre elles. Toutes les données d'un niveau (ici `phone`) sont fournies, suivies du deuxième niveau, et ainsi de suite. Toutes les données d'un niveau (ici « phone ») sont fournies, suivies du deuxième niveau, et ainsi de suite. Ce format n'est pas aussi bien adapté à la consultation directe des données, mais il est plutôt optimisé pour la programmation.
+
+Le bloc suivant extrait spécifiquement le tier correspondant aux phonèmes,  appelé « phone » dans le fichier. Ce niveau contient une segmentation fine de la parole où chaque entrée représente un segment phonétique délimité dans le temps. 
 
 ```{r}
 tg_phone <- tg |>
@@ -632,13 +709,13 @@ Nous procédons ensuite à une analyse descriptive des durées phonémiques. En 
 tg_phone |>
   filter(text != "_") |>
   group_by(text) |>
-  summarize(dur_moyenne = mean(xmax - xmin)) |>
+  summarise(dur_moyenne = mean(xmax - xmin)) |>
   arrange(dur_moyenne) |>
   ggplot(aes(fct_inorder(text), dur_moyenne)) +
     geom_point()
 ```
 
-Le bloc suivant extrait un autre tier, ici appelé « contour », qui peut représenter des catégories prosodiques ou des niveaux mélodiques associés à la parole. En filtrant ce tier pour ne conserver que certains symboles choisis, on se concentre sur les principales catégories d'annotation nécessaires à l'analyse. Afficher le tableau obtenu permet de vérifier que les entrées retenues sont bien celles attendues avant de les utiliser comme éléments de référence pour une fusion avec les phonèmes.
+Le bloc suivant extrait un autre tier, ici appelé `contour`, qui peut représenter des catégories prosodiques ou des niveaux mélodiques associés à la parole. En filtrant ce tier pour ne conserver que certains symboles choisis, on se concentre sur les principales catégories d'annotation nécessaires à l'analyse. Afficher le tableau obtenu permet de vérifier que les entrées retenues sont bien celles attendues avant de les utiliser comme éléments de référence pour une fusion avec les phonèmes.
 
 ```{r}
 tg_contour <- tg |>
@@ -668,7 +745,7 @@ Enfin, nous terminons par un tableau croisé qui récapitule la distribution des
 tg_join |>
   filter(text != "_") |>
   group_by(text) |>
-  summarize(
+  summarise(
     moyenne_l = mean(text_contour == "L", na.rm=TRUE),
     n = n()
   ) |>
@@ -694,7 +771,7 @@ for (j in seq_along(d)) {
   tg <- read_textgrid(file.path(dir_nom, d[j]), encoding="UTF-8")
   tg$id <- j
 
-  # ↓↓↓ cette partie au-dessous fonctionne de traiter une seule
+  # ↓↓↓ cette partie ci-dessous fonctionne de traiter une seule
   # ↓↓↓ fiche ; vous pouvez la changer 
   tg_phone <- tg |>
     filter(tier_name == "phone")
@@ -727,8 +804,8 @@ Après avoir obtenu le tableau `df`, nous pouvons appliquer les mêmes verbes qu
 df |>
   filter(text != "_") |>
   group_by(text) |>
-  summarize(
-    moyenne_l = mean(text_contour == "L", na.rm=TRUE),
+  summarise(
+    moyenne_l = mean(text_contour == "L", na.rm = TRUE),
     n = n()
   ) |>
   arrange(moyenne_l) |>
@@ -742,15 +819,21 @@ Nous voyons que les résultats deviennent plus stables avec tous les fichiers.
 
 Il est possible d'analyser les fichiers audio (.mp3, .wav, etc.) directement
 dans R. Voici nous télécharger un fichier qui contient la prononciation de
-la voyelle /i/ en français avec les fonctions `readWave` et `makesound`.
+la voyelle /i/ en français avec les fonctions `readWave` et `makesound`,
+respectivement du package **tuneR** et de package **phonTools**
+[@tuneR; @phonTools].
 
 ```{r}
+#| message: false
+library(tuneR)
+library(phonTools)
+
 w <- readWave("donnees/voyelles/i.wav")
 snd <- makesound(w@left, fs = w@samp.rate)
 snd
 ```
 
-Le résultat donne un objet spécifique (« Sound Object ») que nous pouvons étudier avec les fonctions provenant du package **phonTools**. Par exemple, nous pouvons calculer le pouvoir du son avec `powertrak`. Par défaut, la fonction crée une visualisation en même temps.
+Le résultat donne un objet spécifique (« Sound Object ») que nous pouvons étudier avec les fonctions provenant du package **phonTools**. Par exemple, nous pouvons calculer l'intensité du son avec `powertrak`. Par défaut, la fonction crée une visualisation en même temps.
 
 ```{r}
 power <- powertrack(snd, fs = fs)
@@ -777,7 +860,7 @@ formants <- as_tibble(formants)
 formants
 ```
 
-Pour aller plus loin, il faut appliquer les fonctions de programmation pour calculer la courbe de pouvoir et les formants pour chaque voyelle (qui sont dans leurs propres fichiers). Nous pouvons appliquer et modifier l'exemple dans la Section 11. Voici le code qui sauvegarde les formants au point du plus grand pouvoir pour chaque voyelle.
+Pour aller plus loin, il faut appliquer les fonctions de programmation pour calculer la courbe de l'intensité et les formants pour chaque voyelle (qui sont dans leurs propres fichiers). Nous pouvons appliquer et modifier l'exemple dans la Section 11. Voici le code qui sauvegarde les formants au point de l'intensité maximale pour chaque voyelle.
 
 ```{r}
 dir_nom <- "donnees/voyelles"
@@ -788,7 +871,7 @@ for (j in seq_along(d)) {
   w <- readWave(file.path(dir_nom, d[j]))
   snd <- makesound(w@left, fs = w@samp.rate)
 
-  # ↓↓↓ cette partie au-dessous fonctionne de traiter une seule
+  # ↓↓↓ cette partie ci-dessous fonctionne de traiter une seule
   # ↓↓↓ fiche ; vous pouvez la changer 
   power <- powertrack(snd, fs = fs, show=FALSE)
   power <- as_tibble(power)
@@ -812,27 +895,32 @@ Nous pouvons récréer la visualisation comme dans la Section 4 avec les formant
 
 ```{r}
 df |>
-  mutate(ipa = stri_replace(fname, "", fixed = ".wav")) |>
+  mutate(api = stri_replace(fname, "", fixed = ".wav")) |>
   ggplot(aes(f2, f1)) +
-    geom_text(aes(label = ipa)) +
+    geom_text(aes(label = api)) +
     scale_x_reverse() +
     scale_y_reverse()
 ```
 
-Pour finir, je note qu'il est aussi possible d'utiliser la fonction `pitchtrack` de la même façon pour calculer le pitch d'un fichier sonore.
+Pour finir, je note qu'il est aussi possible d'utiliser la fonction `pitchtrack`
+de la même façon pour calculer la fréquence fondamentalle d'un fichier sonore.
 
 ## 13. Analyse grammaticale
 
-Dans cette section, nous explorons l'analyse grammaticale automatique à l'aide de **UDPipe**, un outil qui permet d'annoter du texte de manière détaillée : identification des mots, lemmatisation, catégorisation grammaticale et détection de traits morphologiques.
+Dans cette section, nous explorons l'analyse grammaticale automatique à l'aide de **udpipe**, outil qui permet d'annoter automatiquement du texte de manière détaillée : identification des mots, lemmatisation, catégorisation grammaticale et détection de traits morphologiques [@udpipe].
 
-Le premier bloc charge un modèle de langue pré-entraîné pour le français. Ce modèle, dérivé du corpus Universal Dependencies, contient les informations nécessaires pour reconnaître la structure interne des phrases françaises. Son chargement est une étape indispensable avant de pouvoir annoter du texte.
+Le premier bloc charge un modèle de langue pré-entraîné pour le français.
+Ce modèle est dérivé du corpus GSD [@guillaume2019conversion]. Si l'on ne
+spécifie pas de modèle, celui-ci sera téléchargé automatiquement.
 
 ```{r}
 #| message: false
+library(udpipe)
+
 udmodel_fr <- udpipe_load_model(file = "donnees/french-gsd-ud-2.5-191206.udpipe")
 ```
 
-Le bloc suivant applique ce modèle à un texte littéraire, la « tirade du nez ». Le texte est lu depuis un fichier brut puis passé au moteur d'annotation qui segmente les mots, identifie leur catégorie grammaticale, leur lemme et leurs traits morphologiques. Le résultat, converti en tibble, permet d'inspecter les annotations ligne par ligne. Cette représentation est utile pour comprendre en détail comment un outil d'analyse grammaticale automatique décompose une phrase, surtout pour un public qui découvre ces méthodes.
+Le bloc suivant applique ce modèle à un texte littéraire, la « tirade du nez » [@Rostand2006_Cyrano]. Le texte est dans un format brut puis passé au moteur d'annotation qui segmente les mots, identifie leur catégorie grammaticale, leur lemme et leurs traits morphologiques. Le résultat, converti en tibble, permet d'inspecter les annotations ligne par ligne. 
 
 ```{r}
 #| message: false
@@ -843,7 +931,7 @@ df_tirade <- as_tibble(udpipe_annotate(
 df_tirade
 ```
 
-L'application d'udpipe peut prendre plusieurs heures pour les grandes données. Heureusement, comme les résultats sont un tableau, nous pouvons l'appliquer une seule fois, sauvegarder dans un fichier, puis charger pour réanalyser.
+L'application de `udpipe_annotate` peut prendre plusieurs heures pour les grandes données. Heureusement, comme les résultats sont un tableau, nous ne pouvons l'appliquer qu'une seule fois, sauvegarder dans un fichier, puis charger pour réanalyser.
 
 Dans le bloc suivant, nous chargeons un corpus tiré de Wikipédia (3 pour cent de tous les articles), déjà prétraité pour inclure des annotations grammaticales. Ce corpus volumineux permet d'étudier les habitudes grammaticales de milliers de phrases, ce qui ouvre la voie à des analyses quantitatives plus ambitieuses.
 
@@ -865,7 +953,7 @@ wikifr |>
     passe = stri_count(morph, fixed = "Tense=Past")
   ) |>
   group_by(lemma) |>
-  summarize(
+  summarise(
     pres_moyenne = mean(pres),
     imp_moyenne = mean(imp),
     passe_moyenne = mean(passe),
@@ -876,7 +964,7 @@ wikifr |>
   print(n = Inf)
 ```
 
-Il est possible aussi d'entraîner les modèles nous-mêmes. Nous chargeons ensuite un corpus au format CoNLL-U, structure standard utilisée dans le projet Universal Dependencies pour représenter des annotations linguistiques complètes. Ce fichier contient des exemples annotés manuellement, ce qui en fait une ressource précieuse pour entraîner ou évaluer des modèles. La conversion en tibble permet d'en inspecter facilement les colonnes, notamment les mots, les lemmes, les étiquettes grammaticales et les dépendances syntaxiques.
+Il est possible aussi d'entraîner les modèles nous-mêmes. Pour cela, nous chargeons un corpus au format CoNLL-U, structure standard utilisée dans le projet Universal Dependencies pour représenter des annotations linguistiques complètes. Ce fichier contient des exemples annotés manuellement, ce qui en fait une ressource précieuse pour entraîner ou évaluer des modèles. La conversion en tibble permet d'en inspecter facilement les colonnes, notamment les mots, les lemmes, les étiquettes grammaticales et les dépendances syntaxiques.
 
 ```{r}
 #| message: false
@@ -912,11 +1000,12 @@ df_tirade_nouv
 
 Nous allons analyser les différences entre ces résultats et ceux du modèle standard dans une section suivante.
 
-## 14. PCA + UMAP
+## 14. ACP + UMAP
 
-Dans cette section, nous explorons deux méthodes très répandues de réduction de dimensionnalité, la PCA (analyse en composantes principales) et UMAP, qui permettent de représenter des données complexes dans un espace de faible dimension tout en conservant autant que possible leur structure.
+Dans cette section, nous explorons deux méthodes très répandues de réduction de dimensionnalité, la ACP (analyse en composantes principales) et UMAP, qui permettent de représenter des données complexes dans un espace de faible dimension tout en conservant autant que possible leur structure.
 
-Le contexte ici est l'analyse de représentations vectorielles de mots obtenues par un modèle de type [fastText](https://fasttext.cc/docs/en/crawl-vectors.html), qui génère pour chaque mot un vecteur de grande dimension reflétant ses similarités sémantiques dans de vastes corpus textuels. Réduire ces vecteurs à deux dimensions permet de visualiser les relations entre mots d'un simple coup d'œil. fasttext. Nous allons voir d'autres applications de ces méthodes dans les sections suivantes.
+Le contexte ici est l'analyse de représentations vectorielles de mots obtenues par un modèle de type [fastText](https://fasttext.cc/docs/en/crawl-vectors.html), qui génère pour chaque mot un vecteur de grande dimension reflétant ses similarités sémantiques dans de vastes corpus textuels [@fasttext].
+Réduire ces vecteurs à deux dimensions permet de visualiser les relations entre mots d'un simple coup d'œil. fasttext. Nous allons voir d'autres applications de ces méthodes dans les sections suivantes.
 
 ```{r}
 #| message: false
@@ -936,12 +1025,12 @@ X <- embed[idx, ]
 dim(X)
 ```
 
-Le bloc suivant applique la PCA aux vecteurs. Cette méthode linéaire vise à projeter les données dans un espace de plus faible dimension en conservant la direction de variance maximale.
+Le bloc suivant applique la ACP aux vecteurs. Cette méthode linéaire vise à projeter les données dans un espace de plus faible dimension en conservant la direction de variance maximale.
 
 ```{r}
-pca <- prcomp(X, center = TRUE, scale. = TRUE)
-fl$pca1 <- pca$x[, 1]
-fl$pca2 <- pca$x[, 2]
+apc <- prcomp(X, center = TRUE, scale. = TRUE)
+fl$apc1 <- apc$x[, 1]
+fl$apc2 <- apc$x[, 2]
 fl
 ```
 
@@ -951,7 +1040,7 @@ Une fois les deux composantes extraites, nous les représentons graphiquement. C
 
 ```{r}
 fl |>
-  ggplot(aes(pca1, pca2)) +
+  ggplot(aes(apc1, apc2)) +
     geom_point(aes(colour = type)) +
     geom_text(
       aes(label = nom, colour = type),
@@ -960,15 +1049,18 @@ fl |>
     )
 ```
 
-Le bloc suivant applique UMAP, une méthode non linéaire beaucoup plus flexible que la PCA. UMAP cherche à préserver la structure locale des données et est particulièrement efficace pour faire apparaître des groupes compacts ainsi que des relations sémantiques fines. 
+Le bloc suivant applique UMAP, une méthode non linéaire beaucoup plus flexible que la ACP. UMAP cherche à préserver la structure locale des données et est particulièrement efficace pour faire apparaître des groupes compacts ainsi que des relations sémantiques fines. Nous utilisons le package **umap** et la
+fonction `umap` [@umap].
 
 ```{r}
+library(umap)
+
 obj <- umap(X)
 fl$umap1 <- obj$layout[, 1]
 fl$umap2 <- obj$layout[, 2]
 ```
 
-Les coordonnées résultantes sont ajoutées au tableau principal afin de pouvoir les visualiser de la même manière que les composantes PCA.
+Les coordonnées résultantes sont ajoutées au tableau principal afin de pouvoir les visualiser de la même manière que les composantes APC.
 
 ```{r}
 fl |>
@@ -981,11 +1073,12 @@ fl |>
     )
 ```
 
-La dernière visualisation montre le résultat d'UMAP dans un plan à deux dimensions. Ce type de projection peut révéler des structures que la PCA ne met pas en évidence, comme des sous-groupes plus subtils ou des distances sémantiques plus cohérentes à petite échelle. La combinaison des couleurs et des étiquettes rend la lecture intuitive et facilite la comparaison des deux approches de réduction de dimensionnalité.
+La dernière visualisation montre le résultat d'UMAP dans un plan à deux dimensions. Ce type de projection peut révéler des structures que la APC ne met pas en évidence, comme des sous-groupes plus subtils ou des distances sémantiques plus cohérentes à petite échelle. La combinaison des couleurs et des étiquettes rend la lecture intuitive et facilite la comparaison des deux approches de réduction de dimensionnalité.
 
 ## 15. Modèles prédictifs
 
-Dans cette section, nous abordons la construction d'un modèle prédictif à partir des données textuelles issues des mots tapés par les utilisateurs. L'objectif est d'illustrer comment transformer des données brutes en un ensemble de caractéristiques exploitables par un algorithme d'apprentissage supervisé. Nous utilison les données des révu du site [Allociné.fr](https://github.com/TheophileBlard/french-sentiment-analysis-with-bert).
+Dans cette section, nous abordons la construction d'un modèle prédictif à partir des données textuelles issues des mots tapés par les utilisateurs. L'objectif est d'illustrer comment transformer des données brutes en un ensemble de caractéristiques exploitables par un algorithme d'apprentissage supervisé. Nous utilison les données des critique du film du site [Allociné.fr](https://github.com/TheophileBlard/french-sentiment-analysis-with-bert). Nous l'utilisons pour
+une analyse de sentiment.
 
 Nous commençons par importer les données d'analyse linguistique. Ce fichier contient les mots tokenisés et lemmatisés de chaque document.
 
@@ -1003,18 +1096,18 @@ meta <- read_csv2("donnees/polarity_meta.csv.bz2")
 meta
 ```
 
-Cette étape transforme le texte en matrice sparse avec `cast_sparse`. Nous normalisons les lemmes en minuscules avec `stri_trans_tolower`, puis filtrons pour ne garder que les mots apparaissant plus de 200 fois. Chaque ligne représente un document et chaque colonne un lemme.
+Cette étape transforme le texte en matrice sparse avec `to_sparse`. Nous normalisons les lemmes en minuscules avec `stri_trans_tolower`, puis filtrons pour ne garder que les mots apparaissant plus de 200 fois. Chaque ligne représente un document et chaque colonne un lemme.
 
 ```{r}
 X <- parse |>
   mutate(lemma = stri_trans_tolower(lemma)) |>
   group_by(lemma) |>
   filter(n() > 200) |>
-  cast_sparse(doc_id, lemma)
+  to_sparse(doc_id, lemma)
 dim(X)
 ```
 
-Nous créons un dataframe qui associe chaque identifiant de document aux métadonnées correspondantes avec `left_join`, assurant ainsi la correspondance entre X et les étiquettes.
+Nous créons un tibble qui associe chaque identifiant de document aux métadonnées correspondantes avec `left_join`, assurant ainsi la correspondance entre X et les étiquettes.
 
 ```{r}
 df_meta <- tibble(doc_id = as.numeric(rownames(X))) |>
@@ -1022,16 +1115,19 @@ df_meta <- tibble(doc_id = as.numeric(rownames(X))) |>
 df_meta
 ```
 
-Nous séparons aléatoirement les données en un ensemble d'entraînement (10 000 observations) et un ensemble de validation. Cette division permet d'évaluer la performance du modèle sur des données non vues.
+Nous séparons aléatoirement les données en un ensemble d'apprentissage (10 000 observations) et un ensemble de validation. Cette division permet d'évaluer la performance du modèle sur des données non vues.
 
 ```{r}
 ind_train <- sort(sample(seq_len(nrow(X)), 10000))
 ind_valid <- setdiff(seq_len(nrow(X)), ind_train)
 ```
 
-Nous entraînons une régression logistique régularisée avec `cv.glmnet`. La fonction `family="binomial"` spécifie un problème de classification binaire et effectue automatiquement une validation croisée pour sélectionner le paramètre de régularisation optimal.
+Nous entraînons une régression logistique régularisée avec `cv.glmnet` du package **glmnet** [@glmnet]. L'option `family="binomial"` spécifie un problème de classification binaire et effectue automatiquement une validation croisée pour sélectionner le paramètre de régularisation optimal.
 
 ```{r}
+#| message: false
+library(glmnet)
+
 model <- cv.glmnet(
   X[ind_train,], df_meta$polarity[ind_train], family="binomial"
 )
@@ -1059,50 +1155,71 @@ cf <- cf[cf[,1] != 0,,drop=FALSE][-1,,drop=FALSE]
 cf[order(cf[,1]),,drop=FALSE]
 ```
 
-Nous voyons plusieurs mots associent à chaque polarité.
+Nous voyons plusieurs mots associés à chaque polarité.
 
-## 16. LLMs
+## 16. LLM
 
-Les grands modèles de langage (LLMs) offrent une approche complémentaire pour l'analyse de données textuelles. Au lieu d'entraîner un modèle supervisé à partir d'annotations humaines, nous pouvons utiliser un LLM pour générer des annotations à grande échelle. Cette section illustre comment interroger un LLM local via une API REST pour évaluer automatiquement des dimensions textuelles (conviction, certitude, positivité), puis comment utiliser ces annotations générées par le LLM comme étiquettes pour entraîner un modèle prédictif traditionnel. Cette approche permet de combiner la capacité de compréhension nuancée des LLMs avec l'efficacité et l'interprétabilité des modèles linéaires.
+Les grands modèles de langage (abrégé LLM, de l'anglais *large language model*) donnent aux agents conversationnels la capacité de comprendre et de répondre à des entrées en texte libre. Les LLM ne peuvent pas être exécutés directement dans R, mais il est possible d’y accéder au moyen d'une API. Une API permet d’utiliser un LLM à partir de divers logiciels, que ce soit localement ou via un service externe payant. Deux logiciels courants pour utiliser les LLM localement sont [ollama](https://ollama.com/) et [LM Studio](https://lmstudio.ai/).
 
-Nous construisons une requête vers un LLM local avec `POST` de la librairie httr. Le prompt demande au modèle d'évaluer trois dimensions d'un texte (conviction, certitude, positivité) et de retourner les résultats au format JSON. La fonction `toJSON` structure la requête et `content` parse la réponse.
+Voici un exemple d'utilisation d'un LLM avec la fonction `oai_chat`, LM Studio et un modèle source ouvert de OpenAI. Nous pourrions utiliser un autre service en modifiant le paramètre `base_url` ou un autre modèle en modifiant le paramètre `model`. 
 
 ```{r}
 #| eval: false
-msg <- paste(c(
-  "Évaluer le degré de conviction, le degré de certitude et le caractère",
-  "positif de ce texte sur une échelle de 1 (peu convaincant/certain/positif)",
-  "à 10 (très convaincant/certain/positif). Indiquez votre évaluation dans une",
-  "forme pur JSON. Par exemple:",
-  "{\"conviction\": 4, '': \"certain\": 8,\"positif\": 2}.\n\n"
-), collapse=" ")
+msg <- "Combien de personnes vivent dans le 11e arrondissement de Paris ?"
 
-url <- "http://localhost:1234/v1/chat/completions"
-body <- list(
-  model = "openai/gpt-oss-20b",  
-  messages = list(
-    list(role = "user", content = paste0(msg, document))
-  ),
-  temperature = 0.7
+res <- oai_chat(
+  base_url = "http://localhost:1234",
+  model = "openai/gpt-oss-20b",
+  msg = msg,
+  temperature = 0.7,
 )
-
-obj <- POST(
-  url,
-  add_headers("Content-Type" = "application/json"),
-  body = toJSON(body, auto_unbox = TRUE)
-)
-parsed <- content(obj, as = "parsed", type = "application/json")
-res <- as_tibble(fromJSON(parsed$choices[[1]]$message$content))
 res
 ```
 ```{r}
 #| echo: false
-parsed <- read_json("donnees/polarity_exemple.json", simplifyVector=TRUE)
-res <- as_tibble(fromJSON(parsed$choices$message$content[[1]]))
-res
+res <- read_lines("donnees/llm_exemple.txt")
+cat(res)
 ```
 
-Nous importons les résultats d'annotation produits par le LLM pour l'ensemble des documents. Ces annotations serviront de nouvelles étiquettes pour entraîner un modèle.
+Les LLM ouvrent de nombreuses possibilités pour étendre l'analyse des données textuelles. Par exemple, au lieu d'entraîner un modèle supervisé à partir d'annotations humaines, nous pouvons utiliser un LLM pour générer des annotations à grande échelle. Essayons maintenant avec un sous-ensemble de nos données de critiques de films.
+
+Vous trouverez ci-dessous le code qui demande à un modèle LLM d'évaluer la polarité, la certitude et la conviction d'un critiques. Le résultat est renvoyé au [format JSON](https://developer.mozilla.org/fr/docs/Learn_web_development/Core/Scripting/JSON), couramment utilisé pour transmettre des données via une API.
+
+```{r}
+#| eval: false
+msg <- c(
+  'Évaluer le degré de conviction, le degré de certitude et le caractère',
+  'positif de ce texte sur une échelle de 1 (peu convaincant/certain/positif)',
+  'à 10 (très convaincant/certain/positif). Indiquez votre évaluation dans une',
+  'forme pur JSON. Par exemple :',
+  '{"conviction": 4, "certain": 8, "positif": 2}.\n\n'
+)
+
+res <- llm_chat(
+  base_url = "http://localhost:1234/v1/chat/completions",
+  model = "openai/gpt-oss-20b",
+  msg = paste(msg, document, collapse=" "),
+  temperature = 0.7,
+)
+res
+```
+```{r}
+#| echo: false
+res <- "{\"conviction\": 7, \"certain\": 8, \"positif\": 5}"
+cat(res)
+```
+
+Les données au format JSON peuvent être facilement analysées dans R à l'aide de la fonction `fromJSON` du package **jsonlite** [@jsonlite].
+
+```{r}
+library(jsonlite)
+
+as_tibble(fromJSON(res))
+```
+
+Nous importons les résultats d'annotation produits par le LLM pour l'ensemble
+des documents. Ces annotations serviront de nouvelles étiquettes pour entraîner
+un modèle.
 
 ```{r}
 #| message: false
@@ -1110,7 +1227,7 @@ llm <- read_csv2("donnees/polarity_llm.csv.bz2")
 llm
 ```
 
-La fonction table() crée un tableau croisé comparant la polarité originale avec le score de positivité généré par le LLM, permettant d'évaluer la cohérence entre les deux mesures.
+La fonction `table` crée un tableau croisé comparant la polarité originale avec le score de positivité généré par le LLM, permettant d'évaluer la cohérence entre les deux mesures.
 
 ```{r}
 table(llm$polarity, llm$positif)
@@ -1120,7 +1237,7 @@ Nous entraînons un nouveau modèle glmnet en utilisant les annotations de polar
 
 ```{r}
 X_nouv <- X[as.character(llm$doc_id),]
-model <- cv.glmnet(X_nouv, llm$polarity)
+model <- cv.glmnet(X_nouv, llm$positif)
 ```
 
 Nous extrayons et trions les coefficients non nuls pour identifier quels lemmes sont les plus associés aux jugements de polarité du LLM, révélant potentiellement des patterns différents de ceux du modèle précédent.
@@ -1136,78 +1253,61 @@ Cette section démontre une stratégie hybride où un LLM sert d'annotateur auto
 
 ## 17. Whisper
 
-Whisper est un modèle de reconnaissance vocale développé par OpenAI capable de transcrire automatiquement de l'audio en texte avec un haut niveau de précision. Cette section montre comment utiliser l'API Whisper pour transcrire un fichier audio en français et obtenir non seulement le texte complet, mais aussi les timestamps précis de chaque mot. Cette capacité de segmentation temporelle est particulièrement utile pour l'analyse linguistique, l'alignement texte-audio, ou la création de sous-titres automatiques. Nous illustrons le processus d'envoi d'un fichier audio à l'API et le traitement de la réponse JSON structurée.
+Whisper est un modèle de reconnaissance vocale développé par OpenAI capable de transcrire automatiquement de l'audio en texte avec un haut niveau de précision. Cette section montre comment utiliser l'API Whisper pour transcrire un fichier audio en français et obtenir non seulement le texte complet, mais aussi le temps précis de chaque mot. Cette capacité de segmentation temporelle est particulièrement utile pour l'analyse linguistique, l'alignement texte-audio, ou la création de sous-titres automatiques.
 
-Nous envoyons un fichier audio MP3 à l'API Whisper avec `POST` et `upload_file`. Les paramètres spécifient le modèle à utiliser ("whisper-1"), le format de réponse détaillé ("verbose_json"), la langue source ("fr"), et la granularité des timestamps (segments et mots individuels). L'authentification se fait via un Bearer token dans les headers.
+Nous envoyons un fichier audio MP3 à l'API Whisper avec la fonction `oai_transcriptions`. Les paramètres spécifient le modèle à utiliser ("whisper-1") et la langue source ("fr"), et la granularité de temps (segments et mots individuels). 
 
 ```{r}
 #| eval: false
-api_key <- "AJOUTEZ_ICI"
-url <- "https://api.openai.com/v1/audio/transcriptions"
-audio_path <- "static/rhapsodie/mp3/Rhap-D0001.mp3"
+Sys.setenv(OPENAI_API_KEY = "AJOUTEZ_ICI")
 
-res <- POST(
-  url,
-  add_headers(
-    Authorization = paste("Bearer", api_key)
-  ),
-  body = list(
-    file             = upload_file(audio_path),
-    model            = "whisper-1",
-    response_format  = "verbose_json",
-    language         = "fr",
-    `timestamp_granularities[]` = c("segment", "word")
-  ),
-  encode = "multipart"
+trans <- oai_transcriptions(
+  file = "donnees/rhapsodie/mp3/Rhap-D0001.mp3",
+  model_name = "whisper-1",
+  language = "fr"
 )
-```
 
-Nous extrayons le contenu JSON de la réponse avec content() et le parsons avec fromJSON(). La liste résultante contient notamment un élément words qui fournit chaque mot transcrit avec ses timestamps de début et de fin.
-
-```{r}
-#| eval: false
-json_txt <- content(res, as = "text", encoding = "UTF-8")
-transcription <- fromJSON(json_txt, simplifyVector = FALSE)
-whisper_mots <- as_tibble(transcription$words)
+whisper_mots <- as_tibble(trans$words)
 whisper_mots
 ```
 ```{r}
+#| echo: false
 transcription <- read_json("donnees/Rhap-D0001.json", simplifyVector = TRUE)
 whisper_mots <- as_tibble(transcription$words)
 whisper_mots <- tidyr::unnest(whisper_mots, cols = everything())
 whisper_mots
 ```
 
-Cette section illustre l'utilisation de Whisper pour la transcription automatique avec alignement temporel précis. Les données obtenues peuvent servir de base pour diverses analyses : comparaison avec des transcriptions manuelles, étude de la durée des mots, analyse prosodique, ou création de corpus annotés. L'accès programmatique à l'API Whisper via R facilite l'intégration de la reconnaissance vocale dans des pipelines d'analyse de données plus larges, ouvrant la voie à l'étude systématique de grandes quantités de données audio.
+L'accès programmatique à l'API Whisper via R facilite l'intégration de la reconnaissance vocale dans des chaînes de traitement d'analyse de données plus larges, ouvrant la voie à l'étude systématique de grandes quantités de données audio.
 
 ## 18. Plongement de textes
 
-Les plongements de textes (text embeddings) sont des représentations vectorielles denses qui capturent le sens sémantique des documents dans un espace de dimension réduite. Contrairement aux représentations bag-of-words qui créent des vecteurs creux de haute dimension, les embeddings produits par des modèles comme OpenAI's text-embedding génèrent des vecteurs denses de quelques milliers de dimensions où des textes similaires en sens sont proches dans l'espace vectoriel. Cette section montre comment obtenir des embeddings via l'API OpenAI, les utiliser pour entraîner un modèle prédictif, et visualiser la structure sémantique des documents en deux dimensions avec UMAP.
+Les plongements de textes (text embeddings) sont des représentations vectorielles denses qui capturent le sens sémantique des documents dans un espace de dimension réduite. Contrairement aux représentations sac-de-mots qui créent des vecteurs creux de haute dimension, les embeddings produits par des modèles comme OpenAI's plongement de textes génèrent des vecteurs denses de quelques milliers de dimensions où des textes similaires en sens sont proches dans l'espace vectoriel. Cette section montre comment obtenir des embeddings via l'API OpenAI, les utiliser pour entraîner un modèle prédictif, et visualiser la structure sémantique des documents en deux dimensions avec UMAP.
 
-Nous envoyons un document à l'API OpenAI avec `POST` pour obtenir sa représentation vectorielle. Le modèle "text-embedding-3-large" génère un vecteur dense qui encode le contenu sémantique du texte. La fonction `fromJSON` parse la réponse et `unlist` extrait le vecteur d'embedding numérique.
+Pour accéder aux plongements basées sur LLM, nous utilisons encore une API, 
+cette fois avec la fonction `oai_embeddings`. Dans cet exemple, nous utiliserons un modèle propriétaire d'OpenAI, mais il est également possible de modifier l'URL pour utiliser un modèle local.
 
 ```{r}
 #| eval: false
-api_key <- "AJOUTEZ_ICI"
-url <- "https://api.openai.com/v1/audio/transcriptions"
+Sys.setenv(OPENAI_API_KEY = "AJOUTEZ_ICI")
 
-res <- POST(
-  url,
-  add_headers(
-    Authorization = paste("Bearer", api_key),
-    "Content-Type" = "application/json"
-  ),
-  body = toJSON(list(
-    model = "text-embedding-3-large",
-    input = document
-  ), auto_unbox = TRUE)
+res <- oai_embeddings(
+  input = "Que sais-je?",
+  model = "text-embedding-3-large"
 )
 
-json_txt <- content(res, as = "text", encoding = "UTF-8")
-obj <- fromJSON(json_txt, simplifyVector = FALSE)
-X <- unlist(obj$data[[1]]$embedding)
-dim(X)
+dim(res)
 ```
+```{r}
+#| echo: false
+res <- read_rds("donnees/embed_ex_saisje.rds")
+length(res)
+```
+
+Nous voyons que ce plongement de texte a une dimension de 3072. Notez que la dimension ne change pas en fonction de la taille du texte.
+
+Nous chargeons un ensemble de données précalculées d'intégrations provenant d'un échantillon de critiques de films.
+
 ```{r}
 X <- read_rds("donnees/polarity_embed.rds")
 dim(X)
@@ -1228,7 +1328,7 @@ model <- cv.glmnet(
 )
 ```
 
-Nous générons des prédictions sur l'ensemble de validation avec predict() et calculons la précision globale. Les embeddings capturant la sémantique profonde, la performance peut être élevée même avec peu de données d'entraînement.
+Nous générons des prédictions sur l'ensemble de validation avec `predict` et calculons la précision globale. Les embeddings capturant la sémantique profonde, la performance peut être élevée même avec peu de données d'entraînement.
 
 ```{r}
 pred <- predict(model, newx=X[ind_valid,], type = "class")
@@ -1254,18 +1354,19 @@ Nous créons un graphique de dispersion avec ggplot() montrant la projection UMA
 
 ```{r}
 llm |>
+  mutate(positif = factor(positif)) |>
   ggplot(aes(umap1, umap2)) +
-    geom_point(aes(colour = factor(positif)), size=6, alpha=0.4) +
+    geom_point(aes(colour = positif), size=6, alpha=0.4) +
     scale_colour_viridis_d()
 ```
 
-Cette section illustre la puissance des embeddings de textes pour l'analyse et la classification. Comparés aux représentations bag-of-words, les embeddings capturent des relations sémantiques complexes et permettent d'obtenir de bonnes performances avec moins de données d'entraînement. La visualisation UMAP révèle la structure sémantique sous-jacente des documents, montrant comment le modèle d'embedding organise les textes selon leur sens. Cette approche est particulièrement efficace pour des tâches nécessitant une compréhension nuancée du contenu textuel, et peut facilement être intégrée dans des pipelines d'apprentissage automatique plus complexes.
+Cette section illustre la puissance des embeddings de textes pour l'analyse et la classification. Comparés aux représentations sac-de-mots, les embeddings capturent des relations sémantiques complexes et permettent d'obtenir de bonnes performances avec moins de données d'entraînement. La visualisation UMAP révèle la structure sémantique sous-jacente des documents, montrant comment le modèle d'embedding organise les textes selon leur sens. Cette approche est particulièrement efficace pour des tâches nécessitant une compréhension nuancée du contenu textuel, et peut facilement être intégrée dans des chaînes de traitement d'apprentissage automatique plus complexes.
 
 ## 19. Alignement des textes 
 
-Lorsque nous analysons le même texte avec différents modèles ou outils d'annotation linguistique, il est essentiel de pouvoir comparer systématiquement leurs sorties. Cette section présente l'alignement de deux annotations du même texte produites par des modèles différents. En alignant les tokens correspondants, nous pouvons identifier les divergences dans les analyses (étiquettes morphosyntaxiques, lemmes, relations de dépendance) et évaluer la cohérence ou les différences entre les modèles. Cette approche est cruciale pour la validation de modèles, l'amélioration de pipelines d'analyse, ou la compréhension des forces et faiblesses de différents systèmes d'annotation.
+Lorsque nous analysons le même texte avec différents modèles ou outils d'annotation linguistique, il est essentiel de pouvoir comparer systématiquement leurs sorties. Cette section présente l'alignement de deux annotations du même texte produites par des modèles différents. En alignant les tokens correspondants, nous pouvons identifier les divergences dans les analyses (étiquettes morphosyntaxiques, lemmes, relations de dépendance) et évaluer la cohérence ou les différences entre les modèles. Cette approche est cruciale pour la validation de modèles, l'amélioration de chaînes de traitement d'analyse, ou la compréhension des forces et faiblesses de différents systèmes d'annotation.
 
-Nous utilisons la fonction alignement_des_textes() pour apparier les tokens des deux annotations en se basant sur la colonne token. Le paramètre suffix_y = "_nouv" ajoute un suffixe aux colonnes de la seconde annotation pour les distinguer, créant ainsi un dataframe combiné où chaque ligne contient les informations des deux modèles pour le même token.
+Nous utilisons la fonction alignement_des_textes() pour apparier les tokens des deux annotations en se basant sur la colonne token. Le paramètre suffix_y = "_nouv" ajoute un suffixe aux colonnes de la seconde annotation pour les distinguer, créant ainsi un tibble combiné où chaque ligne contient les informations des deux modèles pour le même token.
 
 ```{r}
 df_comb <- alignement_des_textes(
@@ -1294,3 +1395,8 @@ Cette section démontre l'importance de l'alignement pour la comparaison systém
 Ce parcours à travers diverses techniques de traitement et d'analyse des données textuelles et temporelles a montré la richesse des outils disponibles en R pour explorer des corpus linguistiques, qu'ils proviennent de frappes clavier, d'annotations phonétiques, de textes littéraires ou de grands ensembles issus du web. En partant de transformations simples de tableaux et de statistiques descriptives, nous avons progressivement étendu la palette d'analyses vers des modèles plus sophistiqués : fonctions de fenêtre pour décrire des dynamiques, expressions régulières pour extraire de l'information fine au sein des mots, annotation grammaticale automatique pour comprendre la structure des phrases, réduction de dimensionnalité pour visualiser des représentations sémantiques, et enfin modèles prédictifs pour relier des caractéristiques textuelles à des propriétés externes.
 
 L'ensemble de ces approches montre comment des données très hétérogènes — temps d'appui sur les touches, phonèmes, traits morphologiques, vecteurs d'embedding ou encore fréquences lexicales — peuvent être articulées pour éclairer des questions linguistiques ou comportementales. Les exemples présentés ne constituent qu'un point de départ : ils ouvrent la voie à des analyses plus fines, des comparaisons plus larges et des modèles plus ambitieux. L'essentiel est de comprendre que chaque étape, du prétraitement aux modèles prédictifs, contribue à transformer des données brutes en connaissances interprétables. Ces techniques offrent ainsi un ensemble puissant et flexible pour explorer empiriquement la langue et les usages qu'en font les locuteurs.
+
+## Les références
+
+::: {#refs}
+:::
