@@ -100,7 +100,7 @@ suivre, vous pouvez soit exécuter le code dans Google Colab, soit
 
 ```{=html}
 <div class="buttons-container">
-  <a href="" class="button is-primary" target="_blank">
+  <a href="https://distantviewing.org/atelier_r_linguistique.zip" class="button is-primary" target="_blank">
     <span>Télécharger le code</span>
   </a> 
   <a href="https://colab.research.google.com/drive/11vUiFHNm6sOdBVjN2Y5Z2jKF8SCW9Acu?usp=sharing" class="button is-info" target="_blank">
