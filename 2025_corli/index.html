@@ -189,10 +189,10 @@ div.csl-indent {
 <h2 class="anchored" data-anchor-id="configuration">2. Configuration</h2>
 <p>Comme toutes les compétences, la seule façon d’apprendre le langage R est de pratiquer en produisant du code vous-même. Pour vous aider à le faire, je vous fournis des exercices qui correspondent à chaque section ci-dessous. Pour les suivre, vous pouvez soit exécuter le code dans Google Colab, soit <a href="https://cran.r-project.org/">télécharger R</a>, <a href="https://posit.co/downloads/">RStudio</a>, et les exemples et données ci-dessous dans votre propre ordinateur.</p>
 <div class="buttons-container">
-  <a href="" class="button is-primary" target="_blank">
+  <a href="https://distantviewing.org/atelier_r_linguistique.zip" class="button is-primary" target="_blank">
     <span>Télécharger le code</span>
   </a> 
-  <a href="" class="button is-info" target="_blank">
+  <a href="https://colab.research.google.com/drive/11vUiFHNm6sOdBVjN2Y5Z2jKF8SCW9Acu?usp=sharing" class="button is-info" target="_blank">
     <span>Exécuter sur Colab</span>
   </a>
 </div>
@@ -374,16 +374,16 @@ div.csl-indent {
 <pre><code># A tibble: 1,668 × 9
       id groupe api   xsampa   dur    f0    f1    f2    f3
    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
- 1    74 homme  ʊ     U        111   156   463  1086  2453
- 2    71 homme  ɛ     E        125   128   636  1893  2765
- 3    90 homme  u     u        125   171   374   887  2478
- 4    74 homme  ʌ     V        128   152   622  1285  2472
- 5    59 homme  ɪ     I        134   145   424  1913  2556
- 6    74 homme  ɪ     I        134   165   440  2119  2694
- 7    75 homme  ʊ     U        134   160   500  1067  2435
+ 1    74 home   ʊ     U        111   156   463  1086  2453
+ 2    71 home   ɛ     E        125   128   636  1893  2765
+ 3    90 home   u     u        125   171   374   887  2478
+ 4    74 home   ʌ     V        128   152   622  1285  2472
+ 5    59 home   ɪ     I        134   145   424  1913  2556
+ 6    74 home   ɪ     I        134   165   440  2119  2694
+ 7    75 home   ʊ     U        134   160   500  1067  2435
  8     7 fille  ɛ     E        135   205   605  2445  3265
  9    22 fille  ɪ     I        137   229   447  2645  3302
-10    64 homme  ɛ     E        138   128   615  1624  2265
+10    64 home   ɛ     E        138   128   615  1624  2265
 # ℹ 1,658 more rows</code></pre>
 </div>
 </div>
@@ -532,19 +532,19 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(phone<span class="sc">$</span>api, phone<span class="sc">$</span>groupe)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    
-     femme fille garçon homme
-  æ     48    27     19    45
-  ɑ     48    27     19    45
-  e     48    27     19    45
-  ɛ     48    27     19    45
-  ɜ˞    48    27     19    45
-  i     48    27     19    45
-  ɪ     48    27     19    45
-  o     48    27     19    45
-  ɔ     48    27     19    45
-  u     48    27     19    45
-  ʊ     48    27     19    45
-  ʌ     48    27     19    45</code></pre>
+     femme fille garçon home
+  æ     48    27     19   45
+  ɑ     48    27     19   45
+  e     48    27     19   45
+  ɛ     48    27     19   45
+  ɜ˞    48    27     19   45
+  i     48    27     19   45
+  ɪ     48    27     19   45
+  o     48    27     19   45
+  ɔ     48    27     19   45
+  u     48    27     19   45
+  ʊ     48    27     19   45
+  ʌ     48    27     19   45</code></pre>
 </div>
 </div>
 <p>Maintenant, nous avons une base solide de verbes et de fonctions de visualisation. Tous ces éléments sont au cœur de la science des données. Dans la section suivante, nous ajoutons des fonctions de modélisation.</p>
@@ -704,7 +704,7 @@ F-statistic: 11.82 on 1 and 1145049 DF,  p-value: 0.0005857</code></pre>
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cefr) <span class="sc">|&gt;</span></span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mu =</span> <span class="fu">median</span>(d1)) <span class="sc">|&gt;</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mu =</span> <span class="fu">median</span>(d1)) <span class="sc">|&gt;</span></span>
 <span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mu))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 2
@@ -720,7 +720,7 @@ F-statistic: 11.82 on 1 and 1145049 DF,  p-value: 0.0005857</code></pre>
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>mots <span class="sc">|&gt;</span></span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lang) <span class="sc">|&gt;</span></span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mu =</span> <span class="fu">median</span>(d1)) <span class="sc">|&gt;</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mu =</span> <span class="fu">median</span>(d1)) <span class="sc">|&gt;</span></span>
 <span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mu))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 8 × 2
@@ -849,7 +849,7 @@ F-statistic: 11.82 on 1 and 1145049 DF,  p-value: 0.0005857</code></pre>
 <span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nchar =</span> <span class="fu">stri_length</span>(mot)) <span class="sc">|&gt;</span></span>
 <span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(meta, <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lang) <span class="sc">|&gt;</span></span>
-<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mu =</span> <span class="fu">mean</span>(nchar, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mu =</span> <span class="fu">mean</span>(nchar, <span class="at">na.rm=</span><span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mu))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 8 × 2
@@ -914,7 +914,7 @@ F-statistic: 11.82 on 1 and 1145049 DF,  p-value: 0.0005857</code></pre>
 <span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nchar =</span> <span class="fu">stri_length</span>(mot)) <span class="sc">|&gt;</span></span>
 <span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(nchar <span class="sc">&lt;</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
 <span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(nchar, has_maj) <span class="sc">|&gt;</span></span>
-<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mu =</span> <span class="fu">median</span>(dur_mot)) <span class="sc">|&gt;</span></span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mu =</span> <span class="fu">median</span>(dur_mot)) <span class="sc">|&gt;</span></span>
 <span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="fu">factor</span>(nchar), mu)) <span class="sc">+</span></span>
 <span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> has_maj))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -994,7 +994,7 @@ F-statistic: 11.82 on 1 and 1145049 DF,  p-value: 0.0005857</code></pre>
 <div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>tg_phone <span class="sc">|&gt;</span></span>
 <span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(text <span class="sc">!=</span> <span class="st">"_"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(text) <span class="sc">|&gt;</span></span>
-<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">dur_moyenne =</span> <span class="fu">mean</span>(xmax <span class="sc">-</span> xmin)) <span class="sc">|&gt;</span></span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">dur_moyenne =</span> <span class="fu">mean</span>(xmax <span class="sc">-</span> xmin)) <span class="sc">|&gt;</span></span>
 <span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(dur_moyenne) <span class="sc">|&gt;</span></span>
 <span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="fu">fct_inorder</span>(text), dur_moyenne)) <span class="sc">+</span></span>
 <span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1066,7 +1066,7 @@ F-statistic: 11.82 on 1 and 1145049 DF,  p-value: 0.0005857</code></pre>
 <div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>tg_join <span class="sc">|&gt;</span></span>
 <span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(text <span class="sc">!=</span> <span class="st">"_"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(text) <span class="sc">|&gt;</span></span>
-<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">moyenne_l =</span> <span class="fu">mean</span>(text_contour <span class="sc">==</span> <span class="st">"L"</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
 <span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
 <span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
@@ -1156,7 +1156,7 @@ F-statistic: 11.82 on 1 and 1145049 DF,  p-value: 0.0005857</code></pre>
 <div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
 <span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(text <span class="sc">!=</span> <span class="st">"_"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(text) <span class="sc">|&gt;</span></span>
-<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">moyenne_l =</span> <span class="fu">mean</span>(text_contour <span class="sc">==</span> <span class="st">"L"</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
 <span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
 <span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
@@ -1424,7 +1424,7 @@ F-statistic: 11.82 on 1 and 1145049 DF,  p-value: 0.0005857</code></pre>
 <span id="cb96-7"><a href="#cb96-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">passe =</span> <span class="fu">stri_count</span>(morph, <span class="at">fixed =</span> <span class="st">"Tense=Past"</span>)</span>
 <span id="cb96-8"><a href="#cb96-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb96-9"><a href="#cb96-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lemma) <span class="sc">|&gt;</span></span>
-<span id="cb96-10"><a href="#cb96-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb96-10"><a href="#cb96-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb96-11"><a href="#cb96-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">pres_moyenne =</span> <span class="fu">mean</span>(pres),</span>
 <span id="cb96-12"><a href="#cb96-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">imp_moyenne =</span> <span class="fu">mean</span>(imp),</span>
 <span id="cb96-13"><a href="#cb96-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">passe_moyenne =</span> <span class="fu">mean</span>(passe),</span>
@@ -1820,20 +1820,20 @@ excellent   0.374677833</code></pre>
 <div class="sourceCode cell-code" id="cb134"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a>llm <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/polarity_llm.csv.bz2"</span>)</span>
 <span id="cb134-2"><a href="#cb134-2" aria-hidden="true" tabindex="-1"></a>llm</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 943 × 7
+<pre><code># A tibble: 953 × 7
    doc_id input                        polarity raw   conviction certain positif
     &lt;dbl&gt; &lt;chr&gt;                           &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
- 1     39 "Petit film amateur réalisé…        0 "{\"…          5       5       7
- 2    132 "Une comédie romantique bie…        1 "{\"…          6       6       9
- 3    618 "Le sujet est d'une sensibi…        1 "{\"…          8       8       9
- 4    720 "Structure narrative classi…        0 "{\"…          6       6       2
- 5    859 "Un film énigmatique dans s…        1 "{\"…          7       7       8
- 6    989 "Fortunata n'a pas la vie f…        0 "{\"…          5       5       2
- 7   1781 "j'ai vu les deux films et …        1 "{\"…          8       8       8
- 8   1817 "Très déçue. Comme trop sou…        0 "{\"…          7       7       2
- 9   1852 "Antonio Banderas s'investi…        0 "{\"…          9       9       2
-10   1982 "Mais qu est ce que c est n…        0 "{\"…          6       6       2
-# ℹ 933 more rows</code></pre>
+ 1     39 "Petit film amateur réalisé…        0 "{\"…          6       7       5
+ 2    132 "Une comédie romantique bie…        1 "{\"…          7       8       9
+ 3    618 "Le sujet est d'une sensibi…        1 "{\"…          9       9      10
+ 4    720 "Structure narrative classi…        0 "{\"…          8       7       2
+ 5    859 "Un film énigmatique dans s…        1 "{\"…          5       4       7
+ 6    989 "Fortunata n'a pas la vie f…        0 "{\"…          6       8       2
+ 7   1781 "j'ai vu les deux films et …        1 "{\"…          8       7       9
+ 8   1817 "Très déçue. Comme trop sou…        0 "{\"…          8       7       2
+ 9   1852 "Antonio Banderas s'investi…        0 "{\"…          9       9       1
+10   1982 "Mais qu est ce que c est n…        0 "{\"…          6       8       2
+# ℹ 943 more rows</code></pre>
 </div>
 </div>
 <p>La fonction <code>table</code> crée un tableau croisé comparant la polarité originale avec le score de positivité généré par le LLM, permettant d’évaluer la cohérence entre les deux mesures.</p>
@@ -1842,14 +1842,14 @@ excellent   0.374677833</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>   
       1   2   3   4   5   6   7   8   9  10
-  0 129 254  52  20  12   5   5   7   2   0
-  1   2  11   7   6   8  18  32  80 218  75</code></pre>
+  0 129 256  57  15  16   9   9   2   2   1
+  1   2  10   9   7  11  17  32  86 216  67</code></pre>
 </div>
 </div>
 <p>Nous entraînons un nouveau modèle glmnet en utilisant les annotations de polarité générées par le LLM comme variable cible. La matrice X est d’abord filtrée pour ne garder que les documents annotés.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb138"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb138-1"><a href="#cb138-1" aria-hidden="true" tabindex="-1"></a>X_nouv <span class="ot">&lt;-</span> X[<span class="fu">as.character</span>(llm<span class="sc">$</span>doc_id),]</span>
-<span id="cb138-2"><a href="#cb138-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(X_nouv, llm<span class="sc">$</span>polarity)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb138-2"><a href="#cb138-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(X_nouv, llm<span class="sc">$</span>positif)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Nous extrayons et trions les coefficients non nuls pour identifier quels lemmes sont les plus associés aux jugements de polarité du LLM, révélant potentiellement des patterns différents de ceux du modèle précédent.</p>
 <div class="cell">
@@ -1857,19 +1857,17 @@ excellent   0.374677833</code></pre>
 <span id="cb139-2"><a href="#cb139-2" aria-hidden="true" tabindex="-1"></a>cf <span class="ot">&lt;-</span> cf[cf[,<span class="dv">1</span>] <span class="sc">!=</span> <span class="dv">0</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>][<span class="sc">-</span><span class="dv">1</span>,,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span>
 <span id="cb139-3"><a href="#cb139-3" aria-hidden="true" tabindex="-1"></a>cf[<span class="fu">order</span>(cf[,<span class="dv">1</span>]),,drop<span class="ot">=</span><span class="cn">FALSE</span>]</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>11 x 1 sparse Matrix of class "dgCMatrix"
-           s=0.06928058
-mal        -0.063569933
-intérêt    -0.042457059
-mauvais    -0.026973721
-ne         -0.021934904
-médiocre   -0.021916452
-navet      -0.013438376
-avec        0.006829516
-très        0.007689508
-magnifique  0.038056826
-bel         0.040244303
-excellent   0.130214745</code></pre>
+<pre><code>9 x 1 sparse Matrix of class "dgCMatrix"
+           s=0.5341057
+mal        -0.30335297
+mauvais    -0.19382625
+ne         -0.18204717
+pire       -0.04267963
+ridicule   -0.02476939
+très        0.04357302
+magnifique  0.14690575
+bel         0.20887087
+excellent   1.05102845</code></pre>
 </div>
 </div>
 <p>Cette section démontre une stratégie hybride où un LLM sert d’annotateur automatique pour créer des données d’entraînement. En comparant les coefficients du modèle entraîné sur les annotations LLM avec ceux du modèle basé sur les annotations originales, nous pouvons identifier les différences dans les patterns linguistiques capturés par chaque approche. Cette méthode est particulièrement utile lorsque l’annotation humaine est coûteuse ou lorsque nous souhaitons explorer rapidement différentes dimensions d’analyse textuelle. Cependant, il est important de valider la qualité des annotations LLM et de comprendre que le modèle résultant reflète les biais et les capacités du LLM utilisé pour l’annotation.</p>
@@ -1935,7 +1933,7 @@ excellent   0.130214745</code></pre>
 <div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"donnees/polarity_embed.rds"</span>)</span>
 <span id="cb145-2"><a href="#cb145-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(X)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1]  943 3072</code></pre>
+<pre><code>[1]  953 3072</code></pre>
 </div>
 </div>
 <p>Nous créons un ensemble d’entraînement réduit (700 observations) et un ensemble de validation avec <code>sample</code>. Les embeddings étant des représentations riches, même un petit ensemble d’entraînement peut produire de bons résultats.</p>
@@ -1954,7 +1952,7 @@ excellent   0.130214745</code></pre>
 <div class="sourceCode cell-code" id="cb149"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, <span class="at">newx=</span>X[ind_valid,], <span class="at">type =</span> <span class="st">"class"</span>)</span>
 <span id="cb149-2"><a href="#cb149-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(pred <span class="sc">==</span> llm<span class="sc">$</span>polarity[ind_valid])</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9547325</code></pre>
+<pre><code>[1] 0.9644269</code></pre>
 </div>
 </div>
 <p>La fonction <code>table</code> produit une matrice de confusion détaillant la répartition des prédictions correctes et incorrectes, permettant d’identifier d’éventuels biais du modèle.</p>
@@ -1963,8 +1961,8 @@ excellent   0.130214745</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>    y
 pred   0   1
-   0 122   2
-   1   9 110</code></pre>
+   0 135   2
+   1   7 109</code></pre>
 </div>
 </div>
 <p>Nous appliquons UMAP avec <code>umap</code> pour projeter les embeddings de haute dimension en deux dimensions visualisables. Cette technique de réduction dimensionnelle préserve la structure locale et révèle les regroupements sémantiques dans les données.</p>
