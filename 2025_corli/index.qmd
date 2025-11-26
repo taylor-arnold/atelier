@@ -55,7 +55,7 @@ les données qui proviennent de diverses parties de la linguistique.
 
 Bien que nous présentions les principaux concepts dans les notes suivantes, nous vous suggérons de consulter les ressources supplémentaires suivantes pour approfondir le sujet :
 
-- [*R for Data Science (2e)*](https://r4ds.hadley.nz/) Livre en libre accès en anglais qui développe directement les fonctions essentielles de visualisation, de manipulation et de programmation des données dans R.
+- [*R for Data Science (2e)*](https://r4ds.hadley.nz/) Livre disponible gratuitement en anglais qui approfondit les fonctions essentielles de visualisation, de manipulation et de programmation des données dans R présentées dans ces notes.
 - [*Humanities Data in R (2e)*](https://humanitiesdata.org/text/) Livre accèsible en anglais (nom d'utilisateur et mot de passe son "hdir") qui donne les méthodes plus avancées pour traiter des données complexes et multimodales.
 - Les aides-mémoirs :
 [les graphiques](https://raw.githubusercontent.com/rstudio/cheatsheets/main/translations/french/data-visualization_fr.pdf),
@@ -292,10 +292,16 @@ la place des points.
 
 ```{r}
 phone |>
-  ggplot(aes(f2, f1)) +
-  geom_text(aes(label = api)) +
+  ggplot() +
+  geom_text(aes(x=f2, y=f1, label = api)) +
   scale_x_reverse() +
   scale_y_reverse()
+```
+
+Nous pouvons sauvgarder une visualisation avec la fonction `ggsave`. Par défaut, le dernier graphique affiché est enregistré.
+
+```{r}
+ggsave("ma_visualisation.png", height=12, width=12, units="cm")
 ```
 
 Il existe beaucoup de géométries, d'esthétiques et d'échelles pour élargir
@@ -402,6 +408,19 @@ phone |>
   )
 ```
 
+Nous pouvons enregistrer le résultat d'une manipulation de données à l'aide d'une flèche (`<-`). Celui-ci peut ensuite être enregistré sous forme de fichier que nous pouvons ouvrir dans d'autres logiciels à l'aide de `write_csv2`. Voici un exemple
+
+```{r}
+phone_moyenne <- phone |>
+  group_by(api) |>
+  summarise(
+    f1_m = mean(f1),
+    f2_m = mean(f2)
+  )
+
+write_csv2(phone_moyenne, "donnees/phone_moyenne.csv")
+```
+
 Le pouvoir de la fonction `summarise` devient plus clair en voyant l'application
 aux visualisations. Avec une combinaison des verbes et couches de graphiques,
 nous avons les outils pour visualiser les formants moyens de chaque voyelle
@@ -414,9 +433,9 @@ phone |>
     f1_m = mean(f1),
     f2_m = mean(f2)
   ) |>
-  ggplot(aes(f2_m, f1_m)) +
-    geom_point(size = 8) +
-    geom_text(aes(label = api), colour="#fff") +
+  ggplot() +
+    geom_point(aes(x=f2_m, y=f1_m), size = 8) +
+    geom_text(aes(x=f2_m, y=f1_m, label = api), colour="#fff") +
     scale_x_reverse() +
     scale_y_reverse() 
 ```
@@ -598,10 +617,10 @@ touches_min |>
     dur_moyenne100 = slide_mean(dur, before=100),
     dur_moyenne1000 = slide_mean(dur, before=1000) 
   ) |>
-  ggplot(aes(t0, dur_moyenne10)) +
-    geom_line(colour = "#fa8072") +
-    geom_line(aes(y=dur_moyenne100), colour = "#808000") +
-    geom_line(aes(y=dur_moyenne1000), colour = "#6fa8dc")     
+  ggplot() +
+    geom_line(aes(x=t0, y=dur_moyenne10), colour = "#fa8072") +
+    geom_line(aes(x=t0, y=dur_moyenne100), colour = "#808000") +
+    geom_line(aes(x=t0, y=dur_moyenne1000), colour = "#6fa8dc")     
 ```
 
 Enfin, le dernier bloc explore l'utilisation de fenêtres glissantes plus larges permettant de calculer des moyennes mobiles sur différents horizons. Après avoir filtré un utilisateur particulier, nous ordonnons ses frappes puis appliquons plusieurs tailles de fenêtre afin de lisser progressivement les durées observées. Cela donne des courbes plus ou moins sensible aux variations locales : une petite fenêtre suit de près les changements instantanés, tandis qu'une grande fenêtre met en évidence des tendances plus globales. Le graphique obtenu superpose ces différentes moyennes, offrant une visualisation intuitive de l'évolution du rythme de frappe au cours du temps.
@@ -651,8 +670,8 @@ mots |>
   filter(nchar < 10) |>
   group_by(nchar, has_maj) |>
   summarise(mu = median(dur_mot)) |>
-  ggplot(aes(factor(nchar), mu)) +
-    geom_point(aes(colour = has_maj))
+  ggplot() +
+    geom_point(aes(x=factor(nchar), y=mu, colour = has_maj))
 ```
 
 Il y a beaucoup d'autres fonctions de stringi qui ont la même forme avec le choix d'une phrase figée ou une expression régulière. Par exemple, j'utilise souvent `stri_count`, `stri_replace`, `stri_extract` et `stri_match`.
@@ -711,8 +730,8 @@ tg_phone |>
   group_by(text) |>
   summarise(dur_moyenne = mean(xmax - xmin)) |>
   arrange(dur_moyenne) |>
-  ggplot(aes(fct_inorder(text), dur_moyenne)) +
-    geom_point()
+  ggplot() +
+    geom_point(aes(x=fct_inorder(text), y=dur_moyenne))
 ```
 
 Le bloc suivant extrait un autre tier, ici appelé `contour`, qui peut représenter des catégories prosodiques ou des niveaux mélodiques associés à la parole. En filtrant ce tier pour ne conserver que certains symboles choisis, on se concentre sur les principales catégories d'annotation nécessaires à l'analyse. Afficher le tableau obtenu permet de vérifier que les entrées retenues sont bien celles attendues avant de les utiliser comme éléments de référence pour une fusion avec les phonèmes.
@@ -896,8 +915,8 @@ Nous pouvons récréer la visualisation comme dans la Section 4 avec les formant
 ```{r}
 df |>
   mutate(api = stri_replace(fname, "", fixed = ".wav")) |>
-  ggplot(aes(f2, f1)) +
-    geom_text(aes(label = api)) +
+  ggplot() +
+    geom_text(aes(x=f2, y=f1, label = api)) +
     scale_x_reverse() +
     scale_y_reverse()
 ```
@@ -1040,10 +1059,10 @@ Une fois les deux composantes extraites, nous les représentons graphiquement. C
 
 ```{r}
 fl |>
-  ggplot(aes(apc1, apc2)) +
-    geom_point(aes(colour = type)) +
+  ggplot() +
+    geom_point(aes(x=apc1, y=apc2, colour = type)) +
     geom_text(
-      aes(label = nom, colour = type),
+      aes(x=apc1, y=apc2, label = nom, colour = type),
       size = 2,
       nudge_y = -0.25
     )
@@ -1064,10 +1083,10 @@ Les coordonnées résultantes sont ajoutées au tableau principal afin de pouvoi
 
 ```{r}
 fl |>
-  ggplot(aes(umap1, umap2)) +
-    geom_point(aes(colour = type)) +
+  ggplot() +
+    geom_point(aes(x=umap1, y=umap2, colour = type)) +
     geom_text(
-      aes(label = nom, colour = type),
+      aes(x=umap1, y=umap2, label = nom, colour = type),
       size = 2,
       nudge_y = -0.1
     )
@@ -1355,8 +1374,8 @@ Nous créons un graphique de dispersion avec ggplot() montrant la projection UMA
 ```{r}
 llm |>
   mutate(positif = factor(positif)) |>
-  ggplot(aes(umap1, umap2)) +
-    geom_point(aes(colour = positif), size=6, alpha=0.4) +
+  ggplot() +
+    geom_point(aes(x=umap1, y=umap2, colour = positif), size=6, alpha=0.4) +
     scale_colour_viridis_d()
 ```
 
