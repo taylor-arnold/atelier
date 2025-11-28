@@ -159,7 +159,7 @@ structurées sous forme de tableau. L'objet ci-dessus a 1668 lignes et 8 colonne
 Chaque ligne montre les métadonnées d'un locuteur et les mesures phonétiques
 d'une voyelle. Par défaut, nous ne voyons que les dix premières lignes. Pour
 chaque colonne, il y a un nom (id, groupe, etc.) et un type de données. Les
-colonnes numériques ont le type <dbl>, une abréviation de « double »
+colonnes numériques ont le type \<dbl\>, une abréviation de « double »
 dans l'expression 
 « nombre flottante à virgule double précision ». Les colonnes
 qui contiennent des chaines de caractères ont le type \<chr\>, une abréviation de
@@ -688,18 +688,19 @@ Pour une référence de toutes les options, je vous recommande le [« Cheatsheet
 
 ## 10. TextGrid
 
-Dans cette sections, nous travaillons avec des fichiers TextGrid, un format couramment utilisé en phonétique pour annoter des enregistrements audio qui
+Dans cet section, nous travaillons avec des fichiers au format TextGrid, un format couramment utilisé en phonétique pour annoter des enregistrements audio
 qui provient du logiciel Pratt [@styler2013using]. Nous allons étudier les 
-donnée d'un corpus qui s'appelle [Rhapsodie](https://rhapsodie.modyco.fr/presentation/). Rhapsodie fournit une base de
+données d'un corpus qui s'appelle [Rhapsodie](https://rhapsodie.modyco.fr/presentation/). Rhapsodie fournit une base de
 données syntaxique et prosodique pour le français parlé [@lacheret2014rhapsodie].
-Voici un exemple d'un TextGrid du corpus Rhapsodie dans Pratt .
+Voici un exemple d'un TextGrid du corpus Rhapsodie dans Pratt.
 
 <img src="img/praat.png" style="width: 100%">
 
 Ce fichier TextGrid contenant plusieurs niveaux d'annotation, chacun
 représentant des informations différentes comme des segments phonétiques,
 des contours prosodiques ou d'autres repères temporels. Les niveaux d'annotation
-se sont appellés les «tiers». Dans Praat, les annotations sont organisées en différentes couches alignées selon leur temporalité.
+se sont appellés les «tiers». Dans Praat, les annotations sont organisées en
+différentes couches alignées selon leur temporalité.
 
 Voici nous téléchargeons un fichier du corpus Rhapsodie dans R en utilisons le
 package **readtextgrid** [@readtextgrid].
@@ -712,7 +713,7 @@ tg <- read_textgrid("donnees/rhapsodie/tg/Rhap-M0018-Pro.TextGrid")
 tg
 ```
 
-Le format dans R est très différent du format dans Praat. Dans R, les dimensions temporelles des niveaux ne sont pas directement reliées entre elles. Toutes les données d'un niveau (ici `phone`) sont fournies, suivies du deuxième niveau, et ainsi de suite. Toutes les données d'un niveau (ici « phone ») sont fournies, suivies du deuxième niveau, et ainsi de suite. Ce format n'est pas aussi bien adapté à la consultation directe des données, mais il est plutôt optimisé pour la programmation.
+Le format dans R est très différent du format dans Praat. Dans R, les dimensions temporelles des niveaux ne sont pas directement reliées entre elles. Toutes les données d'un niveau (ici `phone`) sont fournies, suivies du deuxième niveau, et ainsi de suite. Ce format n'est pas aussi bien adapté à la consultation directe des données, mais il est plutôt optimisé pour la programmation.
 
 Le bloc suivant extrait spécifiquement le tier correspondant aux phonèmes,  appelé « phone » dans le fichier. Ce niveau contient une segmentation fine de la parole où chaque entrée représente un segment phonétique délimité dans le temps. 
 
