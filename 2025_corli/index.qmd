@@ -41,6 +41,8 @@ options(dplyr.summarise.inform = FALSE)
 theme_set(theme_minimal())
 ```
 
+[Solutions d'exercice](atelier_exercices.html)
+
 Dans cet atelier, je vous présente une introduction au langage R
 pour l'étude de la linguistique. R est un langage de
 programmation libre avec le code source ouvert qui est particulièrement
@@ -1022,7 +1024,10 @@ Nous allons analyser les différences entre ces résultats et ceux du modèle st
 
 ## 14. ACP + UMAP
 
-Dans cette section, nous explorons deux méthodes très répandues de réduction de dimensionnalité, la ACP (analyse en composantes principales) et UMAP, qui permettent de représenter des données complexes dans un espace de faible dimension tout en conservant autant que possible leur structure.
+Dans cette section, nous explorons deux méthodes très répandues de réduction de dimensionnalité, la ACP
+([analyse en composantes principales](https://fr.wikipedia.org/wiki/Analyse_en_composantes_principales))
+et UMAP, qui permettent de représenter des données complexes dans un espace
+de faible dimension tout en conservant autant que possible leur structure.
 
 Le contexte ici est l'analyse de représentations vectorielles de mots obtenues par un modèle de type [fastText](https://fasttext.cc/docs/en/crawl-vectors.html), qui génère pour chaque mot un vecteur de grande dimension reflétant ses similarités sémantiques dans de vastes corpus textuels [@fasttext].
 Réduire ces vecteurs à deux dimensions permet de visualiser les relations entre mots d'un simple coup d'œil. fasttext. Nous allons voir d'autres applications de ces méthodes dans les sections suivantes.
@@ -1215,7 +1220,7 @@ msg <- c(
   '{"conviction": 4, "certain": 8, "positif": 2}.\n\n'
 )
 
-res <- llm_chat(
+res <- oai_chat(
   base_url = "http://localhost:1234/v1/chat/completions",
   model = "openai/gpt-oss-20b",
   msg = paste(msg, document, collapse=" "),

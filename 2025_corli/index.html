@@ -167,6 +167,7 @@ div.csl-indent {
 </header>
 
 
+<p><a href="atelier_exercices.html">Solutions d’exercice</a></p>
 <p>Dans cet atelier, je vous présente une introduction au langage R pour l’étude de la linguistique. R est un langage de programmation libre avec le code source ouvert qui est particulièrement populaire dans les sciences naturelles et sociales. Nous commençons par une introduction générale aux fonctions permettant de télécharger, visualiser et manipuler des données structurées sous forme de tableau. Ensuite, nous continuons à étudier des modèles spécifiques pour l’étude du langage. Nous finissons avec l’application des interfaces de programmation d’application (API) pour l’usage des grands modèles de langage. Dans tous les exemples, nous employons les données qui proviennent de diverses parties de la linguistique.</p>
 <p>Bien que nous présentions les principaux concepts dans les notes suivantes, nous vous suggérons de consulter les ressources supplémentaires suivantes pour approfondir le sujet :</p>
 <ul>
@@ -1540,7 +1541,7 @@ F-statistic: 11.82 on 1 and 1145049 DF,  p-value: 0.0005857</code></pre>
 </section>
 <section id="acp-umap" class="level2">
 <h2 class="anchored" data-anchor-id="acp-umap">14. ACP + UMAP</h2>
-<p>Dans cette section, nous explorons deux méthodes très répandues de réduction de dimensionnalité, la ACP (analyse en composantes principales) et UMAP, qui permettent de représenter des données complexes dans un espace de faible dimension tout en conservant autant que possible leur structure.</p>
+<p>Dans cette section, nous explorons deux méthodes très répandues de réduction de dimensionnalité, la ACP (<a href="https://fr.wikipedia.org/wiki/Analyse_en_composantes_principales">analyse en composantes principales</a>) et UMAP, qui permettent de représenter des données complexes dans un espace de faible dimension tout en conservant autant que possible leur structure.</p>
 <p>Le contexte ici est l’analyse de représentations vectorielles de mots obtenues par un modèle de type <a href="https://fasttext.cc/docs/en/crawl-vectors.html">fastText</a>, qui génère pour chaque mot un vecteur de grande dimension reflétant ses similarités sémantiques dans de vastes corpus textuels <span class="citation" data-cites="fasttext">[<a href="#ref-fasttext" role="doc-biblioref">11</a>]</span>. Réduire ces vecteurs à deux dimensions permet de visualiser les relations entre mots d’un simple coup d’œil. fasttext. Nous allons voir d’autres applications de ces méthodes dans les sections suivantes.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>fl <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"donnees/fruitlegumes.csv"</span>)</span>
@@ -1805,7 +1806,7 @@ excellent   0.374677833</code></pre>
 <span id="cb132-6"><a href="#cb132-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">'{"conviction": 4, "certain": 8, "positif": 2}.</span><span class="sc">\n\n</span><span class="st">'</span></span>
 <span id="cb132-7"><a href="#cb132-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb132-8"><a href="#cb132-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb132-9"><a href="#cb132-9" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">llm_chat</span>(</span>
+<span id="cb132-9"><a href="#cb132-9" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">oai_chat</span>(</span>
 <span id="cb132-10"><a href="#cb132-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">base_url =</span> <span class="st">"http://localhost:1234/v1/chat/completions"</span>,</span>
 <span id="cb132-11"><a href="#cb132-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"openai/gpt-oss-20b"</span>,</span>
 <span id="cb132-12"><a href="#cb132-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">msg =</span> <span class="fu">paste</span>(msg, document, <span class="at">collapse=</span><span class="st">" "</span>),</span>
