@@ -679,7 +679,7 @@ rend le code robuste aux différentes tailles d'image.
 ```{python}
 image_path = posters["filepath"][7]
 image = Image.open(image_path).convert("RGB")
-per_x = 50
+per_x = 60
 per_y = 40
 ```
 
@@ -1372,6 +1372,12 @@ tendances à l'échelle agrégée, pas pour étiqueter de façon définitive
 les personnes représentées.
 
 ```{python}
+#| eval: false
+!pip install -q insightface
+!pip install -q onnxruntime
+```
+
+```{python}
 #| warning: false
 #| message: false
 #| output: false
@@ -1740,6 +1746,11 @@ questions ouvertes sur le contenu visuel.
 Nous utilisons ici l'API OpenAI avec le modèle `gpt-5.4-nano`, qui
 offre des capacités de vision à faible coût et sans nécessiter de
 ressources locales.
+
+```{python}
+#| eval: false
+!pip install -q openai
+```
 
 ```{python}
 import base64

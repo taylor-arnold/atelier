@@ -60,6 +60,8 @@ de l'exécution du premier bloc de code.
 
 ```{python}
 !pip install -q dvt
+!pip install -q insightface
+!pip install -q onnxruntime
 ```
 
 Ensuite, le code ci-dessous télécharge les métadonnées et les fichiers
@@ -329,8 +331,10 @@ notre extrait.
 ```{python}
 img_comb = np.hstack(img_list)
 img_comb = cv2.resize(img_comb, (img_comb.shape[1] // 5, img_comb.shape[0] // 5))
-plt.imshow(img_comb)
-plt.axis("off")
+fig, ax = plt.subplots(1, 1, figsize=(12, 12))
+ax.imshow(img_comb)
+ax.axis("off")
+plt.tight_layout()
 plt.show()
 ```
 
@@ -481,8 +485,10 @@ Voici les portraits des personnages. Ils sont rangés par ordre
 alphabétique : Darrin, Endora, Larry et Sam.
 
 ```{python}
-plt.imshow(face_img)
-plt.axis("off")
+fig, ax = plt.subplots(1, 1, figsize=(12, 12))
+ax.imshow(face_img)
+ax.axis("off")
+plt.tight_layout()
 plt.show()
 ```
 
