@@ -1,0 +1,919 @@
+# Distant Viewing Tutorial 1: Movie Posters and Color Analysis
+
+[[**slides**](https://distantviewing.org/tutorial/dvt_tutorial_slides_01.pdf)]
+[[**chapter**](https://direct.mit.edu/books/oa-monograph/chapter-pdf/2163342/c001700_9780262375160.pdf)]
+[[**homepage**](https://www.distantviewing.org)]
+
+This notebook provides an introduction to the methods presented in the
+book *Distant Viewing: Computational Exploration of Digital Images* (MIT
+Press, 2023). We replicate and extend portions of the analysis using a
+collection of 5000 movie posters presented in the the third chapter of
+the book. We do not assume any prior knowledge of Python or computer
+vision in these notes. While a complete introduction to Python is not in
+the scope of our introduction, we do our best to highlight the main
+features of the language as they apply to the application here. Here are
+the specific learning outcomes for the tutorial:
+
+1.  Explain how digital images are stored as pixel arrays.
+2.  Connect the structure of digital images with computational methods
+    through the distant viewing framework.
+3.  Apply pre-constructed Python code to study a collection of digital
+    images.
+4.  Explain measurements such as hue, saturation, chroma, and value
+    using color theory.
+5.  Compare movie poster composition through time and across genres.
+6.  Produce annotations with state-of-the-art computer vision algorithms
+    to detect faces using the distant viewing toolkit.
+
+For further information about the distant viewing toolkit (**dvt**), the
+open-source Python package that we have developed, please see the
+[project\'s homepage](https://github.com/distant-viewing/dvt). More
+information about the theory of distant viewing and the specific
+application to movie image posters can be the found in our book, which
+is available to download for free under an open access license on our
+[website](https://www.distantviewing.org/book/) along with additional
+data and code to replicate the other studies shown in the text. 
+
+## 1.1 Setup {#11-setup}
+
+As a first step, we need to install a few additional Python components,
+download the movie posters dataset, and tell Python all of the functions
+that we will need later in the tutorial. To get started, we will use the
+code below to install the module called **dvt** (the distant viewing
+toolkit), which contains several useful functions specifically designed
+to apply computer vision algorithms to collections of humanities data.
+The exclamation point at the start of the line of code tells the
+notebook that we we want to directly run a command line tool outside of
+Python itself. Here, we are using the tool called **pip** that can used
+to install additional functionality for Python. To run the code, hover
+your mouse somewhere over the background of the code. This will show a
+triangular play button on the left-hand side of the code block. Hit the
+button and wait for it to finish, which may take a minute or two as
+Colab always takes a bit of time to set up when running the first code
+block.
+
+Next, below we have some code to download the metadata and movie posters
+that we are working with in this notebook. These use the program
+**wget** to download files from the distant viewing website followed by
+the **tar** command to unzip the directory containing the movie poster
+thumbnails. We will explore the individual contents of each of these
+components as needed in the sections below. The last line uses **mkdir**
+to make an empty directory that will be needed in the final section of
+the notebook for running machine learning models over the collection. As
+above, hover over the code and then click pn the play button on the
+left-hand side of the code block. This will run all of the lines of code
+one after another. We should be able to see a small green arrow showing
+the specific line being run at any given point, helping us understand
+which steps take the most time to execute.
+
+```{python}
+#| eval: false
+!wget -q -nc "https://distantviewing.org/tutorial/movies_50_years_meta.csv"
+!wget -q -nc "https://distantviewing.org/tutorial/movies_50_years_tags.csv"
+!wget -q -nc "https://distantviewing.org/tutorial/movies_50_years_hue.csv"
+!wget -q -nc "https://distantviewing.org/tutorial/movies_50_years_face.csv"
+!wget -q -nc "https://distantviewing.org/tutorial/love_story.jpg"
+!wget -q -nc "https://distantviewing.org/tutorial/thm.tar"
+!tar xf thm.tar
+!mkdir -p /root/.cache/torch/hub/checkpoints/
+```
+
+In the last part of the setup, we will run some code in Python (note
+that the lines below do not start with an exclamation mark). This code
+here uses the **import** command to tell Python which libraries and
+functions we are going to use in the notebook. Specifically, the first
+line extracts two components called **cv2** (the OpenCV library for
+image processing). The other lines load modules that themselves contain
+a number of helpful functions. These are **numpy** for working with
+large arrays of numbers, **pandas** for working with tabular datasets,
+**matplotlib.pyplot** for data visualization, and the **dvt** module
+that we described above.
+
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import torch
+import polars as pl
+import numpy as np
+import cv2
+
+from PIL import Image
+from polars import col as c
+from funs import *
+from plotnine import *
+
+theme_set(theme_minimal())
+```
+
+In Google Colab, your working environment resets itself everytime you
+reopen a notebook. Therefore, all of the steps above need to be re-run
+each time that you start the notebook. If you were running this code on
+your own machine, the installation of the **dvt** package and
+downloading the data would only need to be done once. Loading the
+modules in the final code chunk, however, always needs to be run each
+time that Python is restarted.
+
+## 1.2 Movie Poster Dataset {#12-movie-poster-dataset}
+
+Before we jump into the analysis of the movie posters images, it is
+important to take a moment to look at the metadata that we have attached
+to each poster and to understand the structure of the dataset. In the
+code below, we use the `read_csv` function from the pandas module (which
+we have given the short name **pd** following standard Python
+conventions) to load the csv file that has one row for each movie in our
+dataset. We will save the output of the function as an object named
+`posters`. In the final line of the code, we write the object name all
+by itself, which causes the first file lines of the dataset to be
+printed inside of the notebook for us to look at. The data contains one
+row for each of the 100 top grossing films for each year from 1970
+through 2019. For a few movies during the 1970s we were not able to find
+the movie posters; these are excluded from the dataset. For each movie,
+we have the year, the title, the file name of the associated image of
+the movie poster, and a description of the half decade that the movie
+comes from. The latter will be used in our analysis of change over time.
+
+```{python}
+posters = pl.read_csv("data/movies_50_years_meta.csv")
+posters
+```
+
+We have another set of metadata that associates each film with one or
+more genre categories. The dataset contains one row for each pair of
+film and genre tag. The year is included because there are several films
+that share the same title, but can be uniquely identified by knowing the
+title and year of the film.
+
+```{python}
+genre = pl.read_csv("data/movies_50_years_genre.csv")
+genre
+```
+
+Looking at the first and last few rows, do the genre tags seem
+reasonable for the given films? Our analyses in the remainder of the
+notebook will focus on movie poster patterns across time periods and
+genres.
+
+Now that we have a sense of our data, what kinds of questions might we
+be interesed in exploring?
+
+## 1.3 Digital Images {#13-digital-images}
+
+Now that we have seen the metadata for the movie posters, let\'s look at
+how digital images are manipulated in Python by loading in the image
+from a single movie poster. All of the movie posters are stored as JPEG
+files (an abbreviation for the Joint Photographic Experts Group). This
+is a common image format that can be opened and understood by nearly any
+program or device that works with images. If you opened a JPEG file on
+your computer or phone, it would display the image without any special
+setup required. Many of the images that you see on public websites are
+stored as JPEG files and are processed and displayed by your browser.
+
+In the code below, we use the function `dvt.load_image` to load an image
+into Python. We save the image as an object named `img`. The path to the
+poster image is taken directly from the metadata above. Here, we are
+using the formula of taking the name of the dataset (`posters`) followed
+by a period and the name of the column (`path`) followed by the row
+number in square brackets (`[10]`). We have selected the poster from the
+John Wayne film *Chisum* because it has a distinct orange tone that
+will be interesting to look at. After loading the image into Python, we
+print out the image object in the second line by including it on it\'s
+own final line.
+
+```{python}
+img = Image.open(
+    posters.filter(c.title == "Chisum")["filepath"][0]
+)
+img
+```
+
+We see that it\'s relatively easy to load a common image file format
+into Python and then to display it within the notebook. In order to best
+understand the computational analyses that follow, it will be helpful to
+investigate the the way that digital image is represented inside of
+Python. We can use the built-in Python function `type` to see the obect
+type of any Python object. Let\'s do that below:
+
+```{python}
+type(img)
+```
+
+
+```{python}
+arr = np.asarray(img)
+type(arr)
+```
+
+You may have reasonably assumed that the object would have a name
+related to the fact that it contains an image. But, we see that it is
+cryptically called a `numpy.ndarray`. What does this mean? This is a
+generic data type created by the numpy library (the same one that we
+loaded above in the setup section) to store rectangular blocks of
+numbers.
+
+To understand how an array of numbers can represent an image, we will
+print out the object\'s shape attribute (an attribute is a
+characteristic of a Python object that we can access with the object
+name followed by a `.` and the attribute name). This tells us how the
+numbers in array are arranged.
+
+```{python}
+arr.shape
+```
+
+We see that the shape of the object has three components. The first
+number tells us how many rows of numbers there are and the second tells
+us how many columns there are. The third number indicates that there is
+a third dimension with a size of three. The easiest way to picture this
+is to think of having three sets of rectangular grids of numbers, each
+with 229 rows and 150 numbers. Think of an Excel file with three sheets,
+each having a grid of numbers of the same size.
+
+A specific row and column in this grid of numbers represents a *pixel*
+(picture + element), the smallest individal component of an image. We
+need three different numbers for each pixel to indicate the amount of
+red, green, and blue light that is needed to combine to create the color
+at each particular location. The Python library that we are using here
+represents the quantity of light on a scale from 0 (not turned on at
+all) through 255 (as bright as possible). Blending these three
+components together can recreate nearly any color observable by the
+human eye.
+
+To make this more concrete, let\'s see an example of the numbers that
+create the image above. There are far too many to look at all at once.
+Instead, we will use a bracket notation to select the first ten rows,
+first eight columns, and the first color component. Python uses a
+convention that is common in computer programing that starts counting at
+zero, so the `0` below grabs from the first array of numbers, which here
+correspond to the red color intensity.
+
+```{python}
+arr[:10, :8, 0]
+```
+
+The portion of the image that we grabbed above is the far upper
+left-hand corner. We see that to represent this corner we need to turn
+on a lot of red light (around 200ish out a possible 255). However, if we
+look at the image there appear to be no color red anywhere. The upper
+left-hand corner appears to be white. To understand how this is the
+case, let\'s look at the second component, which is the amount of green
+light.
+
+```{python}
+arr[:10, :8, 1]
+```
+
+And while we are at it, also the amount of blue light.
+
+```{python}
+arr[:10, :8, 2]
+```
+
+Looking above, we see that the red, green, and blue lights are all
+turned on at the same level in the upper left-hand corner of the image.
+When we blend light from all three colors together, we get a shade of
+grey. This is something closer to black when the colors are all turned
+low, and something closer to white when the colors are all turned
+higher. So now this approximates what we see in the upper left corner of
+the image, corresponding to a shade of grey that is very close to white.
+
+To solidify our understanding how these components work, let\'s see
+another part of the image corresponding to rows 180-190 and columns
+25-30. It\'s very small, but by looking closely we should be able to
+connect it to the image above. The resulting image is too small for
+Colab to automatically treat as an image for display purposes, so we
+need to use the `plt.imshow` function to display the pixel values as
+pixels.
+
+```{python}
+plt.imshow(arr[180:190, 25:30, :])
+```
+
+This small window of the image is part of the orange at the bottom of
+the movie poster. Let\'s see the red, green, and blue components that
+make up this color.
+
+```{python}
+arr[180, 25, :]
+```
+
+The dark orange color comes from blending a good amount of red light
+(189/255), a bit of green (106/255), and no blue (0/255) together.
+Looking at a color wheel should help explain why orange comes from
+mixing a bit of green with a larger bit of red.
+
+Different image processing libraries have slightly different conventions
+for how to represent digital images. Most use the same ordering of the
+colors (red, green, blue), and some use fractions between 0 and 1 rather
+than integers between 0 and 255. Certain image formats include a fourth
+component, called an alpha channel, to represent image opacity. Other
+formats contain a single color channel to represent grayscale images.
+However, all of these formats have the same underlying concept of
+representing digital images through numbers that indicate pixel
+intensities. This is a very different way of thinking about images than
+the way that humans process visual signals and is something that we will
+explore in the next section.
+
+Now we know we can look closely at color within the posters, which we
+can combine with the metadata.
+
+What are additional questions that we can ask about movie posters?
+
+
+## 1.4 Distant Viewing: Theory {#14-distant-viewing-theory}
+
+Computers represent images by understanding them as three-dimensional
+arrays of numbers. This is very different from the way that images are
+interpreted and used by human viewers. Furthermore, the connection
+between these two representations is not at all obvious. There is no way
+to understand what is being represented by a small subset of pixel
+intensities without seeing a large part of the image as a whole. Even
+something as simple as the amount of blue light in a given pixel can be
+difficult to understand. A lot of blue could be the color blue, or could
+just be blended with red and green to make white. So, in order to do
+computational analyses with large collections of digital images, we
+first need to convert these raw pixel intensities into representations
+that match the interpretations of the images that we are interested in
+studying.
+
+The theory behind distant viewing stems from this exact realization.
+Namely, that the way digital images are represented forces us to
+construct *annotations* that hold structured data that aligns with our
+research questions. These annotations, which can be created manually or
+using computational algorithms, are both destructive (there is
+information lost in the process of creating them) and open to
+interpretation (there is never a neutral way of creating annotations;
+decisions always need to be made about how they are created).
+
+We will work towards more complex annotations, but let\'s start with one
+of the most straightforward: image brightness. Pixel intensities tell us
+how much to turn on the red, green, and blue lights at each postion of
+the image to create a display of a given image. The higher these numbers
+are, it stands to reason, the brighter the image will be when shown on a
+digital display. So, one way to represent a meaningful annotation about
+an image is to take the average value of all pixel intensities. We can
+do this with the following code, which uses the numpy function `mean` to
+compute the average (mean) of all the values in an array.
+
+```{python}
+np.mean(arr)
+```
+
+Little argument probably needs to be made to convince someone that a lot
+of information is lost between this one number and all of the rich
+information that is present in the thumbnail image of the movie poster.
+There is no information about the content of the text in the image, the
+dominant orange color, the shape of the man and the horse, the white
+border, or the way each of these elements is arranged in the frame. So,
+clearly this process of creating annotations is a destructive one. The
+difference between the summarized annotation (a single number) and the
+information in the original image is known in information theory as a
+*semantic gap*. But what about the second part of the theory, that this
+measurement is non-netural and represents specific choices about how we
+want to *view* at a distance? While this may seem less obvious, there
+are many different ways of measuring the brightness of an image. For
+example, we might want to consider the median value of the pixel
+intensities rather than their average value as in the code below.
+
+```{python}
+np.median(arr)
+```
+
+Alternatively, because the human eye is more sensitive to green than
+blue or red light, we might want to weight the brightness more heavily
+based on the color of light that is being used. Many movie posters have
+black or white borders, which could heavily influence the brightness of
+the image as a whole. Perhaps we would want to only take the brightness
+at the middle part of the image. And of course, why do we even care
+about the brightness of the image in the first place? Once we start
+thinking about all of these different options, it should become clear
+that there is no perfect way to represent any element of an image as
+structured data. Choices and tradeoffs are always being made. Eventually
+we need to make some of those choices and see what we can learn with
+them, while keeping the caveats about the nature of image annotations
+and the resulting semantic gaps always in the back of our mind. In other
+words, when we are analyzing images through computer vision, we are
+distant viewing.
+
+## 1.5 Annotating Image Brightness {#15-annotating-image-brightness}
+
+We have now carefully worked through the way the digital images are
+stored, understood the implication for this in terms of the theory of
+distant viewing, and shown one particular way of constructing an
+annotation through image brightness. Let\'s now put this together to do
+an analysis of the movie posters based on their overall brightness. As a
+first step, we need to repeat the process used with the one poster above
+to all of the images in the dataset. In order to do this we use a loop
+in Python. This consists of the keyword `for`, followed by a block of
+indented code. Each of the lines of the indented code will be run once
+for every value of the iteration variable `ind` from the set of row
+numbers in the `posters` dataset. So, we will load the image of each
+poster into Python, compute the image brightness, and the save the
+brightness in a new column that we created in the dataset. To match the
+results in the book as closely as possible, we will divide the
+brightness by 255 so that the values range from 0 (completely black) to
+1 (completely white).
+
+```{python}
+results = []
+for row in posters.iter_rows(named=True):
+    arr = np.asarray(Image.open(row["filepath"]))
+    results.append(np.mean(arr) / 255)
+
+
+posters = posters.with_columns(
+    avg_brightness = pl.Series(results).round(4)
+)
+```
+
+Now that we have added the annotation of the image brightness to each of
+the rows of the poster data, we can arrange the posters from the
+brightest to the darkest using the `sort_values` method.
+
+```{python}
+posters.sort(c.avg_brightness, descending=True)
+```
+
+The theory of distant viewing tells us that the creation of annotations,
+while a necessary step in computational analysis of images, is both
+destructive and subjective. So, before continuing to an aggregative
+analysis, it is useful to connect the annotations back to the images by
+actually looking at some of the posters. One way to do that is to look
+at posters with extreme values. In the code below we load the first
+image in the sorted dataset, which is the poster that has been assigned
+the highest brightness value. Remember that Python starts counting at
+zero. The zero in the first line corresponds to the first row of the
+data.
+
+Feel free to look at other particularly bright rows to get a fuller
+picture of what is being captured by the annotation.
+
+```{python}
+(
+    posters
+    .sort(c.avg_brightness, descending=True)
+    .pipe(plot_image_grid, ncol=4, limit=12, label_name="avg_brightness")
+)
+```
+
+It\'s similarly useful to look at the darkest images in the dataset. To
+do that we modify the code to start at the number of rows in the data
+minus one (again, because of Python\'s convention of starting to count
+at zero). You can change the minus 1 to minus n to look at the n\'th
+least bright image in the data.
+
+```{python}
+(
+    posters
+    .sort(c.avg_brightness, descending=False)
+    .pipe(plot_image_grid, ncol=4, limit=12, label_name="avg_brightness")
+)
+```
+
+After looking at some example posters, how do you feel about the
+annotation\'s ability to capture poster brightness? At least at the
+extremes, what feature(s) of the poster seem to best explain/predict the
+brightness of the image?
+
+Now that we have some understanding of how the annotation works, and
+hopefully some confidence that it corresponds with some meaningful
+quantity, let\'s do some aggregative analysis with the annotations. In
+the code below we group out dataset by `period` (half-decades from 1970
+through 2019) and look at the mean average brightness of all posters
+from that period.
+
+```{python}
+(
+    posters
+    .group_by(c.period)
+    .agg(avg_brightness = c.avg_brightness.mean())
+    .sort(c.period)
+)
+```
+
+
+```{python}
+(
+    posters
+    .group_by(c.period)
+    .agg(avg_brightness = c.avg_brightness.mean())
+    .sort(c.period)
+    .pipe(ggplot, aes("period", "avg_brightness"))
+    + geom_point()
+    + geom_line(group=1)
+)
+```
+
+How would you characterize the pattern here? Is there a meaningful
+pattern? If so, do you have any hypotheses about what might be behind
+them?
+
+Let\'s do a similar analysis using the genres associated with each film.
+To do this, we first use the function `pd.merge` to combine our posters
+data with the genres table.
+
+```{python}
+(
+    posters
+    .join(genre, on=[c.year, c.title])
+)
+```
+
+Then, we can repeate the analysis from the period data by grouping on
+genre and then taking the average brightness of each genre. Whereas it
+made sense to arrange the periods in chronological order to see a
+pattern, here it will be better to have Python arrange the genres by
+their mean average brightness. We do this with the `sort_values` method
+on the summarized data.
+
+```{python}
+(
+    posters
+    .join(genre, on=[c.year, c.title])
+    .group_by(c.genre)
+    .agg(avg_brightness = c.avg_brightness.mean())
+    .sort(c.avg_brightness)
+    .pipe(ggplot, aes("reorder(genre, avg_brightness)", "avg_brightness"))
+    + geom_col()
+    + coord_flip()
+    + labs(x="Brightness", y="Genre")
+)
+```
+
+What patterns do you notice in the genre codes here? Which seem to have
+the darkest posters and which seem to have the brightness ones? Can you
+summarize this pattern in any way? Any hypotheses about what is going on
+here?
+
+
+## 1.6 Saturation and Chroma {#16-saturation-and-chroma}
+
+We have already seen that if we do a careful analysis, we can do quite a
+bit of work with a relatively straightforward annotation based on image
+brightness. Our goal though is to understand the use of color more
+broadly in movie posters, which will require creating additional
+annotations that capture other aspects of poster color. One way to do
+this is to first convert the raw pixel intensities into an alternative
+color space.
+
+The RGB representation of pixels by the amount of red, green, and blue
+light needed to create the color at a specific point in space comes from
+the low-level engineering needs to image capture and display. As we have
+already seen, it is not a particularly meaningful way to think about our
+perception of color. Fortunately, there are other ways to represent
+color that more closely align with human perception and understanding.
+In order to understand how this works, let\'s re-load the poster of the
+John Wayne movie *Chisum*.
+
+```{python}
+arr =np.asarray(Image.open(
+    posters.filter(c.title == "Chisum")["filepath"][0]
+))
+```
+
+Recall that above we located a specific pixel that corresponds to the
+burnt orange color in the poster. It has a RGB representation of the
+following:
+
+```{python}
+arr[180, 25, :]
+```
+
+We can convert the RGB format into an HSV format using the
+`cvt2.cvtColor` function by specifying the type of color space
+transformation (`COLOR_RGB2HSV`)to use as a second argument. We will do
+some conversion of the scales of the output to convert them into a scale
+from 0 to 1, which will better match other sources as well as the longer
+discussion of this case study in Chapter 3 of *Distant Viewing*.
+
+```{python}
+arr_hsv = cv2.cvtColor(arr, cv2.COLOR_RGB2HSV)
+arr_hsv = arr_hsv.astype(np.float64)
+arr_hsv[:, :, 0] = arr_hsv[:, :, 0] / 179.0
+arr_hsv[:, :, 1] = arr_hsv[:, :, 1] / 255.0
+arr_hsv[:, :, 2] = arr_hsv[:, :, 2] / 255.0
+arr_hsv.shape
+```
+
+Notice that the shape of the output is exactly the same as the original
+image. The rows and columns still correspond to the same locations as
+the RGB model; it is only the triple of numbers at that location that
+have changed. Let\'s see what our burnt orange pixel looks like now:
+
+```{python}
+arr_hsv[180, 25, :]
+```
+
+The first component is around `0.095`. This correspond to the **hue** of
+the pixel, with this number corresponding to the color orange. Hue is a
+bit complex and we will further investigate how it works in the next
+section. The second number is the **saturation**, which represents how
+rich the color is. A light pastel, such as a pale pink, will have a low
+saturation. Here, we see that the saturation is the maximum value of
+`1`. Finally, the value is an alternative representation of brightness,
+which here we see is equal to `0.74`.
+
+Let\'s now focus on the saturation of the posters and do a similar
+analysis to the ones above with brightness. To more closely follow the
+analysis in the book, we will compute the related quantity called
+**chroma** instead of working with saturation directly. This can be
+computed by multiplying the saturation by the value. We used this
+quantity because it more closely aligns with the idea of the richness of
+color that we wanted to capture. For example, we see that the burnt
+orange color in our poster for *Chisum* has a saturation of `1`, but
+it\'s chroma is only `0.74` (saturation times value). Only a \"pure\"
+orange color, like what you would see on a color wheel, would have a
+chroma of 1.
+
+Now, let\'s cycle through the posters and add the average chroma value
+to each of them just as we did with the image brightness.
+
+```{python}
+results = []
+for row in posters.iter_rows(named=True):
+    arr = np.asarray(Image.open(row["filepath"]))
+    arr_hsv = cv2.cvtColor(arr, cv2.COLOR_RGB2HSV)
+    arr_hsv = arr_hsv.astype(np.float64)
+    arr_hsv[:, :, 0] = arr_hsv[:, :, 0] / 179.0
+    arr_hsv[:, :, 1] = arr_hsv[:, :, 1] / 255.0
+    arr_hsv[:, :, 2] = arr_hsv[:, :, 2] / 255.0
+    results.append(np.mean(arr_hsv[:, :, 1] * arr_hsv[:, :, 2]))
+
+
+posters = posters.with_columns(
+    avg_chroma = pl.Series(results).round(4)
+)
+```
+
+And again we will arrange the posters data from the most to the least
+highest levels of chroma.
+
+```{python}
+posters.sort(c.avg_brightness, descending=True)
+```
+
+Now, let\'s once again look at some of the posters that correspond to
+extreme values. It is always an important step when working with new
+annotations to go back to the original images, and actually look at them
+to see how the numeric representation of the image corresponds to our
+own viewing and interpretation. As before, please feel free to
+experiment by looking at other posters with particularly high values.
+
+```{python}
+(
+    posters
+    .sort(c.avg_chroma, descending=False)
+    .pipe(plot_image_grid, ncol=4, limit=12, label_name="avg_chroma")
+)
+```
+
+We can also do this with posters have the lowest average chroma. Many
+posters have an average chroma equal to zero. Can you think of what
+feature these all share in common before looking at the examples?
+
+
+```{python}
+(
+    posters
+    .sort(c.avg_chroma, descending=True)
+    .pipe(plot_image_grid, ncol=4, limit=12, label_name="avg_chroma")
+)
+```
+
+
+Let\'s see how the average chroma corresponds to the genres associated
+with each of the movie posters. Because there is such a shift in
+brightness from first twenty years of the data (a lot was in black and
+white), we will filter the data after merging in the genres to only
+include years from 1990 onwards.
+
+```{python}
+(
+    posters
+    .filter(c.year >= 1990)
+    .join(genre, on=[c.year, c.title])
+    .group_by(c.genre)
+    .agg(avg_chroma = c.avg_chroma.mean())
+    .sort(c.avg_chroma)
+    .pipe(ggplot, aes("reorder(genre, avg_chroma)", "avg_chroma"))
+    + geom_col()
+    + coord_flip()
+    + labs(x="Chroma", y="Genre")
+)
+```
+
+Take some time to look at the results. What patterns do you notice here?
+Does anything seem either (i) particularly surprising or (ii)
+particularly unsurprising? Both of these are useful observations for
+understanding the connection between the messages conveyed through the
+poster\'s color and the associated genres.
+
+## 1.7 Dominant Color {#17-dominant-color}
+
+Having looked at the brightness/value and saturation/chroma of the
+posters, we now look to the third element of color, know as **hue**. To
+get started, let\'s take a different example poster. Here, we will load
+the poster from the movie *Take the Lead* (2006), which has several
+different hues of color in it.
+
+```{python}
+img = Image.open(
+    posters.filter(c.title == "Take the Lead")["filepath"][0]
+)
+img
+```
+
+Now, let\'s compute the HSV coordinates of this image just as we did in
+the previous section. Additionally, we will reshape the pixel data so
+that the array has one row for each pixel and only three columns. This
+is just some re-arranging to make the rest of the code easier to write
+and understand.
+
+```{python}
+arr = np.asarray(img)
+arr_hsv = cv2.cvtColor(arr, cv2.COLOR_RGB2HSV)
+arr_hsv = arr_hsv.astype(np.float64)
+arr_hsv[:, :, 0] = arr_hsv[:, :, 0] / 179.0
+arr_hsv[:, :, 1] = arr_hsv[:, :, 1] / 255.0
+arr_hsv[:, :, 2] = arr_hsv[:, :, 2] / 255.0
+arr_hsv = arr_hsv.reshape((-1, 3), order = "F")
+arr_hsv.shape
+```
+
+The hue is a number between 0 and 1 that indicate what we would
+colloqually call \"color\". Unlike brightness, saturation, chroma, and
+value, these numbers are best thought of being arranged in a circle (see
+the associated slides for a visualization). A value of `0` corresponds
+with red, `.33` with green, `.5` with cyan, and `.66` with blue. Values
+close to 1 wrap back through purple and link back into red. So, the hues
+`0.01` and `0.99` are actually quite similar.
+
+To understand a bit better, let\'s look at a histogram showing the
+distribution of the hues in the image. We need to be careful, though,
+because our interpretation of hue is only applicable when the chroma is
+sufficently large. If the chroma value is small, there is little color
+to show anyway and the differences between hues may be difficult or
+impossible to differentate. In the code below, we should the
+distribution of hues with a chroma above `0.3`.
+
+```{python}
+plt.hist(arr_hsv[arr_hsv[:,1] * arr_hsv[:,2] > 0.3, 0], bins=100)
+plt.show()
+```
+
+We should see a lot of values near `0.3`; these correspond to the green
+in the poster, which takes up a lot of space in the image. The peak near
+`0.66` is associated with the blue in the image, mainly on the
+silhouettes of the two characters on the poster. The smaller amount near
+one, and also wrapping around at 1, is the orange/red color in the title
+of the movie.
+
+
+Taking averages of hues does not in general provide meaningful
+summaries. For an extreme example, if we take the average of two shades
+of red that have hues of `0.99` and `0.01`, this would yield a hue of
+`0.5`, cyan, a color directly between green and blue. Alternatively, we
+can create an annotation of hue by breaking the range of hues up into
+standard color names and then count the proportion of each poster that
+corresponds with each color. To do this, we will load another dataset
+that we created with common cut-off values for each of the hues.
+
+```{python}
+hue = pl.read_csv("data/movies_50_years_hue.csv")
+hue
+```
+
+Next, we take the hues in `arr_hsv` and count the numbes of pixels that
+are in each of these buckets after filtering for a sufficently high
+chroma to have a meaningful hue.
+
+```{python}
+bins = np.append(0, hue['end'].to_numpy())
+cnt, _ = np.histogram(
+    arr_hsv[(arr_hsv[:,1] * arr_hsv[:,2] > 0.3), 0], bins = bins
+)
+cnt[0] = cnt[0] + cnt[7]
+cnt = cnt[:7]
+cnt
+```
+
+There are a number of different ways to summarize these counts. We will
+create two annotations from them. First, we associate each poster with a
+dominant color corresponding to the hue name that is most strongly
+represented in the poster. This can be done with the following code. As
+we see, the code associates the *Take the Lead* poster with the color
+green as would be have expected from the histogram.
+
+```{python}
+hue["cnom"].to_numpy()[np.argmax(cnt)]
+```
+
+The other helpful quantity that we will save is the proportion of the
+entire poster that corresponds to this most dominant color. Using the
+code below, we see that that over 42% of this poster corresponds to hues
+which we have categorized as \"green\".
+
+```{python}
+color_percent = np.max(cnt) / arr_hsv.shape[0] * 100
+color_percent
+```
+
+Now that we have seen how to do this with a single image, let\'s cycle
+through all of the posters and compute the name of the dominant color
+and the percentage of the poster corresponding to each color for each of
+the posters.
+
+```{python}
+results = []
+results_percent = []
+for row in posters.iter_rows(named=True):
+    arr = np.asarray(Image.open(row["filepath"]))
+    arr_hsv = cv2.cvtColor(arr, cv2.COLOR_RGB2HSV)
+    arr_hsv = arr_hsv.astype(np.float64)
+    arr_hsv[:, :, 0] = arr_hsv[:, :, 0] / 179.0
+    arr_hsv[:, :, 1] = arr_hsv[:, :, 1] / 255.0
+    arr_hsv[:, :, 2] = arr_hsv[:, :, 2] / 255.0
+    arr_hsv = arr_hsv.reshape((-1, 3), order = "F")
+    bins = np.append(0, hue["end"].to_numpy())
+    cnt, _ = np.histogram(
+        arr_hsv[(arr_hsv[:,1] * arr_hsv[:,2] > 0.3), 0], bins = bins
+    )
+    cnt[0] = cnt[0] + cnt[7]
+    cnt = cnt[:7]
+    results.append(hue["cnom"].to_numpy()[np.argmax(cnt)])
+    results_percent.append(np.max(cnt) / arr_hsv.shape[0] * 100)
+
+
+posters = posters.with_columns(
+    dom_color = pl.Series(results),
+    dom_color_percent = pl.Series(results_percent).round(4)
+)
+```
+
+As with the other two annotations, we can start by looking at the the
+posters the have the most amount of dominant color for each given hue.
+Here, for example is the code to show the image with the largest amount
+of blue. Try to change the code to see other colors such as \"red\",
+\"yellow\", and \"green\".
+
+
+```{python}
+(
+    posters
+    .filter(c.dom_color == "blue")
+    .sort(c.dom_color_percent, descending=True)
+    .pipe(plot_image_grid, ncol=4, limit=12, label_name="avg_chroma")
+)
+```
+
+Now, let\'s do some analysis with these annotations. We will join the
+genre data back into the annotations and, as before, filter to only
+films from 1990 onwards. We will also only consider posters that have at
+least 5% of whatever the selected dominant color is. Then, we can compute the proportion of posters from each genre that have red as a dominant color using the code below.
+
+```{python}
+(
+    posters
+    .join(genre, on=[c.year, c.title])
+    .filter(c.dom_color_percent > 5)
+    .group_by(c.genre)
+    .agg(prop_color = (c.dom_color == "red").mean())
+    .sort(c.prop_color)
+    .pipe(ggplot, aes("reorder(genre, prop_color)", "prop_color"))
+    + geom_col()
+    + coord_flip()
+    + labs(x="Proportion Color", y="Genre")
+)
+```
+
+Do you see any interesting patterns in the data above? After looking
+closely, try to change the color of interest and see if any other
+patterns arise.
+
+## 1.8 Conclusions and Next Steps {#19-conclusions-and-next-steps}
+
+The tutorial has covered a lot of material. We\'ve introduced the basics
+of running Python and an understanding of how digital images are
+represented as arrays of pixel intensites. From there, we motived the
+theoretical stakes of distant viewing. Then, we put this into practice
+by generating increasingly complex annotations based on our
+understanding of color and, finally, by using a neural-network based
+machine learning algorithm to detected faces present in each of the
+movie posters. Throughout, we have tried to connect each of our analyess
+back to research questions regarding the visual cultures around movie
+posters across different genres over a 50-year period.
+
+There are many directions to explore after following this notebook. If
+you want to see how to complete the analysis presented here, including
+the important steps of connecting our observations to existing archival
+and scholarly sources, we suggest checking out Chapter 3 of our *Distant
+Viewing* book. A link is available at the top of this notebook. If you
+are new to programming, learning a [bit more
+Python](https://wiki.python.org/moin/BeginnersGuide) from core
+principles is a good start. If your interests including moving images,
+we have a follow-up notebook that works through an example using a set
+of U.S. television shows from the 1960s and 1970s. Otherwise, we suggest
+checking out the other annotations available in the [distant viewing
+toolkit](https://github.com/distant-viewing/dvt) and applying them to
+your own collections.
+
+Thank you for taking time to engage with us, and we welcome feedback!

@@ -1,0 +1,369 @@
+% !TEX program = xelatex
+\documentclass[8pt,aspectratio=169]{beamer}
+
+\usepackage{tatalk}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Distant Viewing : Tutoriel 1}
+\author{Taylor Arnold}
+\email{tarnold2@richmond.edu}
+\institute{Distant Viewing Lab}
+\date{Affiches de films et analyse des couleurs}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\customtitleframe
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{Introduction}
+\begin{rightframe}{Bienvenue}
+\splitcols{%
+  Ces diapositives accompagnent les tutoriels Python que nous avons conçus pour introduire les fondements théoriques et méthodologiques du distant viewing, ainsi qu'un aperçu des outils du Distant Viewing Toolkit.
+  
+  Elles contiennent des notes, références et schémas supplémentaires que nous trouvons utiles lors des ateliers en présentiel. La plupart des notes techniques et du matériel se trouvent directement dans les notebooks.
+
+  Pour en savoir plus sur notre travail, rendez-vous sur le site du Distant Viewing Lab à l'adresse https://distantviewing.org, ou écrivez-nous directement à tarnold2@richmond.edu.
+}{%
+  \imgcaption{media/image1.png}{Un télescope surplombant Paris, en clin d'œil à la méthodologie du distant viewing.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Distant Viewing Toolkit (DVT)}
+\splitcols{%
+  En 2017, nous avons commencé à développer un outil en Python, le « Distant Viewing Toolkit ». L'idée était de proposer des outils spécifiquement conçus pour l'analyse en sciences humaines de matériaux visuels.
+
+}{%
+  \imgcaption{media/image8.png}{Les trois projets issus du Distant Viewing Toolkit (DVT).}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Distant Viewing Toolkit (DVT)}
+\splitcols{%
+  Ces dernières années, les outils généralistes ont rattrapé les besoins des chercheurs travaillant avec des données variées, sans qu'il soit nécessaire de construire des modèles d'apprentissage automatique à partir de zéro. Face à ces évolutions, nous avons fait évoluer le toolkit en trois sous-projets :
+  \begin{itemize}
+    \item \textbf{DV Explorer} : des outils graphiques dans le navigateur pour découvrir rapidement le fonctionnement de la vision par ordinateur.
+    \item \textbf{DV Scripts} : une collection de scripts Python et de tutoriels montrant comment utiliser des outils généralistes pour des applications en humanités.
+    \item \textbf{DV Data} : une collection croissante de matériaux visuels pour la recherche en humanités.
+  \end{itemize}
+  Ce tutoriel fait partie de DV Scripts. Les liens vers les trois projets se trouvent sur la page d'accueil du laboratoire.
+
+}{%
+  \imgcaption{media/imageE.png}{Les trois projets issus du Distant Viewing Toolkit (DVT).}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmitem{1.1 Configuration}
+  \rmdim{1.2 Jeu de données des affiches de films}
+  \rmdim{1.3 Images numériques}
+  \rmdim{1.4 Distant Viewing : théorie}
+  \rmdim{1.5 Annoter la luminosité de l'image}
+  \rmdim{1.6 Saturation et chroma}
+  \rmdim{1.7 Couleur dominante}
+  \rmdim{1.8 Conclusion et prochaines étapes}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.1 Configuration}
+\begin{rightframe}{Python et Colab}
+\splitcols{%
+  Ce tutoriel s'appuie sur l'environnement Google Colab, qui permet d'utiliser Python directement dans le navigateur, sans installer de logiciel sur sa machine. Colab est gratuit pour les petits projets, et des formules payantes donnent accès à davantage de ressources de calcul.
+
+  Nous utiliserons trois modules Python courants pour l'analyse de données : NumPy, Polars et plotnine.
+  
+  Toutes les bibliothèques utilisées dans le tutoriel sont disponibles sous licence libre. Le code peut aussi être exécuté sur votre propre machine, moyennant une configuration un peu plus poussée.
+}{%
+  \imgcaption{media/imageD.png}{Logos de Google Colab, Python, Pandas, NumPy et Matplotlib.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Exécuter le notebook}
+\splitcols{%
+  Lorsqu'on ouvre le notebook du tutoriel dans Colab, une fenêtre similaire à celle de droite s'affiche dans le navigateur. Le notebook est consultable par tous ; pour exécuter le code, il faut se connecter à un compte Google.
+
+  Remarque : vous pouvez modifier le code et le texte localement dans votre navigateur. Ces modifications ne seront pas enregistrées pour les autres. N'hésitez donc pas à expérimenter avec le code à tout moment !
+
+  Une fois connecté à un compte Google, vous pourrez exécuter les blocs de code (les portions sur fond gris). Pour cela, passez la souris sur le fond gris et cliquez sur le bouton de lecture indiqué par la flèche rouge. Tout au long du tutoriel, il faut exécuter chaque bloc dans l'ordre.
+}{%
+  \imgcaption{media/image9.png}{Capture d'écran de l'interface Colab exécutant le code de configuration du DVT.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{1.1 Configuration}
+  \rmitem{1.2 Jeu de données des affiches de films}
+  \rmdim{1.3 Images numériques}
+  \rmdim{1.4 Distant Viewing : théorie}
+  \rmdim{1.5 Annoter la luminosité de l'image}
+  \rmdim{1.6 Saturation et chroma}
+  \rmdim{1.7 Couleur dominante}
+  \rmdim{1.8 Conclusion et prochaines étapes}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.2 Jeu de données des affiches de films}
+\begin{rightframe}{Présentation du corpus}
+\splitcols{%
+  Dans ce tutoriel, nous allons explorer une collection d'affiches issues des 100 films les plus rentables de chaque année entre 1970 et 2019. Notre corpus comprend près de 5000 images (nous n'avons pas pu retrouver un petit nombre d'affiches anciennes).
+
+  Notre objectif est de comprendre comment la couleur et la composition des affiches (1) ont évolué dans le temps et (2) sont utilisées pour véhiculer (ou détourner) les conventions de genre. Nous voulons mobiliser des techniques computationnelles pour identifier et comprendre des motifs à travers les milliers d'images de notre collection.
+}{%
+  \imgcaption{media/image10.png}{Exemples d'affiches de films à travers les décennies et les genres du jeu de données.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Questions de recherche}
+\splitcols{%
+  Avant de nous lancer dans le travail computationnel, prenons un instant pour réfléchir aux questions de recherche qui sous-tendent cette étude :
+
+  \begin{itemize}
+  \item Quels sont les objectifs principaux d'une affiche de film ? Ces objectifs ont-ils évolué au fil du temps ?
+  \item Quelles informations les concepteurs d'affiches cherchent-ils à transmettre à leur public ?
+  \item Quelles informations déduisez-vous de la luminosité, de la saturation et des exemples d'affiches présentés à droite ?
+  \item Quelles hypothèses peut-on formuler sur la relation entre la couleur, la composition d'une affiche et le genre du film ?
+  \end{itemize}
+}{%
+  \imgcaption{media/image10.png}{Exemples d'affiches de films à travers les décennies et les genres du jeu de données.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{1.1 Configuration}
+  \rmdim{1.2 Jeu de données des affiches de films}
+  \rmitem{1.3 Images numériques}
+  \rmdim{1.4 Distant Viewing : théorie}
+  \rmdim{1.5 Annoter la luminosité de l'image}
+  \rmdim{1.6 Saturation et chroma}
+  \rmdim{1.7 Couleur dominante}
+  \rmdim{1.8 Conclusion et prochaines étapes}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.3 Images numériques}
+\begin{rightframe}{Représentation par pixels}
+\splitcols{%
+  Bien que cette image ait été prise à l'origine sur une pellicule couleur, la version dont nous disposons ici est un scan numérisé, stocké et affiché par un ordinateur.
+
+  À l'œil nu, nous identifions sans peine plusieurs éléments : le cheval, l'homme, le ciel, les nuages. Mais comment cette information est-elle comprise par l'ordinateur ?
+
+  Pour comprendre comment les images numériques sont stockées, nous allons zoomer dans l'image et examiner une version en basse résolution. Chaque point de l'image combinée est obtenu en définissant la quantité de lumière rouge, verte et bleue nécessaire à la reconstitution de la couleur.
+}{%
+  \imgcaption{media/imageA.png}{Détail d'une photographie attribuée à Russell Lee, prise en août 1942.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Lumière RGB}
+\splitcols{%
+  En isolant uniquement les valeurs des pixels verts, on dispose d'assez de place pour voir les nombres eux-mêmes. Comme dans le code Python, ces nombres vont de 0 (pas de vert) à 255 (vert maximal).
+
+  Notez qu'il y a beaucoup de lumière verte ici, alors même que rien dans l'image originale n'est ce qu'on appellerait habituellement « vert ». Le vert se mélange au rouge et au bleu pour produire d'autres couleurs comme le marron, l'orange ou le blanc.
+
+  En général, surtout sur les écrans modernes, les pixels sont trop petits pour être discernables individuellement. Mais si l'on zoomait suffisamment, on verrait apparaître les lumières rouge, verte et bleue, comme sur l'image de droite.
+}{%
+  \imgcaption{media/image13.jpeg}{Visualisation des pixels RGB sur différents types d'écrans CRT et LCD.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Lumière RGB}
+\splitcols{%
+  En isolant uniquement les valeurs des pixels verts, on dispose d'assez de place pour voir les nombres eux-mêmes. Comme dans le code Python, ces nombres vont de 0 (pas de vert) à 255 (vert maximal).
+
+  Notez qu'il y a beaucoup de lumière verte ici, alors même que rien dans l'image originale n'est ce qu'on appellerait habituellement « vert ». Le vert se mélange au rouge et au bleu pour produire d'autres couleurs comme le marron, l'orange ou le blanc.
+
+  En général, surtout sur les écrans modernes, les pixels sont trop petits pour être discernables individuellement. Mais si l'on zoomait suffisamment, on verrait apparaître les lumières rouge, verte et bleue, comme sur l'image de droite.
+}{%
+  \imgcaption{media/image12.jpg}{Visualisation des pixels RGB sur différents types d'écrans CRT et LCD.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{1.1 Configuration}
+  \rmdim{1.2 Jeu de données des affiches de films}
+  \rmdim{1.3 Images numériques}
+  \rmitem{1.4 Distant Viewing : théorie}
+  \rmdim{1.5 Annoter la luminosité de l'image}
+  \rmdim{1.6 Saturation et chroma}
+  \rmdim{1.7 Couleur dominante}
+  \rmdim{1.8 Conclusion et prochaines étapes}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.4 Distant Viewing : théorie}
+\begin{rightframe}{Propriétés mimétiques}
+\splitcols{%
+  Notez qu'il est impossible de comprendre que les nombres dans le coin supérieur gauche représentent l'œil d'un cheval tant que ces nombres ne sont pas replacés dans le contexte de l'image entière.
+
+  Rien, dans l'image numérique, n'indique explicitement qu'il s'agit d'un cheval. Si nous reconnaissons un cheval, c'est parce que la forme ressemble à celle d'un cheval tel que nous le voyons de nos propres yeux.
+
+  Pour reprendre le vocabulaire de la sémiotique, les images numériques (comme leurs équivalents analogiques) produisent du sens par leurs propriétés mimétiques. Elles transmettent de l'information en partageant des similarités avec les choses qu'elles représentent.
+}{%
+  \imgcaption{media/image14.jpg}{Zooms successifs sur l'œil d'un cheval, montrant les tableaux de pixels à côté des représentations en niveaux de gris.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Annotations sémantiques}
+\splitcols{%
+  Puisque les images numériques n'encodent pas explicitement leurs éléments sémantiques, nous devons construire des représentations des informations qui nous intéressent, dans le cadre même du processus analytique.
+
+  Par exemple, à droite, on voit plusieurs façons de résumer l'information contenue dans notre image à travers des annotations structurées.
+  
+  Aucune annotation ne peut représenter parfaitement l'image. On perd toujours de l'information présente dans l'image, et on fait des hypothèses (et parfois des erreurs) dans la manière dont on construit ces annotations.
+}{%
+  \imgcaption[0.8]{media/imageC.png}{Exemples d'annotations sémantiques.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Principes du Distant Viewing}
+\splitcols{%
+  La théorie du distant viewing combine ces observations avec des travaux en sémiotique et en culture visuelle pour proposer une théorie de l'exploration computationnelle des images numériques par la vision par ordinateur, et expliquer pourquoi cette approche est nécessaire.
+
+  \begin{itemize}
+  \item La nature mimétique des images impose que l'analyse computationnelle des images numériques commence par l'extraction de métadonnées sémantiques (« annotations ») via la vision par ordinateur.
+  \item Le processus de construction d'annotations est une forme de regard médiatisée par le calcul.
+  \item L'application de la vision par ordinateur n'est pas un processus neutre. Elle engage des manières de voir socialement situées, qui sont inscrites dans les algorithmes et dans les façons dont ils sont utilisés.
+  \end{itemize}
+}{%
+  \imgcaption[0.7]{media/image16.jpeg}{Couverture de Distant Viewing: Computational Exploration of Digital Images (MIT Press, 2023).}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{1.1 Configuration}
+  \rmdim{1.2 Jeu de données des affiches de films}
+  \rmdim{1.3 Images numériques}
+  \rmdim{1.4 Distant Viewing : théorie}
+  \rmitem{1.5 Annoter la luminosité de l'image}
+  \rmdim{1.6 Saturation et chroma}
+  \rmdim{1.7 Couleur dominante}
+  \rmdim{1.8 Conclusion et prochaines étapes}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.5 Annoter la luminosité de l'image}
+\begin{rightframe}{Mesurer la luminosité}
+\splitcols{%
+  Commençons par une annotation relativement simple, qui mesure la luminosité de chaque affiche.
+
+  \begin{itemize}
+  \item Comment la luminosité des affiches peut-elle évoluer dans le temps ? Quels facteurs pourraient expliquer ces changements ?
+  \item Comment la luminosité peut-elle se rattacher au genre d'un film ? Quels genres pensez-vous être les plus lumineux ? Lesquels seraient les plus sombres ?
+  \end{itemize}
+
+  Comment mesurer la luminosité d'une image ? Rappelons que les intensités des pixels indiquent la quantité de lumière rouge, verte et bleue nécessaire pour produire une couleur donnée. En faisant la moyenne des valeurs de pixels sur toute l'image, on obtient une indication de la quantité totale de lumière utilisée, et donc une manière de mesurer sa luminosité.
+}{%
+  \imgcaption{media/image17.png}{Différentes combinaisons d'intensités de rouge, vert et bleu produisant des luminosités perçues variées.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{1.1 Configuration}
+  \rmdim{1.2 Jeu de données des affiches de films}
+  \rmdim{1.3 Images numériques}
+  \rmdim{1.4 Distant Viewing : théorie}
+  \rmdim{1.5 Annoter la luminosité de l'image}
+  \rmitem{1.6 Saturation et chroma}
+  \rmdim{1.7 Couleur dominante}
+  \rmdim{1.8 Conclusion et prochaines étapes}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.6 Saturation et chroma}
+\begin{rightframe}{Représentations alternatives de la couleur}
+\splitcols{%
+  À droite, une visualisation de la couleur sous la forme teinte–saturation–valeur (HSV), une alternative à la représentation RGB que nous avons utilisée jusqu'ici. La saturation vaut 0 au centre du cylindre (nuances de gris) et 1 sur sa surface extérieure. La valeur est une autre mesure de la luminosité.
+
+  Le chroma est une représentation alternative de la saturation. On peut le visualiser géométriquement en pinçant la base du cylindre HSV pour former un cône.
+  
+  Nous travaillons avec le chroma dans notre analyse parce que nous pensons qu'il rend mieux compte de la richesse d'une couleur. Le choix entre ces deux mesures illustre bien le type de décisions subjectives, parfois subtiles, qui influencent les applications du distant viewing et qu'il faut sans cesse expliciter.
+}{%
+  \imgcaption{media/image18.png}{Visualisations des espaces colorimétriques sous forme de cylindre HSV et de cône Chroma.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{1.1 Configuration}
+  \rmdim{1.2 Jeu de données des affiches de films}
+  \rmdim{1.3 Images numériques}
+  \rmdim{1.4 Distant Viewing : théorie}
+  \rmdim{1.5 Annoter la luminosité de l'image}
+  \rmdim{1.6 Saturation et chroma}
+  \rmitem{1.7 Couleur dominante}
+  \rmitem{1.8 Conclusion et prochaines étapes}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.7 Couleur dominante}
+\begin{rightframe}{Teinte et genre}
+\splitcols{%
+  La teinte (hue) d'une couleur correspond au nom courant qu'on lui donnerait usuellement : rouge, vert, violet, etc. Nous représenterons la teinte par un nombre entre 0 et 1, correspondant aux positions sur la roue chromatique de droite.
+  
+  Notez que la teinte est une mesure circulaire : les valeurs proches de 0 et celles proches de 1 correspondent à des nuances de rouge très similaires.
+
+  En regardant les affiches et en réfléchissant à la signification culturelle de la couleur, prenez un instant pour vous interroger avant de découvrir les résultats agrégés :
+  \begin{itemize}
+  \item Quels liens vous attendez-vous à voir entre des couleurs précises et certains genres ?
+  \item Pensez-vous que certaines couleurs soient des indicateurs fréquents d'un genre particulier ?
+  \item Quelles couleurs vous semblent les plus utilisées sur les affiches de films ?
+  \end{itemize}
+}{%
+  \imgcaption{media/image19.png}{Une roue chromatique standard, avec les valeurs de teinte allant de 0 à 1.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{1.1 Configuration}
+  \rmdim{1.2 Jeu de données des affiches de films}
+  \rmdim{1.3 Images numériques}
+  \rmdim{1.4 Distant Viewing : théorie}
+  \rmdim{1.5 Annoter la luminosité de l'image}
+  \rmdim{1.6 Saturation et chroma}
+  \rmdim{1.7 Couleur dominante}
+  \rmitem{1.8 Conclusion et prochaines étapes}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.8 Conclusion et prochaines étapes}
+\begin{rightframe}{Conclusion}
+\splitcols[0.4]{%
+  En prenant un peu de recul par rapport aux méthodes spécifiques, on voit que le distant viewing décrit une manière particulière de travailler les données quand celles-ci proviennent d'un fonds visuel.
+
+  Plus précisément, il faut créer des annotations structurées qui représentent (imparfaitement) les traits qui nous intéressent, avant même de passer à la visualisation, au nettoyage des données ou à toute autre forme de modélisation.
+
+  Ce schéma se poursuivra dans le second tutoriel.
+}{%
+  \imgcaption{media/image15.png}{Pipeline classique de la science des données (en haut) comparé au pipeline du distant viewing.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Pour aller plus loin}
+  Plusieurs directions s'ouvrent à vous après ces notes :
+
+  \begin{itemize}
+  \item Pour voir comment mener à bien l'analyse présentée ici, consultez le chapitre 3 de Distant Viewing.
+  \item Si vous débutez en programmation, suivez les liens dans le notebook pour découvrir Python.
+  \item Pour en savoir plus sur les algorithmes de vision par ordinateur et le travail sur les images animées, consultez les tutoriels 2 et 3.
+  \end{itemize}
+
+  Merci d'avoir pris le temps de nous suivre. N'hésitez pas à nous contacter pour toute question ou tout retour !
+
+\end{rightframe}
+
+\end{document}

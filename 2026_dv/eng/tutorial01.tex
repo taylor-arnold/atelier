@@ -1,0 +1,369 @@
+% !TEX program = xelatex
+\documentclass[8pt,aspectratio=169]{beamer}
+
+\usepackage{tatalk}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Distant Viewing: Tutorial 1}
+\author{Taylor Arnold \& Lauren Tilton}
+\email{tarnold2@richmond.edu}
+\institute{Distant Viewing Lab}
+\date{Movie Posters and Color Analysis}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\customtitleframe
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{Introduction}
+\begin{rightframe}{Welcome}
+\splitcols{%
+  These slides are designed to accompany the Python tutorials that we have built to introduce the theoretical and methodological foundations of Distant Viewing alongside an overview of the tools made available through the Distant Viewing Toolkit.
+  
+  The slides contain additional notes, references, and diagrams that we find useful when using the tutorials during in-person workshops. Most of the technical notes and materials are available direction in the notebooks.
+
+  For further information about our work, please visit Distant Viewing Lab website at https://distantviewing.org or feel free to email us directly at tarnold2@richmond.edu
+}{%
+  \imgcaption{media/image1.png}{A telescope overlooking the city of Paris, reflecting the distant viewing methodology.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Distant Viewing Toolkit (DVT)}
+\splitcols{%
+  In 2017, we started developing a Python-based tool called the `Distant Viewing Toolkit.' The idea was to build tools specifically designed for the humanistic analysis of visual materials. 
+
+}{%
+  \imgcaption{media/image8.png}{The three successor projects that came out of the Distant Viewing Toolkit (DVT).}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Distant Viewing Toolkit (DVT)}
+\splitcols{%
+  In recent years, general-purpose tools have caught up with the needs of practicioners working with data from a variety of domains, without the need for directly constructing machine learning models from scratch. Given these changes, we've converted the idea of the toolkit into three sub-projects:
+  \begin{itemize}
+    \item \textbf{DV Explorer}: Browser-based GUI tools for quickly getting into the ways that computer vision works.
+    \item \textbf{DV Scripts}: A collection of Python scripts and tutorials showing how to use general-purpose tools for humanities applications.
+    \item \textbf{DV Data}: A growing collection of visual materials for humanities research. 
+  \end{itemize}
+  This tutorial is part of DV Scripts. Links to all three are giving on the lab's main landing page.
+
+}{%
+  \imgcaption{media/imageE.png}{The three successor projects that came out of the Distant Viewing Toolkit (DVT).}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Outline}
+  \rmitem{1.1 Setup}
+  \rmdim{1.2 Movie Poster Dataset}
+  \rmdim{1.3 Digital Images}
+  \rmdim{1.4 Distant Viewing: Theory}
+  \rmdim{1.5 Annotating Image Brightness}
+  \rmdim{1.6 Saturation and Chroma}
+  \rmdim{1.7 Dominant Color}
+  \rmdim{1.8 Conclusions and Next Steps}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.1 Setup}
+\begin{rightframe}{Python and Colab}
+\splitcols{%
+  This tutorial makes use of Google's Colab environment, which allows us to use the Python programming language directly from the browser without needing to install any software locally. Colab can be used for small projects for free, with paid plans available to access more computing resources.
+
+  We will make use of three common Python modules for data analysis: NumPy, Polars, and plotnine.
+  
+  All the software libraries used in the tutorial are available under open-source licenses. The code we work through can all be run on your local machine with just a little bit of extra setup required to get started.
+}{%
+  \imgcaption{media/imageD.png}{Logos for Google Colab, Python, Pandas, NumPy, and Matplotlib.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Running the Notebook}
+\splitcols{%
+  When opening the tutorial notebook in Colab, this should open a window in the browser similar to the one on the right-hand side here. The notebook can be viewed by anyone; in order to run the code itself, we will need to sign into a Google account.
+
+  Note: You will be able to edit the code and text locally in your browser. These changes will not be saved for anyone else. So, at any point, feel free to play around with the code!
+
+  After signing into a Google account, we will be able to run the code block (the parts of the notebook on a grey background). To run the code, hover over the grey background and click on the play button as shown by the red arrow here. Throughout the tutorial, we need to run each of the code blocks in order.
+}{%
+  \imgcaption{media/image9.png}{Screenshot of the Colab notebook interface running the DVT setup code.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Outline}
+  \rmdim{1.1 Setup}
+  \rmitem{1.2 Movie Poster Dataset}
+  \rmdim{1.3 Digital Images}
+  \rmdim{1.4 Distant Viewing: Theory}
+  \rmdim{1.5 Annotating Image Brightness}
+  \rmdim{1.6 Saturation and Chroma}
+  \rmdim{1.7 Dominant Color}
+  \rmdim{1.8 Conclusions and Next Steps}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.2 Movie Poster Dataset}
+\begin{rightframe}{Corpus Overview}
+\splitcols{%
+  In this tutorial we are going to explore a collection of movie posters from the top-100 grossing films from every year between 1970 and 2019. Our corpus consists of nearly 5000 images (we were unable to locate a small set of older posters).
+
+  Our goal is to understand how the color and composition of the posters has (1) changed over time and (2) is used to convey (or subvert) genre conventions. We want to use computational techniques to be able to identify and understand patterns across all the thousands of images in our collection.
+}{%
+  \imgcaption{media/image10.png}{Examples of movie posters from across the decades and genres within the dataset.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Research Questions}
+\splitcols{%
+  Before we dive into the computational work, let's take a second to think about the underlying research questions of this work by considering the following questions:
+
+  \begin{itemize}
+  \item What are the primary goals of movie posters? Have these goals changed over time?
+  \item What kinds of information do the makers of movie posters want to convey to the people who view them?
+  \item What kinds of information do you infer from the brightness, saturation, and the example movie posters on the right?
+  \item What hypotheses might we be able to produce about the relationship between the color and composition of a movie poster and genre?
+  \end{itemize}
+}{%
+  \imgcaption{media/image10.png}{Examples of movie posters from across the decades and genres within the dataset.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Outline}
+  \rmdim{1.1 Setup}
+  \rmdim{1.2 Movie Poster Dataset}
+  \rmitem{1.3 Digital Images}
+  \rmdim{1.4 Distant Viewing: Theory}
+  \rmdim{1.5 Annotating Image Brightness}
+  \rmdim{1.6 Saturation and Chroma}
+  \rmdim{1.7 Dominant Color}
+  \rmdim{1.8 Conclusions and Next Steps}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.3 Digital Images}
+\begin{rightframe}{Pixel Representations}
+\splitcols{%
+  While the image was originally taken using physical color film, the version that we have here is a digitized scan stored and displayed on a computer.
+
+  When viewing the image with our eyes, we can identify a variety of elements such as the horse, the man, the sky, and the clouds. But how is this information understood by our computer?
+
+  To understand the way that digital images are stored, we will further zoom into our image and consider a lower resolution version. Each point in the combined image is created by defining the amount of red, green, and blue light needed to re-create the given color.
+}{%
+  \imgcaption{media/imageA.png}{Cropped image taken from a photograph credited to Russell Lee taken in August 1942.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{RGB Light}
+\splitcols{%
+  Looking at just the green pixel values, we have sufficient space to see the actual numbers. As with the code in Python, these numbers are on a scale from 0 (no green) to 255 (as much green as possible).
+
+  Note that there is a lot of green light here even though nothing in the original image is something that we would usually call ``green.''The green light is blended with red and blue to create other colors such as brown, orange, and white.
+
+  Usually, particularly on modern screens, the individual pixels are too small to individually see. But know that if we zoomed in far enough, we would see the individual red, green, and blue lights as shown in the image on the right.
+}{%
+  \imgcaption{media/image13.jpeg}{Visualization of RGB pixels on different types of CRT and LCD displays.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{RGB Light}
+\splitcols{%
+  Looking at just the green pixel values, we have sufficient space to see the actual numbers. As with the code in Python, these numbers are on a scale from 0 (no green) to 255 (as much green as possible).
+
+  Note that there is a lot of green light here even though nothing in the original image is something that we would usually call ``green.''The green light is blended with red and blue to create other colors such as brown, orange, and white.
+
+  Usually, particularly on modern screens, the individual pixels are too small to individually see. But know that if we zoomed in far enough, we would see the individual red, green, and blue lights as shown in the image on the right.
+}{%
+  \imgcaption{media/image12.jpg}{Visualization of RGB pixels on different types of CRT and LCD displays.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Outline}
+  \rmdim{1.1 Setup}
+  \rmdim{1.2 Movie Poster Dataset}
+  \rmdim{1.3 Digital Images}
+  \rmitem{1.4 Distant Viewing: Theory}
+  \rmdim{1.5 Annotating Image Brightness}
+  \rmdim{1.6 Saturation and Chroma}
+  \rmdim{1.7 Dominant Color}
+  \rmdim{1.8 Conclusions and Next Steps}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.4 Distant Viewing: Theory}
+\begin{rightframe}{Mimetic Properties}
+\splitcols{%
+  Notice that it is impossible to understand that the numbers in the upper-left hand corner represent the eye of a horse until we see those numbers in the context of a wider version of the entire image. 
+
+  In fact, there is no explicit way that the digital image records that this is a horse. Rather, we recognize this as a horse because it looks similar to that that a horse looks when we see it with our own eyes.
+
+  To use the language of semiotics, digital images (just as with their analog counterparts) make meaning through their mimetic properties. They convey information by sharing similarities with the things they represent.
+}{%
+  \imgcaption{media/image14.jpg}{Zoomed versions of the example image centered on the eye of a horse, showing pixel arrays alongside gray-scale visual representations.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Semantic Annotations}
+\splitcols{%
+  Because the digital images do not explicitly code semantic elements, we need to construct representations of the information that we want to study as a part of the analytical process.
+
+  For example, on the right we see a number of different ways that we can summarize the information about our example image through structured annotations.
+  
+  Notice that there is no way to perfectly represent the image through the annotations. We are always both missing information present in the image and making assumptions (and potential errors) in the way that the construct the annotations.
+}{%
+  \imgcaption[0.8]{media/imageC.png}{Example semantic annotations.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Principles of Distant Viewing}
+\splitcols{%
+  The theory of distant viewing combines the observations here with scholarship in semiotics and visual culture to present a theory of how computational exploration of digital images through the application of computer vision works, and why it is needed.
+
+  \begin{itemize}
+  \item Mimetic nature of images necessitates that the computational analysis of digital images starts with the extraction of semantic metadata (``annotations'') using computer vision.
+  \item The process of constructing annotations is a computationally mediated form of viewing.
+  \item The application of computer vision is not a neutral process.It engages in socially mediated ways of seeing and viewing that are encoded into the algorithms and the ways that they are used.
+  \end{itemize}
+}{%
+  \imgcaption[0.7]{media/image16.jpeg}{Cover of Distant Viewing: Computational Exploration of Digital Images (MIT Press, 2023).}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Outline}
+  \rmdim{1.1 Setup}
+  \rmdim{1.2 Movie Poster Dataset}
+  \rmdim{1.3 Digital Images}
+  \rmdim{1.4 Distant Viewing: Theory}
+  \rmitem{1.5 Annotating Image Brightness}
+  \rmdim{1.6 Saturation and Chroma}
+  \rmdim{1.7 Dominant Color}
+  \rmdim{1.8 Conclusions and Next Steps}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.5 Annotating Image Brightness}
+\begin{rightframe}{Measuring Brightness}
+\splitcols{%
+  We start with a relatively straightforward annotation that measures the how bright one of our posters is.
+
+  \begin{itemize}
+  \item What changes might there be in the brightness of movie posters over time? What may contribute to these changes?
+  \item How might brightness relate to the genre of a movie poster? Which genres do you expect to be the brightest? Which do you expect to be darkest?
+  \end{itemize}
+
+  How should we measure the brightness of an image? Recall that the pixel intensities represent how much red, green, and blue light to use to create a specific color. From this, we see that taking the average pixel values across an image will tell us how much light is used in representing the image, therefore presenting one way of measuring the brightness image.
+}{%
+  \imgcaption{media/image17.png}{Different combinations of red, green, and blue pixel intensities used to generate perceived brightness.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Outline}
+  \rmdim{1.1 Setup}
+  \rmdim{1.2 Movie Poster Dataset}
+  \rmdim{1.3 Digital Images}
+  \rmdim{1.4 Distant Viewing: Theory}
+  \rmdim{1.5 Annotating Image Brightness}
+  \rmitem{1.6 Saturation and Chroma}
+  \rmdim{1.7 Dominant Color}
+  \rmdim{1.8 Conclusions and Next Steps}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.6 Saturation and Chroma}
+\begin{rightframe}{Alternative Representations of Color}
+\splitcols{%
+  On the right is a visualization of color as hue, saturation, and value (HSV), an alternative way of representing color to the RGB intensities that we have so far been working with. Saturation is 0 in the middle of the cylinder (shades of grey) and 1 on the exterior of the cylinder. Value is an alternative measurement of brightness.
+
+  Chroma is an alternative representation of the saturation of a color. It can be geometrically visualized by pinching the bottom of the HSV cylinder to form a cone.
+  
+  We work with chroma in our analysis because we think it better represents the richness of a color. The choice between these two measurements is a good example of the kinds of subtle subjective decisions that influence applications of distant viewing and need to constantly be accounted for in our analysis.
+}{%
+  \imgcaption{media/image18.png}{Visualizations of color spaces using an HSV cylinder and a Chroma cone.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Outline}
+  \rmdim{1.1 Setup}
+  \rmdim{1.2 Movie Poster Dataset}
+  \rmdim{1.3 Digital Images}
+  \rmdim{1.4 Distant Viewing: Theory}
+  \rmdim{1.5 Annotating Image Brightness}
+  \rmdim{1.6 Saturation and Chroma}
+  \rmitem{1.7 Dominant Color}
+  \rmitem{1.8 Conclusions and Next Steps}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.7 Dominant Color}
+\begin{rightframe}{Hue and Genre}
+\splitcols{%
+  The hue of a color represents the common name that we would typically give to a color, such as red, green, or purple. We will use a number between 0 and 1 to represent hue, corresponding to the numbers placed on the color wheel on the right.
+  
+  Notice that hue is a circular measurement, with values close to 0 being a similar shade of red to values near 1.
+
+  As we look at the posters and think about cultural significant of color, consider the following questions before looking at the aggregative results:
+  \begin{itemize}
+  \item What connections to you expect exist between individual colors and genre? 
+  \item Do you expect specific colors to be frequently indicative of a specific genre?
+  \item What colors do you think are most commonly used in movie posters?
+  \end{itemize}
+}{%
+  \imgcaption{media/image19.png}{A standard color wheel with hue values scaling from 0 to 1.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Outline}
+  \rmdim{1.1 Setup}
+  \rmdim{1.2 Movie Poster Dataset}
+  \rmdim{1.3 Digital Images}
+  \rmdim{1.4 Distant Viewing: Theory}
+  \rmdim{1.5 Annotating Image Brightness}
+  \rmdim{1.6 Saturation and Chroma}
+  \rmdim{1.7 Dominant Color}
+  \rmitem{1.8 Conclusions and Next Steps}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{1.8 Conclusions and Next Steps}
+\begin{rightframe}{Conclusions}
+\splitcols[0.4]{%
+  Taking a step back from the specific methods, we can see Distant Viewing as a method that describes a specific way of changing the way that we work with data when the data is from a visual archive.
+
+  Specifically, we need to create structured annotations that represent (imperfectly) the features that we are interested in before we go into visualizing, data cleaning, and other kinds of modeling.
+
+  We will see this pattern continue into the second tutorial.
+}{%
+  \imgcaption{media/image15.png}{Traditional data science pipeline (top) compared to the pipeline within DV.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Moving Forward}
+  There are many directions to explore after following these notes:
+
+  \begin{itemize}
+  \item To see how to complete the analysis presented here, check out Chapter 3 of the Distant Viewing.
+  \item If you are new to programming, see the links in the notebook to learn a bit more about working with Python.
+  \item To learn more about the use of computer vision algorithms and how to work with moving images, see Tutorials 2 and 3.
+  \end{itemize}
+
+  Thank you for taking time to engage with us. Please reach out with any questions or feedback!
+
+\end{rightframe}
+
+\end{document}

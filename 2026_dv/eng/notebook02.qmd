@@ -1,0 +1,1325 @@
+# Distant Viewing Tutorial 2: Advanced Models
+
+
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import torch
+import polars as pl
+import numpy as np
+import cv2
+
+from transformers import pipeline, utils
+from PIL import Image
+from polars import col as c
+from funs import *
+from plotnine import *
+
+theme_set(theme_minimal())
+device = "cuda" if torch.cuda.is_available() else "cpu"
+utils.logging.set_verbosity_error()
+utils.logging.disable_progress_bar()
+```
+
+## 2.x Setup
+
+```{python}
+posters = pl.read_csv("data/movies_50_years_meta.csv")
+posters
+```
+
+```{python}
+plot_image_grid(posters, ncol=4, limit=12)
+```
+
+## 2.x Object Detection
+
+First we load the model
+
+```{python}
+from transformers import AutoImageProcessor, AutoModelForObjectDetection
+
+detr_processor = AutoImageProcessor.from_pretrained("facebook/detr-resnet-50")
+detr_model = AutoModelForObjectDetection.from_pretrained("facebook/detr-resnet-50").to(device)
+```
+
+Then we select the filepath
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+```
+
+Next, we apply the model and convert the output into a polars DataFrame object:
+
+```{python}
+inputs = detr_processor(images=image, return_tensors="pt").to(device)
+with torch.no_grad():
+    outputs = detr_model(**inputs)
+
+results = detr_processor.post_process_object_detection(
+    outputs, target_sizes=torch.tensor([image.size[::-1]]), threshold=0.7
+)[0]
+
+boxes = results["boxes"].cpu().numpy()
+label_ids = results["labels"].cpu().numpy()
+
+df = pl.DataFrame({
+    "xmin": boxes[:, 0],
+    "ymin": boxes[:, 1],
+    "xmax": boxes[:, 2],
+    "ymax": boxes[:, 3],
+    "score": results["scores"].cpu().numpy(),
+    "label": [detr_model.config.id2label[i] for i in label_ids]
+})
+df
+```
+
+And finally, visualize the results:
+
+```{python}
+unique_labels = df["label"].unique().to_list()
+color_palette = plt.cm.tab10.colors
+label_to_color = {label: color_palette[i % len(color_palette)] for i, label in enumerate(unique_labels)}
+
+fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+ax.imshow(image)
+
+for row in df.iter_rows(named=True):
+    x_min, y_min = row["xmin"], row["ymin"]
+    x_max, y_max = row["xmax"], row["ymax"]
+    label = row["label"]
+    score = row["score"]
+    color = label_to_color[label]
+
+    rect = patches.Rectangle(
+        (x_min, y_min),
+        x_max - x_min,
+        y_max - y_min,
+        linewidth=2.5,
+        edgecolor=color,
+        facecolor="none"
+    )
+    ax.add_patch(rect)
+
+    ax.text(
+        x_min,
+        y_min - 5,
+        f"{label}: {score:.2f}",
+        color="white",
+        fontsize=11,
+        bbox=dict(facecolor=color, edgecolor="none", pad=2)
+    )
+
+ax.axis("off")
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+import os
+
+if os.path.exists("cache/posters_obj.parquet"):
+    posters_obj = pl.read_parquet("cache/posters_obj.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        img = Image.open(poster["filepath"]).convert("RGB")
+        inputs = detr_processor(images=img, return_tensors="pt").to(device)
+        with torch.no_grad():
+            outputs = detr_model(**inputs)
+        results = detr_processor.post_process_object_detection(
+            outputs, target_sizes=torch.tensor([img.size[::-1]]), threshold=0.7
+        )[0]
+        boxes = results["boxes"].cpu().numpy()
+        label_ids = results["labels"].cpu().numpy()
+        n = len(boxes)
+        all_dfs.append(pl.DataFrame({
+            "year": [poster["year"]] * n,
+            "title": [poster["title"]] * n,
+            "xmin": boxes[:, 0],
+            "ymin": boxes[:, 1],
+            "xmax": boxes[:, 2],
+            "ymax": boxes[:, 3],
+            "score": results["scores"].cpu().numpy(),
+            "label": [detr_model.config.id2label[i] for i in label_ids]
+        }))
+    posters_obj = pl.concat(all_dfs)
+    posters_obj.write_parquet("cache/posters_obj.parquet")
+
+posters_obj
+```
+
+## 2.x Grounding DINO
+
+First we load the model:
+
+```{python}
+from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
+
+gd_processor = AutoProcessor.from_pretrained("IDEA-Research/grounding-dino-tiny")
+gd_model = AutoModelForZeroShotObjectDetection.from_pretrained("IDEA-Research/grounding-dino-tiny").to(device)
+```
+
+Then we select the filepath:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+text_prompt = "a hat."
+```
+
+Next, we apply the model and convert the output into a polars DataFrame object:
+
+```{python}
+inputs = gd_processor(images=image, text=text_prompt, return_tensors="pt").to(device)
+with torch.no_grad():
+    outputs = gd_model(**inputs)
+
+results = gd_processor.post_process_grounded_object_detection(
+    outputs,
+    inputs.input_ids,
+    text_threshold=0.3,
+    target_sizes=[image.size[::-1]],
+)[0]
+
+boxes = results["boxes"].cpu().numpy()
+
+df = pl.DataFrame({
+    "xmin": boxes[:, 0],
+    "ymin": boxes[:, 1],
+    "xmax": boxes[:, 2],
+    "ymax": boxes[:, 3],
+    "score": results["scores"].cpu().numpy(),
+    "label": results["labels"]
+})
+df
+```
+
+And finally, visualize the results:
+
+```{python}
+unique_labels = df["label"].unique().to_list()
+color_palette = plt.cm.tab10.colors
+label_to_color = {label: color_palette[i % len(color_palette)] for i, label in enumerate(unique_labels)}
+
+fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+ax.imshow(image)
+
+for row in df.iter_rows(named=True):
+    x_min, y_min = row["xmin"], row["ymin"]
+    x_max, y_max = row["xmax"], row["ymax"]
+    label = row["label"]
+    score = row["score"]
+    color = label_to_color[label]
+
+    rect = patches.Rectangle(
+        (x_min, y_min),
+        x_max - x_min,
+        y_max - y_min,
+        linewidth=2.5,
+        edgecolor=color,
+        facecolor="none"
+    )
+    ax.add_patch(rect)
+
+    ax.text(
+        x_min,
+        y_min - 5,
+        f"{label}: {score:.2f}",
+        color="white",
+        fontsize=11,
+        bbox=dict(facecolor=color, edgecolor="none", pad=2)
+    )
+
+ax.axis("off")
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_gd.parquet"):
+    posters_gd = pl.read_parquet("cache/posters_gd.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        img = Image.open(poster["filepath"]).convert("RGB")
+        inputs = gd_processor(images=img, text=text_prompt, return_tensors="pt").to(device)
+        with torch.no_grad():
+            outputs = gd_model(**inputs)
+        results = gd_processor.post_process_grounded_object_detection(
+            outputs, inputs.input_ids, text_threshold=0.3, target_sizes=[img.size[::-1]]
+        )[0]
+        boxes = results["boxes"].cpu().numpy()
+        labels = results["labels"]
+        n = min(len(boxes), len(labels))
+        if n == 0:
+            continue
+        all_dfs.append(pl.DataFrame({
+            "year": [poster["year"]] * n,
+            "title": [poster["title"]] * n,
+            "xmin": boxes[:n, 0],
+            "ymin": boxes[:n, 1],
+            "xmax": boxes[:n, 2],
+            "ymax": boxes[:n, 3],
+            "score": results["scores"].cpu().numpy()[:n],
+            "label": labels[:n]
+        }))
+    posters_gd = pl.concat(all_dfs) if all_dfs else pl.DataFrame(schema={"year": pl.Int32, "title": pl.String, "xmin": pl.Float32, "ymin": pl.Float32, "xmax": pl.Float32, "ymax": pl.Float32, "score": pl.Float32, "label": pl.String})
+    posters_gd.write_parquet("cache/posters_gd.parquet")
+
+posters_gd
+```
+
+## 2.x Grounding Dino: Text
+
+First we load the models:
+
+```{python}
+from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection, TrOCRProcessor, VisionEncoderDecoderModel
+
+gd_processor = AutoProcessor.from_pretrained("IDEA-Research/grounding-dino-tiny")
+gd_model = AutoModelForZeroShotObjectDetection.from_pretrained("IDEA-Research/grounding-dino-tiny").to(device)
+
+trocr_processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-printed")
+trocr_model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-printed").to(device)
+```
+
+Then we select the filepath:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+```
+
+Next, we apply the models and convert the output into a polars DataFrame object:
+
+```{python}
+gd_inputs = gd_processor(images=image, text="text. word. letter.", return_tensors="pt").to(device)
+with torch.no_grad():
+    gd_outputs = gd_model(**gd_inputs)
+gd_results = gd_processor.post_process_grounded_object_detection(
+    gd_outputs, gd_inputs.input_ids,
+    text_threshold=0.2, target_sizes=[image.size[::-1]]
+)[0]
+
+text_boxes = gd_results["boxes"].cpu().numpy()
+text_scores = gd_results["scores"].cpu().numpy()
+
+recognized_texts = []
+for box in text_boxes:
+    x1, y1, x2, y2 = [int(v) for v in box]
+    crop = image.crop((x1, y1, x2, y2))
+    pixel_values = trocr_processor(images=crop, return_tensors="pt").pixel_values.to(device)
+    with torch.no_grad():
+        gen_ids = trocr_model.generate(pixel_values, max_new_tokens=64)
+    text = trocr_processor.batch_decode(gen_ids, skip_special_tokens=True)[0]
+    recognized_texts.append(text)
+
+df = pl.DataFrame({
+    "xmin": text_boxes[:, 0],
+    "ymin": text_boxes[:, 1],
+    "xmax": text_boxes[:, 2],
+    "ymax": text_boxes[:, 3],
+    "score": text_scores,
+    "text": recognized_texts
+})
+df
+```
+
+And finally, visualize the results:
+
+```{python}
+colors = plt.cm.tab20.colors
+fig, ax = plt.subplots(1, 1, figsize=(12, 12))
+ax.imshow(image)
+for i, row in enumerate(df.iter_rows(named=True)):
+    x1, y1, x2, y2 = row["xmin"], row["ymin"], row["xmax"], row["ymax"]
+    color = colors[i % len(colors)]
+    rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=2, edgecolor=color, facecolor="none")
+    ax.add_patch(rect)
+    label = f"{row['text'][:30]} ({row['score']:.2f})"
+    ax.text(x1, y1 - 5, label, color="white", fontsize=9, bbox=dict(facecolor=color, edgecolor="none", pad=2))
+ax.set_title(f"Grounding DINO + TrOCR — {len(df)} text region(s)")
+ax.axis("off")
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_gd_text.parquet"):
+    posters_gd_text = pl.read_parquet("cache/posters_gd_text.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        print(poster)
+        img = Image.open(poster["filepath"]).convert("RGB")
+        gd_inputs = gd_processor(images=img, text="text. word. letter.", return_tensors="pt").to(device)
+        with torch.no_grad():
+            gd_outputs = gd_model(**gd_inputs)
+        gd_results = gd_processor.post_process_grounded_object_detection(
+            gd_outputs, gd_inputs.input_ids, text_threshold=0.2, target_sizes=[img.size[::-1]]
+        )[0]
+        text_boxes = gd_results["boxes"].cpu().numpy()
+        text_scores = gd_results["scores"].cpu().numpy()
+        if len(text_boxes) == 0:
+            continue
+        recognized_texts = []
+        for box in text_boxes:
+            x1, y1, x2, y2 = [int(v) for v in box]
+            crop = img.crop((x1, y1, x2, y2))
+            pixel_values = trocr_processor(images=crop, return_tensors="pt").pixel_values.to(device)
+            with torch.no_grad():
+                gen_ids = trocr_model.generate(pixel_values, max_new_tokens=64)
+            recognized_texts.append(trocr_processor.batch_decode(gen_ids, skip_special_tokens=True)[0])
+        n = len(text_boxes)
+        all_dfs.append(pl.DataFrame({
+            "year": [poster["year"]] * n,
+            "title": [poster["title"]] * n,
+            "xmin": text_boxes[:, 0],
+            "ymin": text_boxes[:, 1],
+            "xmax": text_boxes[:, 2],
+            "ymax": text_boxes[:, 3],
+            "score": text_scores,
+            "text": recognized_texts
+        }))
+    posters_gd_text = pl.concat(all_dfs) if all_dfs else pl.DataFrame(schema={"year": pl.Int32, "title": pl.String, "xmin": pl.Float32, "ymin": pl.Float32, "xmax": pl.Float32, "ymax": pl.Float32, "score": pl.Float32, "text": pl.String})
+    posters_gd_text.write_parquet("cache/posters_gd_text.parquet")
+
+posters_gd_text
+```
+
+## 2.x Segment Anything
+
+First we load the model:
+
+```{python}
+from transformers import SamModel, SamProcessor
+
+sam_model = SamModel.from_pretrained("facebook/sam-vit-base").to(device)
+sam_processor = SamProcessor.from_pretrained("facebook/sam-vit-base")
+```
+
+Then we select the filepath and the point to segment from:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+per_x = 15
+per_y = 50
+```
+
+Next, we apply the model. Because the mask output cannot be stored directly in a flat table, we instead summarize each mask by its proportion of the total image area:
+
+```{python}
+point_x = int(image.size[0] * per_x / 100)
+point_y = int(image.size[1] * per_y / 100)
+
+inputs = sam_processor(image, input_points=[[[point_x, point_y]]], return_tensors="pt").to(device)
+with torch.no_grad():
+    outputs = sam_model(**inputs)
+
+masks = sam_processor.image_processor.post_process_masks(
+    outputs.pred_masks.cpu(), inputs["original_sizes"].cpu(), inputs["reshaped_input_sizes"].cpu()
+)[0][0].numpy()
+scores = outputs.iou_scores.cpu().numpy().squeeze()
+
+total_pixels = masks.shape[1] * masks.shape[2]
+
+df = pl.DataFrame({
+    "mask_id": list(range(1, len(masks) + 1)),
+    "iou_score": scores.tolist(),
+    "pixel_count": [int(mask.sum()) for mask in masks],
+    "proportion": [float(mask.sum()) / total_pixels for mask in masks]
+})
+df
+```
+
+And finally, visualize the results using the original mask output:
+
+```{python}
+fig, axes = plt.subplots(1, len(masks) + 1, figsize=(5 * (len(masks) + 1), 5))
+axes[0].imshow(image)
+axes[0].scatter([point_x], [point_y], color="lime", marker="*", s=250, edgecolor="black", linewidth=1.5, zorder=5)
+axes[0].set_title(f"Input image (point at {per_x}%, {per_y}%)")
+axes[0].axis("off")
+for i, (mask, score) in enumerate(zip(masks, scores)):
+    axes[i + 1].imshow(image)
+    overlay = np.zeros((*mask.shape, 4))
+    overlay[mask] = [1, 0, 0, 0.5]
+    axes[i + 1].imshow(overlay)
+    axes[i + 1].scatter([point_x], [point_y], color="lime", marker="*", s=250, edgecolor="black", linewidth=1.5, zorder=5)
+    axes[i + 1].set_title(f"Mask {i+1}, score: {score:.3f}")
+    axes[i + 1].axis("off")
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_sam.parquet"):
+    posters_sam = pl.read_parquet("cache/posters_sam.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        img = Image.open(poster["filepath"]).convert("RGB")
+        px = int(img.size[0] * per_x / 100)
+        py = int(img.size[1] * per_y / 100)
+        inputs = sam_processor(img, input_points=[[[px, py]]], return_tensors="pt").to(device)
+        with torch.no_grad():
+            outputs = sam_model(**inputs)
+        masks = sam_processor.image_processor.post_process_masks(
+            outputs.pred_masks.cpu(), inputs["original_sizes"].cpu(), inputs["reshaped_input_sizes"].cpu()
+        )[0][0].numpy()
+        iou_scores = outputs.iou_scores.cpu().numpy().squeeze()
+        total_pixels = masks.shape[1] * masks.shape[2]
+        n = len(masks)
+        all_dfs.append(pl.DataFrame({
+            "year": [poster["year"]] * n,
+            "title": [poster["title"]] * n,
+            "mask_id": list(range(1, n + 1)),
+            "iou_score": iou_scores.tolist(),
+            "pixel_count": [int(mask.sum()) for mask in masks],
+            "proportion": [float(mask.sum()) / total_pixels for mask in masks]
+        }))
+    posters_sam = pl.concat(all_dfs)
+    posters_sam.write_parquet("cache/posters_sam.parquet")
+
+posters_sam
+```
+
+## 2.x SAM + Grounding DINO
+
+First we load the models:
+
+```{python}
+from transformers import SamModel, SamProcessor, AutoProcessor, AutoModelForZeroShotObjectDetection
+
+gd_processor = AutoProcessor.from_pretrained("IDEA-Research/grounding-dino-tiny")
+gd_model = AutoModelForZeroShotObjectDetection.from_pretrained("IDEA-Research/grounding-dino-tiny").to(device)
+
+sam_model = SamModel.from_pretrained("facebook/sam-vit-base").to(device)
+sam_processor = SamProcessor.from_pretrained("facebook/sam-vit-base")
+```
+
+Then we select the filepath and the prompt:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+text_prompt = "a person."
+```
+
+Next, we run Grounding DINO to find boxes and then SAM to get precise masks. Because pixel-level masks cannot be stored in a flat table, we summarize each detected region by its proportion of the total image area:
+
+```{python}
+gd_inputs = gd_processor(images=image, text=text_prompt, return_tensors="pt").to(device)
+with torch.no_grad():
+    gd_outputs = gd_model(**gd_inputs)
+gd_results = gd_processor.post_process_grounded_object_detection(
+    gd_outputs,
+    gd_inputs.input_ids,
+    text_threshold=0.3,
+    target_sizes=[image.size[::-1]],
+)[0]
+
+gd_boxes = gd_results["boxes"].cpu().numpy()
+gd_scores = gd_results["scores"].cpu().numpy()
+gd_labels = gd_results["labels"]
+
+sam_inputs = sam_processor(image, input_boxes=[gd_boxes.tolist()], return_tensors="pt").to(device)
+with torch.no_grad():
+    sam_outputs = sam_model(**sam_inputs, multimask_output=False)
+
+sam_masks = sam_processor.image_processor.post_process_masks(
+    sam_outputs.pred_masks.cpu(), sam_inputs["original_sizes"].cpu(), sam_inputs["reshaped_input_sizes"].cpu()
+)[0].numpy().squeeze(1)
+
+total_pixels = image.size[0] * image.size[1]
+
+df = pl.DataFrame({
+    "label": gd_labels,
+    "score": gd_scores,
+    "xmin": gd_boxes[:, 0],
+    "ymin": gd_boxes[:, 1],
+    "xmax": gd_boxes[:, 2],
+    "ymax": gd_boxes[:, 3],
+    "pixel_count": [int(mask.sum()) for mask in sam_masks],
+    "proportion": [float(mask.sum()) / total_pixels for mask in sam_masks]
+})
+df
+```
+
+And finally, visualize the results using the original mask output:
+
+```{python}
+colors = plt.cm.tab20.colors
+fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+ax.imshow(image)
+for i, row in enumerate(df.iter_rows(named=True)):
+    color = colors[i % len(colors)]
+    mask = sam_masks[i]
+    overlay = np.zeros((*mask.shape, 4))
+    overlay[mask.astype(bool)] = [*color[:3], 0.5]
+    ax.imshow(overlay)
+    x_min, y_min = row["xmin"], row["ymin"]
+    x_max, y_max = row["xmax"], row["ymax"]
+    rect = patches.Rectangle(
+        (x_min, y_min), x_max - x_min, y_max - y_min,
+        linewidth=2, edgecolor=color, facecolor="none", linestyle="--"
+    )
+    ax.add_patch(rect)
+    ax.text(
+        x_min, y_min - 5,
+        f"{row['label']}: {row['score']:.2f}",
+        color="white", fontsize=11,
+        bbox=dict(facecolor=color, edgecolor="none", pad=2)
+    )
+ax.set_title(f"Grounding DINO + SAM: '{text_prompt}'")
+ax.axis("off")
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_sam_gd.parquet"):
+    posters_sam_gd = pl.read_parquet("cache/posters_sam_gd.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        img = Image.open(poster["filepath"]).convert("RGB")
+        gd_inputs = gd_processor(images=img, text=text_prompt, return_tensors="pt").to(device)
+        with torch.no_grad():
+            gd_outputs = gd_model(**gd_inputs)
+        gd_results = gd_processor.post_process_grounded_object_detection(
+            gd_outputs, gd_inputs.input_ids, text_threshold=0.3, target_sizes=[img.size[::-1]]
+        )[0]
+        gd_boxes = gd_results["boxes"].cpu().numpy()
+        gd_scores = gd_results["scores"].cpu().numpy()
+        gd_labels = gd_results["labels"]
+        if len(gd_boxes) == 0:
+            continue
+        sam_inputs = sam_processor(img, input_boxes=[gd_boxes.tolist()], return_tensors="pt").to(device)
+        with torch.no_grad():
+            sam_outputs = sam_model(**sam_inputs, multimask_output=False)
+        sam_masks = sam_processor.image_processor.post_process_masks(
+            sam_outputs.pred_masks.cpu(), sam_inputs["original_sizes"].cpu(), sam_inputs["reshaped_input_sizes"].cpu()
+        )[0].numpy().squeeze(1)
+        total_pixels = img.size[0] * img.size[1]
+        n = len(gd_boxes)
+        all_dfs.append(pl.DataFrame({
+            "year": [poster["year"]] * n,
+            "title": [poster["title"]] * n,
+            "label": gd_labels,
+            "score": gd_scores,
+            "xmin": gd_boxes[:, 0],
+            "ymin": gd_boxes[:, 1],
+            "xmax": gd_boxes[:, 2],
+            "ymax": gd_boxes[:, 3],
+            "pixel_count": [int(mask.sum()) for mask in sam_masks],
+            "proportion": [float(mask.sum()) / total_pixels for mask in sam_masks]
+        }))
+    posters_sam_gd = pl.concat(all_dfs)
+    posters_sam_gd.write_parquet("cache/posters_sam_gd.parquet")
+
+posters_sam_gd
+```
+
+## 2.x Depth Anything
+
+First we load the model:
+
+```{python}
+from transformers import AutoImageProcessor, AutoModelForDepthEstimation
+
+depth_processor = AutoImageProcessor.from_pretrained("depth-anything/Depth-Anything-V2-Small-hf")
+depth_model = AutoModelForDepthEstimation.from_pretrained("depth-anything/Depth-Anything-V2-Small-hf").to(device)
+```
+
+Then we select the filepath:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+```
+
+Next, we apply the model. Because the full depth map cannot be stored in a flat table, we summarize it by binning pixel depth values into ten equal-width intervals and recording the proportion of the image that falls within each:
+
+```{python}
+inputs = depth_processor(images=image, return_tensors="pt").to(device)
+with torch.no_grad():
+    outputs = depth_model(**inputs)
+
+post_processed = depth_processor.post_process_depth_estimation(outputs, target_sizes=[image.size[::-1]])
+depth = post_processed[0]["predicted_depth"].cpu().numpy()
+depth_normalized = (depth - depth.min()) / (depth.max() - depth.min())
+
+n_bins = 10
+bin_edges = np.linspace(0, 1, n_bins + 1)
+bin_labels = [f"{bin_edges[i]:.1f}–{bin_edges[i+1]:.1f}" for i in range(n_bins)]
+pixel_counts = [
+    int(((depth_normalized >= bin_edges[i]) & (depth_normalized < bin_edges[i + 1])).sum())
+    for i in range(n_bins)
+]
+pixel_counts[-1] = int(((depth_normalized >= bin_edges[-2]) & (depth_normalized <= 1.0)).sum())
+total_pixels = depth_normalized.size
+
+df = pl.DataFrame({
+    "depth_range": bin_labels,
+    "pixel_count": pixel_counts,
+    "proportion": [pc / total_pixels for pc in pixel_counts]
+})
+df
+```
+
+And finally, visualize the results using the original depth map:
+
+```{python}
+fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+axes[0].imshow(image)
+axes[0].set_title("Input image")
+axes[0].axis("off")
+
+im1 = axes[1].imshow(depth_normalized, cmap="inferno")
+axes[1].set_title("Depth map (inferno)")
+axes[1].axis("off")
+plt.colorbar(im1, ax=axes[1], fraction=0.046, pad=0.04, label="Relative depth (near → far)")
+
+axes[2].imshow(image)
+axes[2].imshow(depth_normalized, cmap="plasma", alpha=0.6)
+axes[2].set_title("Overlay")
+axes[2].axis("off")
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_depth.parquet"):
+    posters_depth = pl.read_parquet("cache/posters_depth.parquet")
+else:
+    all_dfs = []
+    n_bins = 10
+    bin_edges = np.linspace(0, 1, n_bins + 1)
+    bin_labels = [f"{bin_edges[i]:.1f}–{bin_edges[i+1]:.1f}" for i in range(n_bins)]
+    for poster in posters.iter_rows(named=True):
+        img = Image.open(poster["filepath"]).convert("RGB")
+        inputs = depth_processor(images=img, return_tensors="pt").to(device)
+        with torch.no_grad():
+            outputs = depth_model(**inputs)
+        post_processed = depth_processor.post_process_depth_estimation(outputs, target_sizes=[img.size[::-1]])
+        depth = post_processed[0]["predicted_depth"].cpu().numpy()
+        depth_norm = (depth - depth.min()) / (depth.max() - depth.min())
+        pixel_counts = [
+            int(((depth_norm >= bin_edges[i]) & (depth_norm < bin_edges[i + 1])).sum())
+            for i in range(n_bins)
+        ]
+        pixel_counts[-1] = int(((depth_norm >= bin_edges[-2]) & (depth_norm <= 1.0)).sum())
+        total_pixels = depth_norm.size
+        all_dfs.append(pl.DataFrame({
+            "year": [poster["year"]] * n_bins,
+            "title": [poster["title"]] * n_bins,
+            "depth_range": bin_labels,
+            "pixel_count": pixel_counts,
+            "proportion": [pc / total_pixels for pc in pixel_counts]
+        }))
+    posters_depth = pl.concat(all_dfs)
+    posters_depth.write_parquet("cache/posters_depth.parquet")
+
+posters_depth
+```
+
+
+## 2.x Image Embedding
+
+First we load the model:
+
+```{python}
+from transformers import AutoImageProcessor, AutoModel
+
+dino_processor = AutoImageProcessor.from_pretrained("facebook/dinov2-large")
+dino_model = AutoModel.from_pretrained("facebook/dinov2-large").to(device)
+```
+
+Then we select the filepath:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+```
+
+Next, we apply the model and store the L2-normalized CLS embedding as a single-row polars DataFrame with a List column:
+
+```{python}
+inputs = dino_processor(images=image, return_tensors="pt").to(device)
+with torch.no_grad():
+    outputs = dino_model(**inputs)
+
+cls_embedding = outputs.last_hidden_state[:, 0, :].cpu().numpy().squeeze()
+patch_embeddings = outputs.last_hidden_state[:, 1:, :].cpu().numpy().squeeze()
+cls_embedding_normalized = cls_embedding / (cls_embedding ** 2).sum() ** 0.5
+
+df = pl.DataFrame({"embedding": [cls_embedding_normalized.tolist()]})
+df
+```
+
+And finally, visualize the results:
+
+```{python}
+print(f"CLS embedding shape: {cls_embedding.shape}")
+print(f"Patch embeddings shape: {patch_embeddings.shape}  (num_patches, embedding_dim)")
+print(f"L2 norm of CLS: {(cls_embedding ** 2).sum() ** 0.5:.4f}")
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 4))
+axes[0].imshow(image)
+axes[0].set_title("Input image")
+axes[0].axis("off")
+axes[1].plot(df["embedding"][0], linewidth=0.5)
+axes[1].set_title(f"DINOv2 CLS embedding ({len(cls_embedding)} dims, L2-normalized)")
+axes[1].set_xlabel("Dimension")
+axes[1].set_ylabel("Value")
+axes[1].grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_dino.parquet"):
+    posters_dino = pl.read_parquet("cache/posters_dino.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        img = Image.open(poster["filepath"]).convert("RGB")
+        inputs = dino_processor(images=img, return_tensors="pt").to(device)
+        with torch.no_grad():
+            outputs = dino_model(**inputs)
+        emb = outputs.last_hidden_state[:, 0, :].cpu().numpy().squeeze()
+        emb = emb / (emb ** 2).sum() ** 0.5
+        all_dfs.append(pl.DataFrame({
+            "year": [poster["year"]],
+            "title": [poster["title"]],
+            "embedding": [emb.tolist()]
+        }))
+    posters_dino = pl.concat(all_dfs)
+    posters_dino.write_parquet("cache/posters_dino.parquet")
+
+posters_dino
+```
+
+## 2.x Contrastive Models: SigLIP2
+
+First we load the model:
+
+```{python}
+from transformers import AutoProcessor, AutoModel
+
+siglip_processor = AutoProcessor.from_pretrained("google/siglip2-base-patch16-224")
+siglip_model = AutoModel.from_pretrained("google/siglip2-base-patch16-224").to(device)
+```
+
+Then we select the filepath:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+```
+
+Next, we apply the model and store the L2-normalized image embedding as a single-row polars DataFrame with a List column:
+
+```{python}
+inputs = siglip_processor(images=image, return_tensors="pt").to(device)
+with torch.no_grad():
+    output = siglip_model.get_image_features(**inputs)
+
+image_features = output if torch.is_tensor(output) else output.pooler_output
+image_embedding = image_features.cpu().numpy().squeeze()
+image_embedding_normalized = image_embedding / (image_embedding ** 2).sum() ** 0.5
+
+df = pl.DataFrame({"embedding": [image_embedding_normalized.tolist()]})
+df
+```
+
+And finally, visualize the results:
+
+```{python}
+print(f"Embedding shape: {image_embedding.shape}")
+print(f"L2 norm: {(image_embedding ** 2).sum() ** 0.5:.4f}")
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 4))
+axes[0].imshow(image)
+axes[0].set_title("Input image")
+axes[0].axis("off")
+axes[1].plot(df["embedding"][0], linewidth=0.5)
+axes[1].set_title(f"SigLIP2 embedding ({len(image_embedding)} dims, L2-normalized)")
+axes[1].set_xlabel("Dimension")
+axes[1].set_ylabel("Value")
+axes[1].grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_siglip.parquet"):
+    posters_siglip = pl.read_parquet("cache/posters_siglip.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        img = Image.open(poster["filepath"]).convert("RGB")
+        inputs = siglip_processor(images=img, return_tensors="pt").to(device)
+        with torch.no_grad():
+            output = siglip_model.get_image_features(**inputs)
+        image_features = output if torch.is_tensor(output) else output.pooler_output
+        emb = image_features.cpu().numpy().squeeze()
+        emb = emb / (emb ** 2).sum() ** 0.5
+        all_dfs.append(pl.DataFrame({
+            "year": [poster["year"]],
+            "title": [poster["title"]],
+            "embedding": [emb.tolist()]
+        }))
+    posters_siglip = pl.concat(all_dfs)
+    posters_siglip.write_parquet("cache/posters_siglip.parquet")
+
+posters_siglip
+```
+
+## 2.x Face Detection and Recognition
+
+First we load the model:
+
+```{python}
+import insightface
+from insightface.app import FaceAnalysis
+
+face_app = FaceAnalysis(name="buffalo_l", providers=["CPUExecutionProvider"])
+face_app.prepare(ctx_id=0, det_size=(640, 640))
+```
+
+Then we select the filepath:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+```
+
+Next, we apply the model and convert the detected faces into a polars DataFrame:
+
+```{python}
+image_bgr = np.array(image)[:, :, ::-1]
+faces = face_app.get(image_bgr)
+
+boxes = np.array([f.bbox for f in faces])
+embeddings = np.array([f.normed_embedding for f in faces])
+ages = [int(f.age) for f in faces]
+genders = ["M" if f.gender == 1 else "F" for f in faces]
+similarity_matrix = embeddings @ embeddings.T if len(embeddings) > 0 else np.zeros((0, 0))
+
+if len(faces) > 0:
+    df = pl.DataFrame({
+        "face_id": list(range(len(faces))),
+        "xmin": boxes[:, 0].tolist(),
+        "ymin": boxes[:, 1].tolist(),
+        "xmax": boxes[:, 2].tolist(),
+        "ymax": boxes[:, 3].tolist(),
+        "age": ages,
+        "gender": genders
+    })
+else:
+    df = pl.DataFrame(schema={
+        "face_id": pl.Int32, "xmin": pl.Float32, "ymin": pl.Float32,
+        "xmax": pl.Float32, "ymax": pl.Float32, "age": pl.Int32, "gender": pl.Utf8
+    })
+df
+```
+
+And finally, visualize the results:
+
+```{python}
+colors = plt.cm.tab10.colors
+fig, axes = plt.subplots(1, 2, figsize=(18, 8))
+
+axes[0].imshow(image)
+for row in df.iter_rows(named=True):
+    i = row["face_id"]
+    x1, y1, x2, y2 = row["xmin"], row["ymin"], row["xmax"], row["ymax"]
+    color = colors[i % len(colors)]
+    rect = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=2.5, edgecolor=color, facecolor="none")
+    axes[0].add_patch(rect)
+    axes[0].text(
+        x1, y1 - 5, f"Face {i} ({row['gender']}, ~{row['age']})",
+        color="white", fontsize=10, bbox=dict(facecolor=color, edgecolor="none", pad=2)
+    )
+axes[0].set_title(f"Detected faces ({len(df)})")
+axes[0].axis("off")
+
+if len(faces) > 0:
+    im = axes[1].imshow(similarity_matrix, cmap="RdYlGn", vmin=-0.2, vmax=1.0)
+    axes[1].set_xticks(range(len(faces)))
+    axes[1].set_yticks(range(len(faces)))
+    axes[1].set_xticklabels([f"Face {i}" for i in range(len(faces))])
+    axes[1].set_yticklabels([f"Face {i}" for i in range(len(faces))])
+    for i in range(len(faces)):
+        for j in range(len(faces)):
+            axes[1].text(j, i, f"{similarity_matrix[i, j]:.2f}", ha="center", va="center", color="black", fontsize=10)
+    axes[1].set_title("Face similarity matrix (cosine)")
+    plt.colorbar(im, ax=axes[1], fraction=0.046, pad=0.04)
+else:
+    axes[1].text(0.5, 0.5, "No faces detected", ha="center", va="center", transform=axes[1].transAxes)
+    axes[1].axis("off")
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_face.parquet"):
+    posters_face = pl.read_parquet("cache/posters_face.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        img = Image.open(poster["filepath"]).convert("RGB")
+        img_bgr = np.array(img)[:, :, ::-1]
+        faces = face_app.get(img_bgr)
+        if len(faces) == 0:
+            continue
+        boxes = np.array([f.bbox for f in faces])
+        n = len(faces)
+        all_dfs.append(pl.DataFrame({
+            "year": [poster["year"]] * n,
+            "title": [poster["title"]] * n,
+            "face_id": list(range(n)),
+            "xmin": boxes[:, 0].tolist(),
+            "ymin": boxes[:, 1].tolist(),
+            "xmax": boxes[:, 2].tolist(),
+            "ymax": boxes[:, 3].tolist(),
+            "age": [int(f.age) for f in faces],
+            "gender": ["M" if f.gender == 1 else "F" for f in faces]
+        }))
+    posters_face = pl.concat(all_dfs)
+    posters_face.write_parquet("cache/posters_face.parquet")
+
+posters_face
+```
+
+## 2.x Pose Detection
+
+First we load the models:
+
+```{python}
+from transformers import AutoImageProcessor, AutoModelForObjectDetection, VitPoseImageProcessor, VitPoseForPoseEstimation
+
+person_processor = AutoImageProcessor.from_pretrained("facebook/detr-resnet-50")
+person_model = AutoModelForObjectDetection.from_pretrained("facebook/detr-resnet-50").to(device)
+
+pose_processor = VitPoseImageProcessor.from_pretrained("usyd-community/vitpose-base-simple")
+pose_model = VitPoseForPoseEstimation.from_pretrained("usyd-community/vitpose-base-simple").to(device)
+```
+
+Then we select the filepath:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+confidence_threshold = 0.3
+keypoint_names = [
+    "nose", "left_eye", "right_eye", "left_ear", "right_ear",
+    "left_shoulder", "right_shoulder", "left_elbow", "right_elbow",
+    "left_wrist", "right_wrist", "left_hip", "right_hip",
+    "left_knee", "right_knee", "left_ankle", "right_ankle"
+]
+```
+
+Next, we detect people with DETR, estimate their poses with ViTPose, and convert the keypoint output into a polars DataFrame:
+
+```{python}
+det_inputs = person_processor(images=image, return_tensors="pt").to(device)
+with torch.no_grad():
+    det_outputs = person_model(**det_inputs)
+det_results = person_processor.post_process_object_detection(
+    det_outputs, target_sizes=torch.tensor([image.size[::-1]]), threshold=0.8
+)[0]
+person_mask = det_results["labels"].cpu().numpy() == person_model.config.label2id["person"]
+person_boxes = det_results["boxes"].cpu().numpy()[person_mask]
+
+person_boxes_xywh = person_boxes.copy()
+person_boxes_xywh[:, 2] -= person_boxes_xywh[:, 0]
+person_boxes_xywh[:, 3] -= person_boxes_xywh[:, 1]
+
+pose_inputs = pose_processor(image, boxes=[person_boxes_xywh.tolist()], return_tensors="pt").to(device)
+with torch.no_grad():
+    pose_outputs = pose_model(**pose_inputs)
+pose_results = pose_processor.post_process_pose_estimation(pose_outputs, boxes=[person_boxes_xywh.tolist()])[0]
+
+rows = []
+for person_idx, person in enumerate(pose_results):
+    keypoints = person["keypoints"].cpu().numpy()
+    kp_scores = person["scores"].cpu().numpy()
+    for k_idx, ((x, y), score) in enumerate(zip(keypoints, kp_scores)):
+        rows.append({
+            "person_id": person_idx,
+            "keypoint": keypoint_names[k_idx],
+            "x": float(x),
+            "y": float(y),
+            "score": float(score)
+        })
+
+df = pl.DataFrame(rows)
+df
+```
+
+And finally, visualize the results:
+
+```{python}
+skeleton = [
+    (0,1),(0,2),(1,3),(2,4),(5,6),(5,7),(7,9),(6,8),(8,10),
+    (5,11),(6,12),(11,12),(11,13),(13,15),(12,14),(14,16)
+]
+colors = plt.cm.tab10.colors
+fig, ax = plt.subplots(1, 1, figsize=(12, 12))
+ax.imshow(image)
+for person_idx, person in enumerate(pose_results):
+    color = colors[person_idx % len(colors)]
+    keypoints = person["keypoints"].cpu().numpy()
+    kp_scores = person["scores"].cpu().numpy()
+    box = person_boxes[person_idx]
+    rect = patches.Rectangle(
+        (box[0], box[1]), box[2] - box[0], box[3] - box[1],
+        linewidth=1.5, edgecolor=color, facecolor="none", linestyle="--", alpha=0.5
+    )
+    ax.add_patch(rect)
+    for j1, j2 in skeleton:
+        if kp_scores[j1] > confidence_threshold and kp_scores[j2] > confidence_threshold:
+            ax.plot([keypoints[j1, 0], keypoints[j2, 0]], [keypoints[j1, 1], keypoints[j2, 1]], color=color, linewidth=2.5, alpha=0.8)
+    for (x, y), score in zip(keypoints, kp_scores):
+        if score > confidence_threshold:
+            ax.scatter([x], [y], color=color, s=40, edgecolor="white", linewidth=1.5, zorder=5)
+        else:
+            ax.scatter([x], [y], color=color, s=20, edgecolor="white", linewidth=0.5, alpha=0.3, marker="x", zorder=5)
+ax.set_title(f"ViTPose — {len(pose_results)} person(s), confidence threshold {confidence_threshold}")
+ax.axis("off")
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_pose.parquet"):
+    posters_pose = pl.read_parquet("cache/posters_pose.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        img = Image.open(poster["filepath"]).convert("RGB")
+        det_inputs = person_processor(images=img, return_tensors="pt").to(device)
+        with torch.no_grad():
+            det_outputs = person_model(**det_inputs)
+        det_results = person_processor.post_process_object_detection(
+            det_outputs, target_sizes=torch.tensor([img.size[::-1]]), threshold=0.8
+        )[0]
+        person_mask = det_results["labels"].cpu().numpy() == person_model.config.label2id["person"]
+        person_boxes = det_results["boxes"].cpu().numpy()[person_mask]
+        if len(person_boxes) == 0:
+            continue
+        person_boxes_xywh = person_boxes.copy()
+        person_boxes_xywh[:, 2] -= person_boxes_xywh[:, 0]
+        person_boxes_xywh[:, 3] -= person_boxes_xywh[:, 1]
+        pose_inputs = pose_processor(img, boxes=[person_boxes_xywh.tolist()], return_tensors="pt").to(device)
+        with torch.no_grad():
+            pose_outputs = pose_model(**pose_inputs)
+        pose_results_all = pose_processor.post_process_pose_estimation(pose_outputs, boxes=[person_boxes_xywh.tolist()])[0]
+        rows = []
+        for person_idx, person in enumerate(pose_results_all):
+            keypoints = person["keypoints"].cpu().numpy()
+            kp_scores = person["scores"].cpu().numpy()
+            for k_idx, ((x, y), score) in enumerate(zip(keypoints, kp_scores)):
+                rows.append({
+                    "year": poster["year"],
+                    "title": poster["title"],
+                    "person_id": person_idx,
+                    "keypoint": keypoint_names[k_idx],
+                    "x": float(x),
+                    "y": float(y),
+                    "score": float(score)
+                })
+        if rows:
+            all_dfs.append(pl.DataFrame(rows))
+    posters_pose = pl.concat(all_dfs)
+    posters_pose.write_parquet("cache/posters_pose.parquet")
+
+posters_pose
+```
+
+## 2.x VLMs
+
+First we load the model:
+
+```{python}
+from mlx_vlm import load, generate
+from mlx_vlm.prompt_utils import apply_chat_template
+from mlx_vlm.utils import load_config
+
+model_path = "mlx-community/Qwen2.5-VL-3B-Instruct-4bit"
+vlm_model, vlm_processor = load(model_path)
+vlm_config = load_config(model_path)
+```
+
+Then we select the filepath:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+```
+
+Next, we apply the model and store the question and response in a polars DataFrame:
+
+```{python}
+question = "Describe the dominant colors in this movie poster"
+formatted_prompt = apply_chat_template(vlm_processor, vlm_config, question, num_images=1)
+response = generate(vlm_model, vlm_processor, formatted_prompt, [image_path], max_tokens=512, verbose=False).text
+
+df = pl.DataFrame({"question": [question], "response": [response]})
+df
+```
+
+And finally, visualize the results:
+
+```{python}
+import textwrap
+wrapped = "\n".join(textwrap.wrap(response, width=60))
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+axes[0].imshow(image)
+axes[0].set_title("Input image")
+axes[0].axis("off")
+axes[1].axis("off")
+axes[1].text(0.0, 1.0, f"Q: {question}\n\nA: {wrapped}", fontsize=9, transform=axes[1].transAxes, va="top")
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_vlm.parquet"):
+    posters_vlm = pl.read_parquet("cache/posters_vlm.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        formatted_prompt = apply_chat_template(vlm_processor, vlm_config, question, num_images=1)
+        response = generate(vlm_model, vlm_processor, formatted_prompt, [poster["filepath"]], max_tokens=512, verbose=False).text
+        all_dfs.append(pl.DataFrame({
+            "year": [poster["year"]],
+            "title": [poster["title"]],
+            "question": [question],
+            "response": [response]
+        }))
+    posters_vlm = pl.concat(all_dfs)
+    posters_vlm.write_parquet("cache/posters_vlm.parquet")
+
+posters_vlm
+```
+
+## 2.x VLMs + Structured Output
+
+First we load the model and define the output schema:
+
+```{python}
+from mlx_vlm import load, generate
+from mlx_vlm.prompt_utils import apply_chat_template
+from mlx_vlm.utils import load_config
+from pydantic import BaseModel, Field
+from typing import List
+import json
+
+class ColorAnalysis(BaseModel):
+    dominant_colors: List[str] = Field(description="A list of the primary dominant colors found in the poster.")
+    accent_color: str = Field(description="The main accent or highlight color used.")
+    vibe_description: str = Field(description="A brief description of the mood or vibe these colors create.")
+
+json_schema = ColorAnalysis.model_json_schema()
+model_path = "mlx-community/Qwen2.5-VL-3B-Instruct-4bit"
+vlm_model, vlm_processor = load(model_path)
+vlm_config = load_config(model_path)
+```
+
+Then we select the filepath:
+
+```{python}
+image_path = posters["filepath"][2]
+image = Image.open(image_path).convert("RGB")
+```
+
+Next, we apply the model with a JSON schema constraint and parse the structured output into a polars DataFrame:
+
+```{python}
+question = "Analyze this movie poster and provide the dominant colors, accent color, and the overall color vibe in JSON format."
+formatted_prompt = apply_chat_template(vlm_processor, vlm_config, question, num_images=1)
+
+output = clean_json_string(generate(
+    vlm_model,
+    vlm_processor,
+    formatted_prompt,
+    [image_path],
+    max_tokens=512,
+    verbose=False,
+    extra_sampling_attrs={"json_schema": json_schema}
+).text)
+
+try:
+    parsed = ColorAnalysis.model_validate_json(output)
+    df = pl.DataFrame({
+        "dominant_colors": [", ".join(parsed.dominant_colors)],
+        "accent_color": [parsed.accent_color],
+        "vibe_description": [parsed.vibe_description]
+    })
+except Exception as e:
+    print(f"Parse error: {e}")
+    df = pl.DataFrame({"raw_output": [output]})
+df
+```
+
+And finally, visualize the results:
+
+```{python}
+import textwrap
+if "raw_output" not in df.columns:
+    vibe_wrapped = "\n".join(textwrap.wrap(df["vibe_description"][0], width=50))
+    text = (
+        f"Dominant colors:\n{df['dominant_colors'][0]}\n\n"
+        f"Accent color: {df['accent_color'][0]}\n\n"
+        f"Vibe:\n{vibe_wrapped}"
+    )
+else:
+    text = df["raw_output"][0]
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+axes[0].imshow(image)
+axes[0].set_title("Input image")
+axes[0].axis("off")
+axes[1].axis("off")
+axes[1].text(0.0, 1.0, text, fontsize=10, transform=axes[1].transAxes, va="top")
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+if os.path.exists("cache/posters_vlm_struct.parquet"):
+    posters_vlm_struct = pl.read_parquet("cache/posters_vlm_struct.parquet")
+else:
+    all_dfs = []
+    for poster in posters.iter_rows(named=True):
+        formatted_prompt = apply_chat_template(vlm_processor, vlm_config, question, num_images=1)
+        output = clean_json_string(generate(
+            vlm_model, vlm_processor, formatted_prompt, [poster["filepath"]],
+            max_tokens=512, verbose=False,
+            extra_sampling_attrs={"json_schema": json_schema}
+        ).text)
+        try:
+            parsed = ColorAnalysis.model_validate_json(output)
+            all_dfs.append(pl.DataFrame({
+                "year": [poster["year"]],
+                "title": [poster["title"]],
+                "dominant_colors": [", ".join(parsed.dominant_colors)],
+                "accent_color": [parsed.accent_color],
+                "vibe_description": [parsed.vibe_description]
+            }))
+        except Exception:
+            pass
+    posters_vlm_struct = pl.concat(all_dfs)
+    posters_vlm_struct.write_parquet("cache/posters_vlm_struct.parquet")
+
+posters_vlm_struct
+```

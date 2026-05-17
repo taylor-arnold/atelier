@@ -1,0 +1,514 @@
+% !TEX program = xelatex
+\documentclass[8pt,aspectratio=169]{beamer}
+
+\usepackage{tatalk}
+\addbibresource{references.bib}
+
+\renewcommand{\outlinefontsize}{\small}
+\renewcommand{\outlineitemskip}{3pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Distant Viewing : Tutoriel 2}
+\author{Taylor Arnold}
+\email{tarnold2@richmond.edu}
+\institute{Distant Viewing Lab}
+\date{Modèles avancés}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\customtitleframe
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{Introduction}
+\begin{rightframe}{Bienvenue}
+\splitcols{%
+  Ces diapositives accompagnent les tutoriels Python que nous avons conçus pour introduire les fondements théoriques et méthodologiques du distant viewing, ainsi qu'un aperçu des outils du Distant Viewing Toolkit.
+  
+  Elles contiennent des notes, références et schémas supplémentaires que nous trouvons utiles lors des ateliers en présentiel. La plupart des notes techniques et du matériel se trouvent directement dans les notebooks.
+
+  Pour en savoir plus sur notre travail, rendez-vous sur le site du Distant Viewing Lab à l'adresse https://distantviewing.org, ou écrivez-nous directement à tarnold2@richmond.edu.
+}{%
+  \imgcaption{media/image1.png}{Un télescope surplombant Paris, en clin d'œil à la méthodologie du distant viewing.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmitem{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.1 Préparation des données}
+\begin{rightframe}{Python et Colab}
+\splitcols{%
+  Ce tutoriel s'appuie sur l'environnement Google Colab, qui permet d'utiliser Python directement dans le navigateur, sans installer de logiciel sur sa machine. Colab est gratuit pour les petits projets, et des formules payantes donnent accès à davantage de ressources de calcul.
+
+  Nous utiliserons trois modules Python courants pour l'analyse de données : NumPy, Polars et plotnine.
+  
+  Toutes les bibliothèques utilisées dans le tutoriel sont disponibles sous licence libre. Le code peut aussi être exécuté sur votre propre machine, moyennant une configuration un peu plus poussée.
+}{%
+  \imgcaption{media/imageD.png}{Logos de Google Colab, Python, Pandas, NumPy et Matplotlib.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Exécuter le notebook}
+\splitcols{%
+  Lorsqu'on ouvre le notebook du tutoriel dans Colab, une fenêtre similaire à celle de droite s'affiche dans le navigateur. Le notebook est consultable par tous ; pour exécuter le code, il faut se connecter à un compte Google.
+
+  Remarque : vous pouvez modifier le code et le texte localement dans votre navigateur. Ces modifications ne seront pas enregistrées pour les autres. N'hésitez donc pas à expérimenter avec le code à tout moment !
+
+  Une fois connecté à un compte Google, vous pourrez exécuter les blocs de code (les portions sur fond gris). Pour cela, passez la souris sur le fond gris et cliquez sur le bouton de lecture indiqué par la flèche rouge. Tout au long du tutoriel, il faut exécuter chaque bloc dans l'ordre.
+}{%
+  \imgcaption{media/image9.png}{Capture d'écran de l'interface Colab exécutant le code de configuration du DVT.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Présentation du corpus}
+\splitcols{%
+  Dans ce tutoriel, nous allons explorer une collection d'affiches issues des 100 films les plus rentables de chaque année entre 1970 et 2019. Notre corpus comprend près de 5000 images (nous n'avons pas pu retrouver un petit nombre d'affiches anciennes).
+
+  Notre objectif est de comprendre comment la couleur et la composition des affiches (1) ont évolué dans le temps et (2) sont utilisées pour véhiculer (ou détourner) les conventions de genre. Nous voulons mobiliser des techniques computationnelles pour identifier et comprendre des motifs à travers les milliers d'images de notre collection.
+}{%
+  \imgcaption{media/image10.png}{Exemples d'affiches de films à travers les décennies et les genres du jeu de données.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmitem{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.2 Détection d'objets}
+\begin{rightframe}{DETR-ResNet}
+\splitcols{%
+  La détection d'objets, une tâche relativement ancienne en vision par ordinateur, consiste à identifier dans une image une ou plusieurs catégories d'objets définies à l'avance. Elle combine deux tâches initialement distinctes : (1) la classification et (2) la localisation. La plupart des modèles modernes pour classes fixes constatent qu'il vaut mieux les traiter conjointement.
+
+  Nous utiliserons le modèle DETR-RESNET-50, entraîné sur le jeu de données COCO 2017 qui compte 1000 catégories étiquetées sur plus de 100 000 images.\footcite{DBLP:journals/corr/abs-2005-12872} Comme la plupart des modèles de détection, il produit des scores de confiance et des boîtes englobantes rectangulaires censées contenir l'objet en question.
+}{%
+  \imgcaption{media/screenshot01.png}{Architecture du modèle DETR-ResNet d'après l'article original.}
+}
+\end{rightframe}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmitem{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.3 Détection à vocabulaire ouvert}
+\begin{rightframe}{Grounding DINO}
+\splitcols{%
+  Une version plus récente de la détection d'objets combine l'idée de détection avec un modèle de langage de type transformeur pour repérer n'importe quel objet décrit par du texte libre. Nous utiliserons Grounding DINO, un modèle disponible en poids ouverts et exécutable sans architecture ni matériel particuliers.\footcite{liu2023grounding}
+
+  Le modèle accepte n'importe quelle description textuelle et produit des résultats raisonnables dans les langues bien dotées avec des objets courants. Ses meilleures performances s'obtiennent toutefois en décrivant les objets par leur nom en anglais.
+}{%
+  \imgcaption{media/screenshot02.png}{Architecture du modèle Grounding DINO d'après l'article original.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmitem{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.4 Grounding DINO + TrOCR}
+\begin{rightframe}{Grounding DINO + TrOCR}
+\splitcols{%
+  Les affiches de films, comme beaucoup d'images historiques que l'on peut vouloir étudier, contiennent énormément de texte, et ce texte est essentiel pour comprendre leur message. On peut combiner Grounding DINO avec un modèle OCR pour localiser puis décoder le texte présent sur chaque affiche. Nous utiliserons TrOCR, accessible via la même API \texttt{transformers} que les autres modèles vus jusqu'ici.\footcite{li2022trocrtransformerbasedopticalcharacter}
+}{%
+  \imgcaption{media/screenshot03.png}{Architecture du modèle TrOCR.}
+}
+\end{rightframe}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmitem{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.5 Segment Anything}
+\begin{rightframe}{SAM : Segmentation à partir d'un point}
+\splitcols{%
+  Segment Anything (SAM) et ses successeurs ont fait beaucoup parler d'eux dans la communauté de l'apprentissage automatique.\footcite{kirillov2023segment} SAM permet d'estimer la région, c'est-à-dire l'ensemble précis des pixels, correspondant à un objet sans avoir à savoir à l'avance de quel objet il s'agit. Les approches précédentes de la segmentation supposaient qu'il fallait connaître le nom de l'objet au préalable, mais à bien y réfléchir, cela rejoint notre façon de voir : on peut identifier la portion d'une image qui correspond à un nouvel animal même sans connaître son nom.
+
+  C'est un modèle très puissant, mais — comme on va le voir — un peu mal compris, car la plupart des gens le connaissent uniquement à travers l'image de droite, tirée de l'article original.
+}{%
+  \imgcaption{media/screenshot04.png}{Exemple de SAM en action.}
+}
+\end{rightframe}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmitem{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.6 SAM + Grounding DINO}
+\begin{rightframe}{Segmentation guidée par texte}
+\splitcols{%
+  Comme pour le cas du texte, on peut combiner un modèle de grounding avec SAM pour produire les régions correspondant à n'importe quelle description textuelle d'un objet. Cette approche a été formalisée sous le nom de Grounded SAM, mais on peut l'implémenter soi-même directement à partir du code déjà utilisé.\footcite{ren2024grounded}
+}{%
+  \imgcaption{media/screenshot05.png}{Exemple de Grounded SAM.}
+}
+\end{rightframe}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmitem{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.7 Estimation de profondeur}
+\begin{rightframe}{Depth Anything}
+\splitcols{%
+  Le modèle suivant, Depth Anything, cherche à mesurer la distance entre chaque objet et la caméra.\footcite{yang2024depth} Certaines variantes fournissent des mesures métriques précises, mais celles-ci ne sont pas très utiles pour nos affiches de films, qui ne sont pas une photographie unique prise sous un angle donné, mais plutôt un assemblage d'éléments composés dynamiquement dans un cadre. Nous resterons donc sur la version originale, plus rapide, du modèle Depth Anything.
+
+  Si la distance exacte à la caméra n'a pas de sens précis dans notre cas, nous verrons qu'elle permet tout de même de démêler l'arrière-plan et le premier plan sur de nombreuses affiches.
+}{%
+  \imgcaption{media/screenshot06.png}{Architecture du modèle Depth Anything, telle que décrite dans l'article original.}
+}
+\end{rightframe}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmitem{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.8 Plongements d'images}
+\begin{rightframe}{DINOv2}
+\splitcols{%
+  Toutes les annotations vues jusqu'ici sont *interprétables* : on peut dire « il y a deux personnes sur cette affiche » ou « 30 \% de l'image est au premier plan ». Mais on peut aussi vouloir une représentation plus abstraite, qui résume l'image dans son ensemble en un vecteur de nombres — un *plongement* (embedding).
+
+  Les plongements sont utilisés depuis une quinzaine d'années pour travailler aussi bien sur du texte que sur des images. Bien avant les modèles de grounding vus plus haut, c'était la seule manière de travailler avec des catégories définies à l'avance et entraînées spécifiquement sur un grand jeu de données.
+
+  Nous utiliserons aujourd'hui le modèle DINOv2, qui sert également de base au modèle Grounding DINO vu précédemment.\footcite{oquab2023dinov2}
+}{%
+  \imgcaption{media/screenshot07.png}{Architecture du modèle DINOv2 telle que décrite dans l'article original.}
+}
+\end{rightframe}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmitem{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.9 Modèles contrastifs}
+\begin{rightframe}{SigLIP2}
+\splitcols{%
+  DINOv2 produit des plongements à partir d'images seules. Une autre
+  famille de modèles, dits *contrastifs*, apprend conjointement à
+  représenter images et textes dans un même espace. Le modèle le plus
+  connu est CLIP ; SigLIP et sa version améliorée SigLIP2 en sont des
+  évolutions plus performantes.\footcite{tschannen2025siglip}
+
+  Nous utiliserons aujourd'hui le modèle SigLIP2, qui nous permet de plonger images et textes dans un même espace de grande dimension.
+}{%
+  \imgcaption{media/CLIP.png}{Vue conceptuelle du modèle CLIP d'origine.}
+}
+\end{rightframe}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmitem{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.10 Détection et reconnaissance de visages}
+\begin{rightframe}{SigLIP2}
+\splitcols{%
+  Les visages sont au cœur de la grammaire visuelle des affiches de
+  films. Nous allons ici aller un cran plus loin avec la bibliothèque
+  InsightFace, qui détecte les visages, estime l'âge et le genre
+  apparents, et produit un plongement permettant de reconnaître si
+  deux visages sont ceux de la même personne.\footcite{deng2021masked}
+
+  Quelques mots de précaution s'imposent. L'âge et le genre prédits
+  par ces modèles sont des estimations probabilistes, fondées sur les
+  données d'entraînement utilisées. Ces données présentent des biais
+  connus (sous-représentation de certaines populations, étiquettes
+  binaires pour le genre, etc.), et il est important d'en tenir compte
+  dans toute analyse.
+}{%
+  \imgcaption{media/facerec.png}{Visualisation de la détection et de la reconnaissance de visages, tirée du site d'InsightFace.}
+}
+\end{rightframe}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmitem{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.11 Estimation de pose}
+\begin{rightframe}{ViTPose}
+\splitcols{%
+  Au-delà de la simple détection d'une personne, on peut chercher à
+  caractériser sa *pose* : position de la tête, des bras, des jambes.
+  L'estimation de pose consiste à localiser un ensemble de points-clés
+  anatomiques (nez, yeux, épaules, coudes, etc.) sur le corps humain.
+
+  Notre pipeline procède en deux étapes : on détecte d'abord les
+  personnes avec DETR, puis on applique ViTPose, un modèle dédié à
+  l'estimation de pose, sur chaque personne détectée.\footcite{xu2022vitpose}
+}{%
+  \imgcaption{media/screenshot08.png}{Exemple de ViTPose en action, tiré de l'article original.}
+}
+\end{rightframe}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmitem{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.12 Modèles vision-langage (VLM)}
+\begin{rightframe}{ViTPose}
+\splitcols{%
+  Les modèles vus jusqu'ici produisent des sorties structurées : des
+  boîtes, des masques, des vecteurs. Les modèles vision-langage (VLM)
+  font quelque chose de différent : on leur fournit une image et une
+  question en langage naturel, et ils répondent en langage naturel.
+
+  On pourrait utiliser de nombreux modèles à poids ouverts, en local ou via un service comme OpenRouter. Par simplicité, nous utiliserons aujourd'hui l'API d'OpenAI. L'avantage est qu'on peut facilement l'adapter pour appeler des modèles locaux via des outils comme Ollama ou LMStudio.
+}{%
+  \imgcaption{media/qwen-omni.png}{Le modèle Qwen2.5-Omni, l'un des modèles VLM généralistes à poids ouverts les plus populaires.}
+}
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmitem{2.13 VLM avec sortie structurée}
+  \rmdim{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.13 VLM avec sortie structurée}
+\begin{rightframe}{Pydantic}
+\splitcols{%
+  Les modèles VLM deviennent encore plus utiles lorsqu'on les force à produire des données structurées. La méthode la plus répandue, en tout cas en 2026, passe par Pydantic. Cet outil permet de décrire le schéma souhaité pour les données en sortie, puis de vérifier que le VLM les a bien structurées comme demandé.
+}{%
+  \imgcaption{media/screenshot09.png}{Page d'accueil de l'outil de validation Pydantic.}
+}
+\end{rightframe}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{outlineframe}{Plan}
+  \rmdim{2.1 Préparation des données}
+  \rmdim{2.2 Détection d'objets}
+  \rmdim{2.3 Détection à vocabulaire ouvert}
+  \rmdim{2.4 Grounding DINO + TrOCR}
+  \rmdim{2.5 Segment Anything}
+  \rmdim{2.6 SAM + Grounding DINO}
+  \rmdim{2.7 Estimation de profondeur}
+  \rmdim{2.8 Plongements d'images}
+  \rmdim{2.9 Modèles contrastifs}
+  \rmdim{2.10 Détection et reconnaissance de visages}
+  \rmdim{2.11 Estimation de pose}
+  \rmdim{2.12 Modèles vision-langage (VLM)}
+  \rmdim{2.13 VLM avec sortie structurée}
+  \rmitem{2.14 Conclusion}
+\end{outlineframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{2.14 Conclusion}
+\begin{rightframe}{Prochaines étapes}
+Nous avons vu toute une variété de modèles dans ce tutoriel. Ils couvrent une bonne partie des modèles de pointe disponibles mi-2026 pour travailler avec des données visuelles fixes.
+
+Les modèles spécifiques — et, à un rythme plus lent, les tâches elles-mêmes — vont continuer à évoluer et à se renouveler dans les années qui viennent. Mais comme on l'a vu ici, les nouveaux modèles s'appuient sur les précédents et ne les remplacent que rarement totalement.
+
+Il faut rester attentif aux évolutions du domaine, mais les outils présentés ici devraient rester utiles pendant plusieurs années.
+\end{rightframe}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\framesection{}
+\begin{frame}[allowframebreaks]{Références}
+  \printbibliography[heading=none]
+\end{frame}
+
+\end{document}

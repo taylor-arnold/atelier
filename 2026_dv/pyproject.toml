@@ -1,0 +1,23 @@
+[project]
+name = "fda-py-nb"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "accelerate>=1.13.0",
+    "insightface>=0.7.3",
+    "jupyter>=1.1.1",
+    "mlx-vlm>=0.5.0",
+    "openai>=1.78.0",
+    "onnxruntime>=1.26.0",
+    "pillow>=12.2.0",
+    "plotnine>=0.15.4",
+    "polars>=1.40.1",
+    "qwen-vl-utils>=0.0.14",
+    "timm>=1.0.27",
+    "torch>=2.12.0",
+    "torchvision>=0.27.0",
+    "transformers>=5.8.1",
+    "dvt>=1.1.0",
+]
