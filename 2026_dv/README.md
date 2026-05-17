@@ -15,5 +15,14 @@
     - [diapositives](https://raw.githubusercontent.com/taylor-arnold/atelier/refs/heads/main/2026_dv/slides/tutoriel01.pdf)
     - [colab](https://colab.research.google.com/github/taylor-arnold/atelier/blob/main/2026_dv/nb/notebook01.ipynb)
     - [solutions](https://taylor-arnold.github.io/atelier/2026_dv/docs/notebook01.html)
-
+- **Tutoriel Distant Viewing 2** : Modèles avancés
+    - [diapositives](https://raw.githubusercontent.com/taylor-arnold/atelier/refs/heads/main/2026_dv/slides/tutoriel02.pdf)
+    - [colab](https://colab.research.google.com/github/taylor-arnold/atelier/blob/main/2026_dv/nb/notebook02.ipynb)
+    - [solutions](https://taylor-arnold.github.io/atelier/2026_dv/docs/notebook02.html)
+- Exemple: [Digital Documerica](https://digitaldocumerica.org)
+- **Tutoriel Distant Viewing 3** : Images animées
+    - [diapositives](https://raw.githubusercontent.com/taylor-arnold/atelier/refs/heads/main/2026_dv/slides/tutoriel03.pdf)
+    - [colab](https://colab.research.google.com/github/taylor-arnold/atelier/blob/main/2026_dv/nb/notebook03.ipynb)
+    - [solutions](https://taylor-arnold.github.io/atelier/2026_dv/docs/notebook03.html)
+- Conclusions
 

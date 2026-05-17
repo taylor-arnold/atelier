@@ -1,6 +1,6 @@
 # Tutoriel Distant Viewing 2 : Modèles avancés
 
-[[**diapositives**](https://distantviewing.org/tutorial/dvt_tutorial_slides_01.pdf)]
+[[**diapositives**](https://raw.githubusercontent.com/taylor-arnold/atelier/refs/heads/main/2026_dv/slides/tutoriel02.pdf)]
 [[**site web**](https://www.distantviewing.org)]
 
 Ce second notebook prolonge l'introduction du premier en passant à une
@@ -44,6 +44,38 @@ Voici les objectifs d'apprentissage de ce second tutoriel :
 8.  Estimer la pose corporelle des personnages.
 9.  Interroger une image en langage naturel à l'aide d'un modèle de
     vision-langage, avec ou sans sortie structurée.
+
+Pour commencer, nous devons télécharger le jeu de données des affiches
+de films, et indiquer à Python toutes les fonctions dont nous aurons
+besoin par la suite. 
+
+```{python}
+#| eval: false
+!mkdir -p data
+!mkdir -p cache
+!mkdir -p /root/.cache/torch/hub/checkpoints/
+!wget -q -nc -P data/ "https://distantviewing.org/atelier/movies_50_years_meta.csv"
+!wget -q -nc -P data/ "https://distantviewing.org/atelier/movies_50_years_hue.csv"
+!wget -q -nc -P data/ "https://distantviewing.org/atelier/movies_50_years_genre_fra.csv"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_depth.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_obj.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_vlm_single.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_dino.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_pose.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_vlm_struct_single.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_face.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_sam_gd.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_vlm_struct.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_gd_text.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_vlm.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_sam.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_gd.parquet"
+!wget -q -nc -P cache/ "https://distantviewing.org/atelier/posters_siglip.parquet"
+!wget -q -nc "https://distantviewing.org/atelier/mp_med.tar"
+!wget -q -nc "https://distantviewing.org/atelier/funs.py"
+!tar -xf mp_med.tar --warning=no-unknown-keyword
+!mv mp_med data
+```
 
 Quelques remarques techniques avant de commencer. Ce notebook utilise
 la bibliothèque `transformers` de Hugging Face, qui donne accès à un

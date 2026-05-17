@@ -1,6 +1,6 @@
 # Tutoriel Distant Viewing 1 : Affiches de films et analyse des couleurs
 
-[[**diapositives**](https://distantviewing.org/tutorial/dvt_tutorial_slides_01.pdf)]
+[[**diapositives**](https://raw.githubusercontent.com/taylor-arnold/atelier/refs/heads/main/2026_dv/slides/tutoriel01.pdf)]
 [[**chapitre**](https://direct.mit.edu/books/oa-monograph/chapter-pdf/2163342/c001700_9780262375160.pdf)]
 [[**site web**](https://www.distantviewing.org)]
 
@@ -59,11 +59,15 @@ de temps.
 
 ```{python}
 #| eval: false
-!wget -q -nc "https://distantviewing.org/tutorial/movies_50_years_meta.csv"
-!wget -q -nc "https://distantviewing.org/tutorial/movies_50_years_face.csv"
-!wget -q -nc "https://distantviewing.org/tutorial/thm.tar"
-!tar xf thm.tar
+!mkdir -p data
 !mkdir -p /root/.cache/torch/hub/checkpoints/
+!wget -q -nc -P data/ "https://distantviewing.org/atelier/movies_50_years_meta.csv"
+!wget -q -nc -P data/ "https://distantviewing.org/atelier/movies_50_years_hue.csv"
+!wget -q -nc -P data/ "https://distantviewing.org/atelier/movies_50_years_genre_fra.csv"
+!wget -q -nc "https://distantviewing.org/atelier/mp_med.tar"
+!wget -q -nc "https://distantviewing.org/atelier/funs.py"
+!tar -xf mp_med.tar --warning=no-unknown-keyword
+!mv mp_med data
 ```
 
 Dans la dernière partie de la configuration, nous allons exécuter du

@@ -1,6 +1,6 @@
 # Tutoriel Distant Viewing 3 : Images animées
 
-[[**diapositives**](https://distantviewing.org/tutorial/dvt_tutorial_slides_02.pdf)]
+[[**diapositives**](https://raw.githubusercontent.com/taylor-arnold/atelier/refs/heads/main/2026_dv/slides/tutoriel03.pdf)]
 [[**chapitre**](https://direct.mit.edu/books/oa-monograph/chapter-pdf/2163344/c003200_9780262375160.pdf)]
 [[**site web**](https://www.distantviewing.org)]
 
@@ -79,15 +79,16 @@ le plus de temps.
 
 ```{python}
 #| eval: false
-!wget -q -nc "https://distantviewing.org/tutorial/bewitched_sample.mp4"
-!wget -q -nc "https://distantviewing.org/tutorial/faces.tar"
-!wget -q -nc "https://distantviewing.org/tutorial/ttl_sitcom_metadata.csv"
-!wget -q -nc "https://distantviewing.org/tutorial/ttl_sitcom_characters.csv"
-!wget -q -nc "https://distantviewing.org/tutorial/ttl_sitcom_shots.csv"
-!tar xf faces.tar
-!mkdir -p /root/.cache/torch/hub/checkpoints/
 !mkdir -p data
-!mv ttl_* data
+!mkdir -p cache
+!mkdir -p /root/.cache/torch/hub/checkpoints/
+!wget -q -nc -P data/ "https://distantviewing.org/atelier/ttl_sitcom_characters.csv"
+!wget -q -nc -P data/ "https://distantviewing.org/atelier/ttl_sitcom_metadata.csv"
+!wget -q -nc -P data/ "https://distantviewing.org/atelier/ttl_sitcom_shots.csv"
+!wget -q -nc "https://distantviewing.org/atelier/faces.tar"
+!wget -q -nc "https://distantviewing.org/atelier/bewitched_sample.mp4"
+!wget -q -nc "https://distantviewing.org/atelier/funs.py"
+!tar -xf faces.tar --warning=no-unknown-keyword
 ```
 
 Dans la dernière partie de la configuration, nous allons exécuter du
