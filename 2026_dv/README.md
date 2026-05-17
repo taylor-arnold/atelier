@@ -1,4 +1,4 @@
-## Initiation au Distant Viewing
+# Initiation au Distant Viewing
 
 **Date et horaire** : 18 mai de 14h à 17h
 
@@ -8,8 +8,12 @@
 
 **Intervenant** : [Taylor Arnold](https://taylorarnold.org) professeur en sciences des données, spécialisé dans l’analyse de données visuelles et multimodales appliquées aux humanités numériques et computationnelles.
 
-### Plan de l'atelier
+## Plan de l'atelier
 
-- Introduction
+- Introductions
+- **Tutoriel Distant Viewing 1** : Affiches de films et analyse des couleurs
+    - [diapositives](https://raw.githubusercontent.com/taylor-arnold/atelier/refs/heads/main/2026_dv/slides/tutoriel01.pdf)
+    - [colab](https://colab.research.google.com/github/taylor-arnold/atelier/blob/main/2026_dv/nb/notebook01.ipynb)
+    - [solutions](https://taylor-arnold.github.io/atelier/2026_dv/docs/notebook01.html)
 
 
