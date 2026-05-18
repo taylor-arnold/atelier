@@ -6,6 +6,8 @@
 
 # Initiation au Distant Viewing
 
+**Lien** : [https://tinyurl.com/vbd8uzfw](https://tinyurl.com/vbd8uzfw)
+
 **Date et horaire** : 18 mai de 14h à 17h
 
 **Lieu** : Salle 606, EPITA, au Kremlin-Bicêtre
