@@ -211,7 +211,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Interroger une image en langage naturel à l’aide d’un modèle de vision-langage, avec ou sans sortie structurée.</li>
 </ol>
 <p>Pour commencer, nous devons télécharger le jeu de données des affiches de films, et indiquer à Python toutes les fonctions dont nous aurons besoin par la suite.</p>
-<div id="64769342" class="cell" data-execution_count="1">
+<div id="78bb4816" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p data</span>
@@ -241,7 +241,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Quelques remarques techniques avant de commencer. Ce notebook utilise la bibliothèque <code>transformers</code> de Hugging Face, qui donne accès à un très grand nombre de modèles pré-entraînés via une interface uniforme. La première fois qu’un modèle est chargé, ses poids sont téléchargés et mis en cache localement, ce qui peut prendre du temps selon votre connexion. Les exécutions suivantes seront beaucoup plus rapides. Si une carte graphique compatible CUDA est disponible, les modèles seront automatiquement exécutés dessus ; sinon, ils tourneront sur CPU, ce qui reste possible mais nettement plus lent pour les modèles les plus lourds.</p>
-<div id="78416384" class="cell" data-execution_count="2">
+<div id="fe7a902a" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -268,7 +268,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="préparation-des-données" class="level2">
 <h2 class="anchored" data-anchor-id="préparation-des-données">2.1 Préparation des données</h2>
 <p>Nous repartons du même jeu de métadonnées que dans le premier notebook. Chaque ligne correspond à un film, avec son année, son titre, le chemin vers l’image de l’affiche, et la demi-décennie de sortie.</p>
-<div id="9d508967" class="cell" data-execution_count="3">
+<div id="4f24ae49" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>posters <span class="op">=</span> pl.read_csv(<span class="st">"data/movies_50_years_meta.csv"</span>)</span>
@@ -371,7 +371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Nous disposons d’un autre ensemble de métadonnées qui associe chaque film à une ou plusieurs catégories de genre. Le jeu de données contient une ligne pour chaque paire film/étiquette de genre. L’année est incluse parce que plusieurs films partagent le même titre, mais peuvent être identifiés de manière unique en connaissant à la fois le titre et l’année.</p>
-<div id="1caba957" class="cell" data-execution_count="4">
+<div id="42759e92" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>genre <span class="op">=</span> pl.read_csv(<span class="st">"data/movies_50_years_genre_fra.csv"</span>)</span>
@@ -461,7 +461,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Un coup d’œil rapide à quelques affiches permet de garder en tête la diversité visuelle de la collection : compositions très différentes, nombres de personnages variables, présence ou absence de texte, époques et genres distincts. C’est cette variété qui rendra les analyses agrégées intéressantes.</p>
-<div id="f09fcf3d" class="cell" data-execution_count="5">
+<div id="1586de83" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>plot_image_grid(posters, ncol<span class="op">=</span><span class="dv">4</span>, limit<span class="op">=</span><span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -480,7 +480,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="détection-dobjets">2.2 Détection d’objets</h2>
 <p>Notre première annotation profonde sera une détection d’objets. L’objectif est simple : pour chaque affiche, localiser les objets présents et leur attribuer une étiquette tirée d’un vocabulaire prédéfini. Nous utilisons ici DETR (Detection Transformer), un modèle de détection de Facebook AI Research entraîné sur le jeu de données COCO, qui couvre 80 catégories d’objets courants (personne, voiture, chaise, etc.).</p>
 <p>Première étape : charger le modèle et son processeur d’images. Le processeur s’occupe des transformations nécessaires (redimensionnement, normalisation) pour que l’image soit acceptée par le réseau.</p>
-<div id="b20c8db6" class="cell" data-execution_count="6">
+<div id="f509e325" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoImageProcessor, AutoModelForObjectDetection</span>
@@ -490,7 +490,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Nous sélectionnons ensuite une affiche pour expérimenter. Comme dans le premier notebook, nous prendrons une affiche bien identifiable pour suivre ce que fait le modèle.</p>
-<div id="c166d9ed" class="cell" data-execution_count="7">
+<div id="a6211347" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">7</span>]</span>
@@ -498,7 +498,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Nous appliquons maintenant le modèle. Le bloc <code>with torch.no_grad()</code> indique à PyTorch que nous ne souhaitons pas calculer de gradients — nous utilisons le modèle uniquement en inférence, ce qui économise de la mémoire et accélère le calcul. Le post-traitement convertit les sorties brutes du réseau en boîtes englobantes accompagnées de scores de confiance et d’étiquettes. Nous fixons un seuil de <code>0.7</code> : seules les détections dont le modèle est confiant à plus de 70 % sont conservées.</p>
-<div id="0a4f98c6" class="cell" data-execution_count="8">
+<div id="c2f96d7f" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> detr_processor(images<span class="op">=</span>image, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
@@ -573,7 +573,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Chaque ligne du tableau correspond à un objet détecté, avec ses coordonnées dans l’image (les quatre nombres définissent un rectangle), son étiquette, et le score de confiance associé. Comme toujours, il est essentiel de revenir à l’image pour vérifier que ces détections correspondent à ce que nous voyons.</p>
-<div id="78b4431e" class="cell" data-execution_count="9">
+<div id="7d9c75ad" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>unique_labels <span class="op">=</span> df[<span class="st">"label"</span>].unique().to_list()</span>
@@ -623,7 +623,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Quelques observations à garder à l’esprit. D’abord, le vocabulaire est fermé : DETR ne sait reconnaître que les 80 catégories de COCO. Tout ce qui sort de ce vocabulaire — un chapeau, un sabre laser, une silhouette stylisée — sera soit ignoré, soit rattaché à la catégorie la plus proche, parfois de manière surprenante. Ensuite, le modèle a été entraîné sur des photographies du quotidien ; les affiches de films, avec leurs compositions stylisées et leurs effets graphiques, sortent partiellement de cette distribution. Certaines détections seront donc moins fiables que d’autres, et le score de confiance reste notre meilleur indicateur.</p>
 <p>Appliquons maintenant le modèle à l’ensemble de la collection. Comme ce traitement peut être long, nous mettons le résultat en cache. Si le fichier existe déjà, nous le relisons ; sinon, nous parcourons les affiches une par une.</p>
-<div id="935dfb0c" class="cell" data-execution_count="10">
+<div id="24018239" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(<span class="st">"cache/posters_obj.parquet"</span>):</span>
@@ -805,7 +805,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Nous avons maintenant, pour chaque film, la liste des objets détectés sur son affiche. C’est une annotation très riche : on peut compter le nombre de personnes par affiche, étudier l’évolution de certaines catégories au fil du temps, ou comparer la présence d’objets entre genres.</p>
-<div id="2f1a81e5" class="cell" data-execution_count="11">
+<div id="2de14018" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -836,7 +836,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="détection-à-vocabulaire-ouvert-grounding-dino" class="level2">
 <h2 class="anchored" data-anchor-id="détection-à-vocabulaire-ouvert-grounding-dino">2.3 Détection à vocabulaire ouvert : Grounding DINO</h2>
 <p>La limitation principale de DETR est son vocabulaire fixe. Que faire si nous voulons détecter quelque chose qui ne fait pas partie de COCO, comme un chapeau, un drapeau, ou une arme ? C’est ici qu’interviennent les modèles dits <em>zero-shot</em>, capables de détecter n’importe quel objet décrit par une phrase en langage naturel. Grounding DINO est l’un des plus utilisés. On lui fournit une image <em>et</em> une description textuelle de ce qu’on cherche, et il renvoie les régions de l’image correspondant à cette description.</p>
-<div id="0072690a" class="cell" data-execution_count="12">
+<div id="7901f33b" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoProcessor, AutoModelForZeroShotObjectDetection</span>
@@ -846,7 +846,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>La convention pour le prompt textuel est particulière : on liste les catégories recherchées sous forme de phrases courtes terminées par un point. Ici, nous cherchons un chapeau.</p>
-<div id="5a85cbdc" class="cell" data-execution_count="13">
+<div id="20a40c4d" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">7</span>]</span>
@@ -855,7 +855,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Le code d’inférence est analogue à celui de DETR, à ceci près qu’on passe désormais le texte au modèle en plus de l’image.</p>
-<div id="cda13ea4" class="cell" data-execution_count="14">
+<div id="9e6769dd" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> gd_processor(images<span class="op">=</span>image, text<span class="op">=</span>text_prompt, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
@@ -935,7 +935,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Comme pour DETR, il est utile de superposer les boîtes détectées sur l’image pour vérifier visuellement que les régions retournées par Grounding DINO correspondent bien à ce que l’on cherchait.</p>
-<div id="e67a7bdc" class="cell" data-execution_count="15">
+<div id="8c11b7f5" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>unique_labels <span class="op">=</span> df[<span class="st">"label"</span>].unique().to_list()</span>
@@ -984,7 +984,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>L’intérêt pour la recherche est considérable : nous pouvons désormais construire des annotations adaptées à nos questions, sans être contraints par le vocabulaire d’un jeu de données préexistant. Cela dit, la flexibilité a un coût. Les résultats dépendent fortement de la formulation du prompt — « a hat » et « a cowboy hat » ne donnent pas les mêmes détections — et la frontière entre concepts proches peut être floue. Comme toujours, il faut valider les résultats sur quelques exemples avant d’agréger.</p>
-<div id="62707366" class="cell" data-execution_count="16">
+<div id="8ee3f7ca" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>text_prompt <span class="op">=</span> <span class="st">"a hat."</span></span>
@@ -1174,7 +1174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="grounding-dino-trocr-extraction-du-texte">2.4 Grounding DINO + TrOCR : extraction du texte</h2>
 <p>Les affiches de films contiennent presque toujours du texte : titre, nom des acteurs, slogan, mentions de production. Ce texte est un élément central de la composition visuelle, et il porte une information très différente de celle des images. Pour l’extraire, nous combinons deux modèles : Grounding DINO pour localiser les régions contenant du texte, puis TrOCR (Transformer-based OCR) de Microsoft pour lire ce qui est écrit dans chaque région.</p>
 <p>Cette approche en deux étapes — détecter puis reconnaître — est très courante en vision par ordinateur. Elle a l’avantage de la modularité : on peut remplacer chaque composant indépendamment, par exemple utiliser un autre détecteur ou un autre moteur OCR.</p>
-<div id="52293bf2" class="cell" data-execution_count="17">
+<div id="bbdbc2ae" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoProcessor, AutoModelForZeroShotObjectDetection, TrOCRProcessor, VisionEncoderDecoderModel</span>
@@ -1186,7 +1186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>trocr_model <span class="op">=</span> VisionEncoderDecoderModel.from_pretrained(<span class="st">"microsoft/trocr-base-printed"</span>).to(device)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="3c11258a" class="cell" data-execution_count="18">
+<div id="d8509278" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">7</span>]</span>
@@ -1194,7 +1194,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Pour la détection, nous demandons à Grounding DINO de repérer tout ce qui ressemble à du texte. On peut formuler la requête de plusieurs façons ; ici, nous combinons trois variantes pour augmenter le rappel. Pour chaque région détectée, nous découpons l’image et passons le résultat à TrOCR, qui produit la transcription.</p>
-<div id="865b1d76" class="cell" data-execution_count="19">
+<div id="11f6bf16" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>gd_inputs <span class="op">=</span> gd_processor(images<span class="op">=</span>image, text<span class="op">=</span><span class="st">"text. word. letter."</span>, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
@@ -1278,7 +1278,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="c81cbb72" class="cell" data-execution_count="20">
+<div id="8bd04979" class="cell" data-execution_count="20">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> plt.cm.tab20.colors</span>
@@ -1305,7 +1305,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>L’OCR sur des affiches de films est un cas particulièrement difficile : les typographies sont créatives, le texte est souvent stylisé, parfois incliné ou intégré au graphisme. Les transcriptions ne seront donc pas parfaites. Mais à l’échelle de la collection, elles permettent de poser des questions intéressantes : quels mots reviennent le plus souvent dans les titres ? Quelle est l’évolution de la quantité de texte sur les affiches au fil des décennies ?</p>
-<div id="0a7210b7" class="cell" data-execution_count="21">
+<div id="eedaccb3" class="cell" data-execution_count="21">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(<span class="st">"cache/posters_gd_text.parquet"</span>):</span>
@@ -1497,7 +1497,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>À titre d’illustration, on peut regarder comment la place occupée par le texte sur les affiches évolue dans le temps : la composition typographique d’une affiche est un indice de l’esthétique commerciale d’une époque autant que des conventions de chaque genre.</p>
-<div id="a90ca05e" class="cell" data-execution_count="22">
+<div id="aac471ee" class="cell" data-execution_count="22">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1538,7 +1538,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="segment-anything-segmentation-à-partir-dun-point">2.5 Segment Anything : segmentation à partir d’un point</h2>
 <p>Les boîtes englobantes sont utiles, mais elles ne disent rien de la forme exacte des objets. Une boîte autour d’un personnage inclut forcément des pixels du fond. Pour aller plus loin, on utilise la <em>segmentation</em>, qui consiste à classer chaque pixel comme appartenant ou non à un objet d’intérêt.</p>
 <p>Segment Anything (SAM), publié par Meta AI, est un modèle de segmentation très général. Au lieu de prédire une classe pour chaque pixel à partir d’un vocabulaire fixe, SAM accepte un <em>prompt</em> — un point, une boîte, ou un masque approximatif — et renvoie le masque précis correspondant. C’est extrêmement souple : nous pouvons segmenter à peu près n’importe quoi, à condition de pouvoir le pointer.</p>
-<div id="57cac68a" class="cell" data-execution_count="23">
+<div id="7b2db94f" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> SamModel, SamProcessor</span>
@@ -1548,7 +1548,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Nous choisissons une affiche et un point de référence, exprimé en pourcentage de la largeur et de la hauteur. Travailler en pourcentage rend le code robuste aux différentes tailles d’image.</p>
-<div id="a9360b1f" class="cell" data-execution_count="24">
+<div id="0f981e0a" class="cell" data-execution_count="24">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">7</span>]</span>
@@ -1558,7 +1558,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>SAM renvoie en réalité plusieurs masques candidats par point, avec un score de confiance pour chacun. Comme un masque pixel par pixel ne se range pas commodément dans un tableau, nous résumons chaque masque par sa proportion de la surface totale de l’image — une statistique très utile pour comparer les segmentations à grande échelle.</p>
-<div id="d5420e3b" class="cell" data-execution_count="25">
+<div id="81a9e5e3" class="cell" data-execution_count="25">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>point_x <span class="op">=</span> <span class="bu">int</span>(image.size[<span class="dv">0</span>] <span class="op">*</span> per_x <span class="op">/</span> <span class="dv">100</span>)</span>
@@ -1631,7 +1631,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="9c305a6f" class="cell" data-execution_count="26">
+<div id="3dc0fc56" class="cell" data-execution_count="26">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="bu">len</span>(masks) <span class="op">+</span> <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">5</span> <span class="op">*</span> (<span class="bu">len</span>(masks) <span class="op">+</span> <span class="dv">1</span>), <span class="dv">5</span>))</span>
@@ -1659,7 +1659,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Les trois masques renvoyés correspondent à différents niveaux de granularité — typiquement, un masque très local autour du point, un masque intermédiaire, et un masque englobant. C’est à nous de choisir celui qui correspond à notre question de recherche. Cette ambiguïté est précisément un exemple de la « non-neutralité » dont parle la théorie du distant viewing : il n’y a pas de bon masque dans l’absolu, il y a un masque adapté à un usage.</p>
-<div id="14733077" class="cell" data-execution_count="27">
+<div id="a41f827c" class="cell" data-execution_count="27">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>per_x <span class="op">=</span> <span class="dv">50</span></span>
@@ -1821,7 +1821,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="sam-grounding-dino-segmentation-guidée-par-texte" class="level2">
 <h2 class="anchored" data-anchor-id="sam-grounding-dino-segmentation-guidée-par-texte">2.6 SAM + Grounding DINO : segmentation guidée par texte</h2>
 <p>Pointer un endroit précis sur chaque affiche n’a pas toujours de sens à l’échelle d’une collection : la position d’un personnage varie d’une affiche à l’autre. Pour automatiser, on combine deux modèles : Grounding DINO détecte d’abord les régions correspondant à un concept exprimé en langage naturel, puis SAM raffine la segmentation à l’intérieur de chaque boîte. Le résultat est une segmentation pilotée par texte, sans intervention manuelle.</p>
-<div id="7addd6c7" class="cell" data-execution_count="28">
+<div id="1ac81e25" class="cell" data-execution_count="28">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> SamModel, SamProcessor, AutoProcessor, AutoModelForZeroShotObjectDetection</span>
@@ -1834,7 +1834,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Le prompt que nous donnons définit ce que nous cherchons. Ici, nous voulons segmenter les personnages.</p>
-<div id="eb817928" class="cell" data-execution_count="29">
+<div id="d2c12108" class="cell" data-execution_count="29">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">7</span>]</span>
@@ -1843,7 +1843,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Le pipeline applique d’abord Grounding DINO pour obtenir les boîtes, puis passe ces boîtes à SAM pour obtenir les masques fins. Comme précédemment, nous résumons chaque masque par sa proportion de l’image.</p>
-<div id="d0366524" class="cell" data-execution_count="30">
+<div id="5a50ee56" class="cell" data-execution_count="30">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>gd_inputs <span class="op">=</span> gd_processor(images<span class="op">=</span>image, text<span class="op">=</span>text_prompt, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
@@ -1943,7 +1943,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="490e135d" class="cell" data-execution_count="31">
+<div id="c877702b" class="cell" data-execution_count="31">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> plt.cm.tab20.colors</span>
@@ -1982,7 +1982,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Cette annotation est particulièrement utile pour mesurer la <em>proportion d’écran</em> occupée par un concept : quelle part de l’affiche est occupée par des personnages ? Cette proportion évolue-t-elle au fil des décennies ou diffère-t-elle selon le genre ? Ces questions, difficiles à aborder avec de simples boîtes englobantes, deviennent accessibles dès qu’on dispose de masques.</p>
-<div id="607f27d8" class="cell" data-execution_count="32">
+<div id="e503b6fd" class="cell" data-execution_count="32">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>text_prompt <span class="op">=</span> <span class="st">"a person."</span></span>
@@ -2205,7 +2205,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Avec cette annotation, on peut comparer la place que chaque genre accorde aux personnages dans la composition de ses affiches — un proxy visuel intéressant pour distinguer les films centrés sur des figures humaines de ceux qui mettent en avant des décors, des objets ou des éléments graphiques.</p>
-<div id="3ff2f297" class="cell" data-execution_count="33">
+<div id="9fdd16b8" class="cell" data-execution_count="33">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -2236,7 +2236,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="estimation-de-profondeur-depth-anything">2.7 Estimation de profondeur : Depth Anything</h2>
 <p>Une affiche est une image plate, mais elle représente presque toujours une scène avec une certaine profondeur : un personnage au premier plan, un paysage au fond. La profondeur perçue est un élément important de la composition. Peut-on l’estimer automatiquement à partir d’une seule image ?</p>
 <p>C’est exactement ce que fait Depth Anything : pour chaque pixel, le modèle prédit une valeur de profondeur relative. On n’obtient pas une mesure en mètres — c’est impossible sans information de calibration — mais une carte de profondeur normalisée où les valeurs faibles correspondent aux pixels proches et les valeurs élevées aux pixels lointains.</p>
-<div id="0c200232" class="cell" data-execution_count="34">
+<div id="269d2f8c" class="cell" data-execution_count="34">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoImageProcessor, AutoModelForDepthEstimation</span>
@@ -2245,7 +2245,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>depth_model <span class="op">=</span> AutoModelForDepthEstimation.from_pretrained(<span class="st">"depth-anything/Depth-Anything-V2-Small-hf"</span>).to(device)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="5f7983da" class="cell" data-execution_count="35">
+<div id="0b371a4e" class="cell" data-execution_count="35">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">7</span>]</span>
@@ -2253,7 +2253,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>La carte de profondeur complète contient une valeur par pixel — bien trop pour une ligne de tableau. Nous la résumons en découpant les profondeurs normalisées en dix intervalles d’égale largeur, et en notant la proportion de l’image qui tombe dans chaque intervalle.</p>
-<div id="15bba025" class="cell" data-execution_count="36">
+<div id="ff6381c4" class="cell" data-execution_count="36">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> depth_processor(images<span class="op">=</span>image, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
@@ -2359,7 +2359,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="cf445227" class="cell" data-execution_count="37">
+<div id="80db11a1" class="cell" data-execution_count="37">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">18</span>, <span class="dv">6</span>))</span>
@@ -2389,7 +2389,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Une carte de profondeur, même approximative, ouvre tout un éventail de questions : les affiches contemporaines mobilisent-elles plus la profondeur que les anciennes ? Les genres se distinguent-ils par leur usage du premier plan et du fond ? Une comédie privilégie-t-elle des compositions « plates » et des fonds neutres, là où un film d’action joue davantage avec la profondeur ?</p>
-<div id="50a6bb58" class="cell" data-execution_count="38">
+<div id="170027fd" class="cell" data-execution_count="38">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(<span class="st">"cache/posters_depth.parquet"</span>):</span>
@@ -2535,7 +2535,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>On peut par exemple regarder, par genre, la proportion moyenne de pixels situés dans la moitié « lointaine » de la carte de profondeur. Cela donne une idée grossière de la place que chaque genre accorde aux arrière-plans étendus par rapport aux compositions en gros plan.</p>
-<div id="35b735e7" class="cell" data-execution_count="39">
+<div id="aa45bcb6" class="cell" data-execution_count="39">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -2568,7 +2568,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Toutes les annotations vues jusqu’ici sont <em>interprétables</em> : on peut dire « il y a deux personnes sur cette affiche » ou « 30 % de l’image est au premier plan ». Mais on peut aussi vouloir une représentation plus abstraite, qui résume l’image dans son ensemble en un vecteur de nombres — un <em>plongement</em> (embedding). Deux images proches dans leur contenu donneront des vecteurs proches dans cet espace.</p>
 <p>Les plongements ne sont pas directement interprétables, mais ils sont extraordinairement utiles : on peut les utiliser pour faire de la recherche par similarité (« trouve-moi les affiches qui ressemblent à celle-ci »), du regroupement (clustering), de la classification, ou de la visualisation de la collection en deux dimensions par projection (UMAP, t-SNE).</p>
 <p>DINOv2 est un modèle de Meta AI entraîné de façon auto-supervisée sur un très grand corpus d’images. Il produit des vecteurs d’image de très bonne qualité sans avoir besoin de catégories d’entraînement.</p>
-<div id="e2f5321e" class="cell" data-execution_count="40">
+<div id="5286d810" class="cell" data-execution_count="40">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoImageProcessor, AutoModel</span>
@@ -2577,7 +2577,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>dino_model <span class="op">=</span> AutoModel.from_pretrained(<span class="st">"facebook/dinov2-large"</span>).to(device)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="abab63c4" class="cell" data-execution_count="41">
+<div id="98f5127c" class="cell" data-execution_count="41">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">7</span>]</span>
@@ -2585,7 +2585,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Le modèle renvoie un vecteur de plusieurs centaines de dimensions (1024 pour la variante « large »). Nous extrayons en particulier le plongement dit <em>CLS</em>, qui résume l’image entière en un seul vecteur, puis le normalisons pour qu’il soit de norme 1. Cette normalisation rend les comparaisons par similarité cosinus plus simples.</p>
-<div id="03cce080" class="cell" data-execution_count="42">
+<div id="ccc9de45" class="cell" data-execution_count="42">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> dino_processor(images<span class="op">=</span>image, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
@@ -2626,7 +2626,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="e647b163" class="cell" data-execution_count="43">
+<div id="c56a90c5" class="cell" data-execution_count="43">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"CLS embedding shape: </span><span class="sc">{</span>cls_embedding<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -2659,7 +2659,7 @@ L2 norm of CLS: 43.8385</code></pre>
 </div>
 </div>
 <p>Le tracé du vecteur n’a pas grand intérêt visuel — c’est juste une suite de nombres — mais il rappelle bien la nature de cette annotation : elle est purement quantitative et n’aura de sens qu’en comparaison avec d’autres vecteurs. Une fois tous les plongements calculés sur la collection, on peut par exemple regrouper les affiches similaires et examiner si les groupes obtenus correspondent à des genres, des époques ou des écoles esthétiques.</p>
-<div id="dbf38c56" class="cell" data-execution_count="44">
+<div id="15666cef" class="cell" data-execution_count="44">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(<span class="st">"cache/posters_dino.parquet"</span>):</span>
@@ -2767,7 +2767,7 @@ L2 norm of CLS: 43.8385</code></pre>
 </div>
 </div>
 <p>Une façon simple de tester la cohérence visuelle d’une période est de regarder, pour chaque affiche, si son plus proche voisin dans l’espace des plongements appartient à la même demi-décennie. Si oui, c’est un signe que la période a une signature visuelle propre, reconnaissable par le modèle.</p>
-<div id="8891cf19" class="cell" data-execution_count="45">
+<div id="51e00803" class="cell" data-execution_count="45">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>embeddings <span class="op">=</span> np.array(posters_dino[<span class="st">"embedding"</span>].to_list())</span>
@@ -2812,7 +2812,7 @@ L2 norm of CLS: 43.8385</code></pre>
 <h2 class="anchored" data-anchor-id="modèles-contrastifs-siglip2">2.9 Modèles contrastifs : SigLIP2</h2>
 <p>DINOv2 produit des plongements à partir d’images seules. Une autre famille de modèles, dits <em>contrastifs</em>, apprend conjointement à représenter images et textes dans un même espace. Le modèle le plus connu est CLIP ; SigLIP et sa version améliorée SigLIP2 en sont des évolutions plus performantes.</p>
 <p>L’intérêt est considérable : si images et textes vivent dans le même espace vectoriel, on peut comparer une image à une phrase (« combien cette affiche ressemble-t-elle à <em>un film d’horreur des années 1980</em> ? »), classer des images sans données d’entraînement spécifiques, ou faire de la recherche bidirectionnelle entre les deux modalités.</p>
-<div id="2adadfa0" class="cell" data-execution_count="46">
+<div id="f598cfb7" class="cell" data-execution_count="46">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoProcessor, AutoModel</span>
@@ -2821,7 +2821,7 @@ L2 norm of CLS: 43.8385</code></pre>
 <span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>siglip_model <span class="op">=</span> AutoModel.from_pretrained(<span class="st">"google/siglip2-base-patch16-224"</span>).to(device)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="4f64da66" class="cell" data-execution_count="47">
+<div id="f78edd30" class="cell" data-execution_count="47">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">7</span>]</span>
@@ -2829,7 +2829,7 @@ L2 norm of CLS: 43.8385</code></pre>
 </details>
 </div>
 <p>Pour le moment, nous nous contentons d’extraire le plongement image, comme nous l’avons fait avec DINOv2. La différence essentielle, qu’on ne voit pas dans le code, est que cet espace est aligné avec celui des textes du même modèle.</p>
-<div id="db59350e" class="cell" data-execution_count="48">
+<div id="784a5eab" class="cell" data-execution_count="48">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> siglip_processor(images<span class="op">=</span>image, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
@@ -2870,7 +2870,7 @@ L2 norm of CLS: 43.8385</code></pre>
 </div>
 </div>
 </div>
-<div id="d0a69e02" class="cell" data-execution_count="49">
+<div id="94eb247c" class="cell" data-execution_count="49">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Embedding shape: </span><span class="sc">{</span>image_embedding<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -2901,7 +2901,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 <p>DINOv2 et SigLIP2 ont chacun leurs forces. DINOv2 a tendance à mieux capturer la structure visuelle et la composition, tandis que SigLIP2 est plus sensible au contenu sémantique aligné avec le langage. Dans les analyses, il peut être intéressant de comparer les deux : si les regroupements obtenus diffèrent, c’est souvent révélateur des dimensions visuelles que chaque modèle privilégie.</p>
-<div id="741226eb" class="cell" data-execution_count="50">
+<div id="7f10b68d" class="cell" data-execution_count="50">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(<span class="st">"cache/posters_siglip.parquet"</span>):</span>
@@ -3010,7 +3010,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 <p>Comme images et textes partagent le même espace, on peut classer les affiches selon leur proximité à une phrase de notre choix. Voici par exemple les affiches qui ressemblent le plus, selon SigLIP2, à la description « A scary movie poster » — un moyen rapide de retrouver les codes visuels associés à un genre sans avoir à les définir explicitement.</p>
-<div id="24dee886" class="cell" data-execution_count="51">
+<div id="f147b69d" class="cell" data-execution_count="51">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>text_inputs <span class="op">=</span> siglip_processor(text<span class="op">=</span>[<span class="st">"A scary movie poster"</span>], padding<span class="op">=</span><span class="st">"max_length"</span>, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
@@ -3042,14 +3042,14 @@ L2 norm: 8.6625</code></pre>
 <h2 class="anchored" data-anchor-id="détection-et-reconnaissance-de-visages">2.10 Détection et reconnaissance de visages</h2>
 <p>Les visages sont au cœur de la grammaire visuelle des affiches de films. Nous allons ici aller un cran plus loin avec la bibliothèque InsightFace, qui détecte les visages, estime l’âge et le genre apparents, et produit un plongement permettant de reconnaître si deux visages sont ceux de la même personne.</p>
 <p>Quelques mots de précaution s’imposent. L’âge et le genre prédits par ces modèles sont des estimations probabilistes, fondées sur les données d’entraînement utilisées. Ces données présentent des biais connus (sous-représentation de certaines populations, étiquettes binaires pour le genre, etc.), et il est important d’en tenir compte dans toute analyse. Ces annotations sont utiles pour décrire des tendances à l’échelle agrégée, pas pour étiqueter de façon définitive les personnes représentées.</p>
-<div id="a04609cc" class="cell" data-execution_count="52">
+<div id="0377afc6" class="cell" data-execution_count="52">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q insightface</span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q onnxruntime</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="c119eb57" class="cell" data-message="false" data-execution_count="53">
+<div id="2ead4586" class="cell" data-message="false" data-execution_count="53">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> insightface</span>
@@ -3059,7 +3059,7 @@ L2 norm: 8.6625</code></pre>
 <span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>face_app.prepare(ctx_id<span class="op">=</span><span class="dv">0</span>, det_size<span class="op">=</span>(<span class="dv">640</span>, <span class="dv">640</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="11d473f2" class="cell" data-execution_count="54">
+<div id="acd754bb" class="cell" data-execution_count="54">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">0</span>]</span>
@@ -3067,7 +3067,7 @@ L2 norm: 8.6625</code></pre>
 </details>
 </div>
 <p>InsightFace renvoie pour chaque visage : une boîte englobante, un plongement normalisé (de dimension 512), une estimation d’âge et de genre. Le plongement permet de calculer une matrice de similarité entre tous les visages détectés : des valeurs proches de 1 indiquent deux visages similaires (potentiellement la même personne), des valeurs faibles ou négatives indiquent des visages différents.</p>
-<div id="67b05ee9" class="cell" data-message="false" data-execution_count="55">
+<div id="68aac282" class="cell" data-message="false" data-execution_count="55">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>image_bgr <span class="op">=</span> np.array(image)[:, :, ::<span class="op">-</span><span class="dv">1</span>]</span>
@@ -3150,7 +3150,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 </div>
-<div id="e713376b" class="cell" data-execution_count="56">
+<div id="56ee7adf" class="cell" data-execution_count="56">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> plt.cm.tab10.colors</span>
@@ -3197,7 +3197,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 <p>Avec ces annotations, on peut par exemple suivre l’évolution du nombre moyen de visages par affiche, ou comparer les distributions d’âge apparent par genre cinématographique. Les plongements permettent aussi de détecter si la même personne apparaît sur plusieurs affiches — utile pour étudier la carrière des acteurs ou les visages récurrents d’une époque.</p>
-<div id="8a0625a1" class="cell" data-execution_count="57">
+<div id="6736e286" class="cell" data-execution_count="57">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(<span class="st">"cache/posters_face.parquet"</span>):</span>
@@ -3390,7 +3390,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 <p>Pour illustrer, on peut comparer chaque genre selon la part de ses affiches qui contiennent au moins un visage classé féminin et la part qui contiennent au moins un visage classé masculin. La diagonale sert de repère : les genres qui s’en écartent sont ceux où les visages détectés penchent fortement d’un côté ou de l’autre.</p>
-<div id="59ddc756" class="cell" data-execution_count="58">
+<div id="d9c14dfd" class="cell" data-execution_count="58">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -3425,7 +3425,7 @@ L2 norm: 8.6625</code></pre>
 <h2 class="anchored" data-anchor-id="estimation-de-pose-vitpose">2.11 Estimation de pose : ViTPose</h2>
 <p>Au-delà de la simple détection d’une personne, on peut chercher à caractériser sa <em>pose</em> : position de la tête, des bras, des jambes. L’estimation de pose consiste à localiser un ensemble de points-clés anatomiques (nez, yeux, épaules, coudes, etc.) sur le corps humain. Pour des affiches de films, c’est particulièrement intéressant car les poses sont rarement neutres : héros debout face à la caméra, amants enlacés, action en plein mouvement. Quantifier ces postures peut révéler des conventions visuelles propres à chaque genre.</p>
 <p>Notre pipeline procède en deux étapes : on détecte d’abord les personnes avec DETR, puis on applique ViTPose, un modèle dédié à l’estimation de pose, sur chaque personne détectée.</p>
-<div id="050e4642" class="cell" data-execution_count="59">
+<div id="ee8b36ba" class="cell" data-execution_count="59">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoImageProcessor, AutoModelForObjectDetection, VitPoseImageProcessor, VitPoseForPoseEstimation</span>
@@ -3437,7 +3437,7 @@ L2 norm: 8.6625</code></pre>
 <span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>pose_model <span class="op">=</span> VitPoseForPoseEstimation.from_pretrained(<span class="st">"usyd-community/vitpose-base-simple"</span>).to(device)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="f89719eb" class="cell" data-execution_count="60">
+<div id="ca8172df" class="cell" data-execution_count="60">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">0</span>]</span>
@@ -3452,7 +3452,7 @@ L2 norm: 8.6625</code></pre>
 </details>
 </div>
 <p>ViTPose prédit pour chaque personne 17 points-clés selon la convention COCO, chacun accompagné d’un score de confiance. Les points peu fiables (score sous le seuil) seront laissés de côté lors de la visualisation.</p>
-<div id="c3bfe4fb" class="cell" data-execution_count="61">
+<div id="88917280" class="cell" data-execution_count="61">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>det_inputs <span class="op">=</span> person_processor(images<span class="op">=</span>image, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(device)</span>
@@ -3599,7 +3599,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 <p>Le squelette est obtenu en reliant des paires de points-clés selon une convention anatomique (nez aux yeux, épaule au coude, coude au poignet, etc.).</p>
-<div id="197da3de" class="cell" data-message="false" data-execution_count="62">
+<div id="1e644dd1" class="cell" data-message="false" data-execution_count="62">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>skeleton <span class="op">=</span> [</span>
@@ -3641,7 +3641,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 <p>Les affiches stylisées posent un défi particulier à ViTPose, qui a été entraîné sur des photographies. Les silhouettes très simplifiées, les angles inhabituels ou les corps partiellement occultés génèrent des estimations imparfaites. Cela dit, à grande échelle, ces annotations permettent quand même de quantifier des choses intéressantes : proportion d’affiches où l’on voit les visages, où les personnages tendent les bras, où la pose est centrée ou décalée.</p>
-<div id="59b15098" class="cell" data-execution_count="63">
+<div id="1bb128b0" class="cell" data-execution_count="63">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(<span class="st">"cache/posters_pose.parquet"</span>):</span>
@@ -3824,7 +3824,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 <p>On peut s’en servir pour comparer les genres selon la part de leurs affiches où l’on distingue clairement le visage (nez détecté avec confiance) et celle où l’on voit les jambes (genoux détectés) — un proxy simple pour distinguer les compositions cadrées sur la tête de celles qui montrent les personnages en pied.</p>
-<div id="2ebc8799" class="cell" data-execution_count="64">
+<div id="b1318b68" class="cell" data-execution_count="64">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -3862,13 +3862,13 @@ L2 norm: 8.6625</code></pre>
 <h2 class="anchored" data-anchor-id="modèles-vision-langage-vlm">2.12 Modèles vision-langage (VLM)</h2>
 <p>Les modèles vus jusqu’ici produisent des sorties structurées : des boîtes, des masques, des vecteurs. Les modèles vision-langage (VLM) font quelque chose de différent : on leur fournit une image et une question en langage naturel, et ils répondent en langage naturel. Ce sont, schématiquement, des LLM auxquels on a ajouté un encodeur d’images. On peut leur demander de décrire ce qu’ils voient, de compter des éléments, d’interpréter une scène, ou de répondre à des questions ouvertes sur le contenu visuel.</p>
 <p>Nous utilisons ici l’API OpenAI avec le modèle <code>gpt-5.4-nano</code>, qui offre des capacités de vision à faible coût et sans nécessiter de ressources locales.</p>
-<div id="40c2ac91" class="cell" data-execution_count="65">
+<div id="38d12507" class="cell" data-execution_count="65">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q openai</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="4dc338ff" class="cell" data-execution_count="66">
+<div id="109ca7e1" class="cell" data-execution_count="66">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> base64</span>
@@ -3881,7 +3881,7 @@ L2 norm: 8.6625</code></pre>
 <span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> base64.b64encode(f.read()).decode(<span class="st">"utf-8"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="f6ab970c" class="cell" data-execution_count="67">
+<div id="9e152b1b" class="cell" data-execution_count="67">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">7</span>]</span>
@@ -3889,7 +3889,7 @@ L2 norm: 8.6625</code></pre>
 </details>
 </div>
 <p>La question que nous posons est libre. Ici, nous demandons une description des couleurs dominantes — l’occasion de comparer la réponse du VLM avec les annotations colorimétriques produites de façon plus rigoureuse dans le premier notebook.</p>
-<div id="b1b980fa" class="cell" data-execution_count="68">
+<div id="eff47857" class="cell" data-execution_count="68">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>question <span class="op">=</span> <span class="st">"Describe the dominant colors in this movie poster"</span></span>
@@ -3945,7 +3945,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 </div>
-<div id="84ef3c06" class="cell" data-execution_count="69">
+<div id="bce7f512" class="cell" data-execution_count="69">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> textwrap</span>
@@ -3968,7 +3968,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 <p>Les VLM sont impressionnants, mais ils introduisent de nouvelles difficultés. Leurs réponses sont des textes libres, qui peuvent varier d’une exécution à l’autre ; ils peuvent « halluciner » (décrire des éléments absents de l’image) ; et leur formulation dépend largement de la façon dont la question est posée. Du point de vue du distant viewing, ils restent des constructeurs d’annotations parmi d’autres — particulièrement riches, mais aussi particulièrement opaques. Il est essentiel de les valider sur des échantillons avant d’en tirer des conclusions à grande échelle.</p>
-<div id="99f31dbf" class="cell" data-execution_count="70">
+<div id="ec18c04f" class="cell" data-execution_count="70">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(<span class="st">"cache/posters_vlm.parquet"</span>):</span>
@@ -4100,7 +4100,7 @@ L2 norm: 8.6625</code></pre>
 <h2 class="anchored" data-anchor-id="vlm-avec-sortie-structurée">2.13 VLM avec sortie structurée</h2>
 <p>Le texte libre est agréable à lire mais difficile à analyser en masse. Pour 5 000 affiches, on préfère obtenir des données structurées : des champs nommés, des listes, des catégories. Heureusement, la plupart des VLM modernes acceptent une contrainte de format de sortie, généralement sous forme de schéma JSON. On définit la structure attendue, et le modèle est forcé de produire une sortie conforme — bien plus simple à parser et à fusionner avec le reste des annotations.</p>
 <p>Nous utilisons ici Pydantic pour décrire le schéma de sortie. Chaque champ a un nom, un type, et une description qui sert d’indication au modèle.</p>
-<div id="16f49cf0" class="cell" data-execution_count="71">
+<div id="961bd28a" class="cell" data-execution_count="71">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pydantic <span class="im">import</span> BaseModel, Field</span>
@@ -4130,7 +4130,7 @@ L2 norm: 8.6625</code></pre>
 <span id="cb75-25"><a href="#cb75-25" aria-hidden="true" tabindex="-1"></a>    vibe_description: <span class="bu">str</span> <span class="op">=</span> Field(description<span class="op">=</span><span class="st">"Une brève description de l'ambiance ou de l'atmosphère créée par ces couleurs."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="b34fa7fb" class="cell" data-execution_count="72">
+<div id="bafc6758" class="cell" data-execution_count="72">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>image_path <span class="op">=</span> posters[<span class="st">"filepath"</span>][<span class="dv">7</span>]</span>
@@ -4138,7 +4138,7 @@ L2 norm: 8.6625</code></pre>
 </details>
 </div>
 <p>La génération se fait via <code>client.beta.chat.completions.parse</code>, qui retourne directement un objet Pydantic validé sans traitement supplémentaire. En cas d’échec, nous conservons la sortie brute pour pouvoir l’inspecter.</p>
-<div id="48edcff1" class="cell" data-execution_count="73">
+<div id="b654038b" class="cell" data-execution_count="73">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>question <span class="op">=</span> <span class="st">"Analysez cette affiche de film et identifiez la couleur de l'arrière-plan, la couleur du premier plan, la couleur du texte et la couleur d'accent."</span></span>
@@ -4213,7 +4213,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 </div>
-<div id="60b164dd" class="cell" data-execution_count="74">
+<div id="e6902e9b" class="cell" data-execution_count="74">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb78"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> textwrap</span>
@@ -4247,7 +4247,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 <p>La sortie structurée transforme un VLM, qui produirait sinon du texte difficilement exploitable, en générateur d’annotations directement utilisables. On peut combiner des champs catégoriels (couleur dominante, ambiance) avec des descriptions plus ouvertes, et tirer parti du meilleur des deux mondes : la richesse interprétative du langage naturel et la structure des bases de données.</p>
-<div id="dcf9d716" class="cell" data-execution_count="75">
+<div id="f0babd7a" class="cell" data-execution_count="75">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb79"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(<span class="st">"cache/posters_vlm_struct.parquet"</span>):</span>
@@ -4420,7 +4420,7 @@ L2 norm: 8.6625</code></pre>
 </div>
 </div>
 <p>À partir des couleurs prédites par le VLM, on peut suivre par période la part des affiches dont l’arrière-plan dominant est identifié comme blanc, et celle dont l’arrière-plan est identifié comme noir. C’est un proxy commode pour interroger les évolutions de la palette graphique des affiches à travers les décennies.</p>
-<div id="bc78ea2b" class="cell" data-execution_count="76">
+<div id="353dbc56" class="cell" data-execution_count="76">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb80"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>(</span>

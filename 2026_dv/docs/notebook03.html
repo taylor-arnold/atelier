@@ -208,7 +208,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="configuration" class="level2">
 <h2 class="anchored" data-anchor-id="configuration">3.1 Configuration</h2>
 <p>Pour commencer, nous devons installer quelques composants Python supplémentaires, télécharger les jeux de données, et indiquer à Python toutes les fonctions dont nous aurons besoin par la suite. Pour démarrer, nous utiliserons le code ci-dessous pour installer le module <strong>dvt</strong> (le distant viewing toolkit), qui contient plusieurs fonctions utiles spécialement conçues pour appliquer des algorithmes de vision par ordinateur à des collections de données en humanités. Le point d’exclamation au début de la ligne de code indique au notebook que nous voulons exécuter directement un outil en ligne de commande en dehors de Python. Ici, nous utilisons <strong>pip</strong> pour installer des fonctionnalités supplémentaires pour Python. Pour exécuter le code, passez votre souris sur l’arrière-plan du code. Un bouton de lecture triangulaire apparaîtra à gauche du bloc de code. Cliquez sur le bouton et attendez la fin de l’exécution, ce qui peut prendre une minute ou deux, car Colab met toujours un peu de temps à se mettre en place lors de l’exécution du premier bloc de code.</p>
-<div id="b9f5d8c1" class="cell" data-execution_count="1">
+<div id="63645e52" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q dvt</span>
@@ -237,7 +237,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Ensuite, le code ci-dessous télécharge les métadonnées et les fichiers vidéo que nous utiliserons dans ce notebook. Il s’appuie sur le programme <strong>wget</strong> pour télécharger les fichiers depuis le site distant viewing, suivi de la commande <strong>tar</strong> pour décompresser le répertoire contenant les portraits de personnages. Nous explorerons le contenu de chacun de ces éléments au fur et à mesure dans les sections suivantes. La dernière ligne utilise <strong>mkdir</strong> pour créer un répertoire vide qui sera nécessaire dans la dernière section du notebook pour exécuter les modèles d’apprentissage automatique sur la collection. Comme ci-dessus, passez la souris sur le code puis cliquez sur le bouton de lecture à gauche du bloc. Toutes les lignes seront exécutées les unes après les autres. Une petite flèche verte indique la ligne en cours d’exécution à tout moment, ce qui nous aide à comprendre quelles étapes prennent le plus de temps.</p>
-<div id="f8b4fbeb" class="cell" data-execution_count="2">
+<div id="fa46f502" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>mkdir <span class="op">-</span>p data</span>
@@ -253,7 +253,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Dans la dernière partie de la configuration, nous allons exécuter du code en Python (les lignes ci-dessous ne commencent pas par un point d’exclamation). Ce code utilise la commande <strong>import</strong> pour indiquer à Python quelles bibliothèques et fonctions nous allons utiliser dans le notebook. Plus précisément, il s’agit de <strong>os</strong> pour interagir avec le système de fichiers, <strong>numpy</strong> pour travailler avec de grands tableaux de nombres, <strong>polars</strong> pour les jeux de données tabulaires, <strong>matplotlib.pyplot</strong> pour la visualisation de base des images, <strong>plotnine</strong> pour la visualisation de données, <strong>insightface</strong> pour la détection et la reconnaissance de visages, <strong>PIL</strong> (Pillow) pour charger les fichiers image, et le module <strong>dvt</strong> décrit ci-dessus.</p>
-<div id="6c707f78" class="cell" data-execution_count="3">
+<div id="83b9ccd5" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -278,7 +278,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="jeu-de-données-des-sitcoms-de-lère-des-réseaux" class="level2">
 <h2 class="anchored" data-anchor-id="jeu-de-données-des-sitcoms-de-lère-des-réseaux">3.2 Jeu de données des sitcoms de l’ère des réseaux</h2>
 <p>Avant de regarder les étapes computationnelles nécessaires pour travailler avec des images animées, il est utile de comprendre les questions de recherche en sciences humaines qui motivent ce travail. Ici, nous nous intéressons à deux sitcoms américains populaires des années 1960 et du début des années 1970 : <em>Bewitched</em> (1964-1972) et <em>I Dream of Jeannie</em> (1965-1970). Voici les métadonnées de chacun des épisodes de l’ensemble des deux séries :</p>
-<div id="ff50c2a6" class="cell" data-execution_count="4">
+<div id="203bfe56" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pl.read_csv(<span class="st">"data/ttl_sitcom_metadata.csv"</span>)</span>
@@ -443,7 +443,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="travailler-avec-les-images-dune-vidéo">3.4 Travailler avec les images d’une vidéo</h2>
 <p>Les formats vidéo comme <strong>mp4</strong>, <strong>avi</strong> ou <strong>ogg</strong> stockent habituellement les images animées dans un format complexe, très optimisé pour réduire la taille des fichiers et le temps de décompression. Lorsqu’on travaille avec des images animées en Python, on décompresse en général ces fichiers pour les transformer en une suite d’images individuelles stockées comme des tableaux de pixels — une par image de la vidéo d’entrée. Le distant viewing toolkit (<strong>dvt</strong>) contient plusieurs fonctions pour travailler efficacement avec des fichiers vidéo en Python. Dans cette section, nous allons voir comment elles fonctionnent.</p>
 <p>D’abord, on peut utiliser la fonction <code>video_info</code> pour accéder aux métadonnées d’un fichier vidéo. Ici, nous chargeons les métadonnées de notre extrait, qui affichent le nombre de images, la hauteur et la largeur de chaque image en pixels, et la fréquence de lecture en images par seconde (<code>IPS</code> ou <code>FPS</code> en anglais).</p>
-<div id="59b92644" class="cell" data-execution_count="5">
+<div id="ae10a7f1" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>info <span class="op">=</span> dvt.video_info(<span class="st">'bewitched_sample.mp4'</span>)</span>
@@ -459,7 +459,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Comme on le voit dans les métadonnées, même ce court extrait contient 1319 images individuelles. Sur un épisode complet de série télévisée, sans parler d’un long métrage, charger toutes les images d’une vidéo en une seule fois en Python devient vite difficile. La taille des images, en particulier en haute définition, est tout simplement trop importante pour qu’elles tiennent toutes en même temps dans la mémoire de l’ordinateur.</p>
 <p>Le distant viewing toolkit (<strong>dvt</strong>) propose une approche alternative avec la fonction <code>yield_video</code>. Elle permet d’écrire une boucle qui charge chaque image de la vidéo une par une. À chaque appel, la fonction <code>yield</code> renvoie la image suivante sous forme de tableau de pixels, un entier décrivant le numéro de la image depuis le début de la vidéo, et un code temporel donnant le nombre de secondes écoulées.</p>
 <p>Le code ci-dessous montre un exemple d’utilisation de <code>yield_video</code>. On parcourt chaque image. Pour chacune, on stocke le numéro de image, le code temporel, et la valeur moyenne des pixels (une mesure de la luminosité de la image). Puis on transforme l’ensemble en une table de données avec une ligne par image de la vidéo.</p>
-<div id="f20c7277" class="cell" data-execution_count="6">
+<div id="3662de98" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> {<span class="st">'frame'</span>: [], <span class="st">'time'</span>: [], <span class="st">'brightness'</span>: []}</span>
@@ -555,7 +555,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>La luminosité est l’une des annotations les plus simples qu’on puisse utiliser pour résumer une image. Mais même cette mesure élémentaire permet déjà d’avoir une représentation grossière de notre extrait. Pour le voir, traçons la luminosité de la image au cours du temps.</p>
-<div id="1ec4130e" class="cell" data-execution_count="7">
+<div id="79057631" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -578,7 +578,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="détection-des-ruptures-de-plan">3.5 Détection des ruptures de plan</h2>
 <p>L’une des premières tâches qu’on cherche souvent à effectuer sur un fichier vidéo est d’identifier les coupures entre les plans. Ce processus s’appelle la <em>détection des ruptures de plan</em> (shot boundary detection). Comme on l’a vu sur le graphique de luminosité ci-dessus, des heuristiques simples permettent déjà d’identifier approximativement de nombreux types de ruptures. Pour obtenir des prédictions plus précises — qui ne confondent pas un mouvement rapide avec une rupture de plan et qui ne ratent pas les transitions plus subtiles comme les fondus enchaînés — il faut faire appel à un algorithme plus complexe. Le distant viewing toolkit (<strong>dvt</strong>) inclut un algorithme de détection de ruptures de plan fondé sur les réseaux de neurones, qui fonctionne bien sur de nombreux genres et types de sources.</p>
 <p>Pour exécuter l’algorithme intégré, nous créons d’abord un annotateur avec la fonction <code>AnnoShotBreaks</code>. Puis nous le faisons tourner sur le fichier vidéo. C’est le seul annotateur du toolkit qui travaille directement sur un fichier vidéo plutôt que sur des images ou des images individuelles. Le code Python affichera sa progression dans le fichier au fur et à mesure, et renverra un dictionnaire contenant les ruptures prédites.</p>
-<div id="a3856373" class="cell" data-execution_count="8">
+<div id="56d29608" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>anno_breaks <span class="op">=</span> dvt.AnnoShotBreaks()</span>
@@ -616,7 +616,7 @@ Processing video frames 1319/1319</code></pre>
 </div>
 </div>
 <p>Nous allons convertir la sortie de la détection en jeu de données tabulaire, et ajouter l’heure de début et l’heure de fin à l’aide des métadonnées récupérées avec <code>video_info</code>. Voici ce que l’algorithme a trouvé pour cet extrait :</p>
-<div id="13dc8a29" class="cell" data-execution_count="9">
+<div id="50adec66" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>shot <span class="op">=</span> (</span>
@@ -705,7 +705,7 @@ Processing video frames 1319/1319</code></pre>
 </div>
 <p>Prenez quelques minutes pour vérifier que ces ruptures correspondent bien à celles que vous aviez repérées en regardant la vidéo. Vous pouvez même revoir la vidéo (en mettant en pause à chaque coupure) et constater qu’elle coïncide avec les ruptures identifiées automatiquement.</p>
 <p>Dans la section suivante, nous nous intéresserons à la détection et à l’identification de visages. C’est une tâche courante lorsqu’on travaille avec des images animées, mais qui finalement s’applique sur des images individuelles. Pour simplifier le travail au début, nous allons utiliser le code suivant pour construire un jeu de données contenant une image par plan détecté dans l’extrait. Plus précisément, nous prenons l’image centrale de chaque plan, telle que repérée dans la table <code>shot</code> ci-dessus.</p>
-<div id="067ed442" class="cell" data-execution_count="10">
+<div id="1c5651f5" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>img_list <span class="op">=</span> []</span>
@@ -715,7 +715,7 @@ Processing video frames 1319/1319</code></pre>
 </details>
 </div>
 <p>Pour avoir une idée de ce à quoi elles ressemblent, on peut combiner ces images et les convertir en vignettes afin de voir les six plans de notre extrait.</p>
-<div id="8512b1c3" class="cell" data-execution_count="11">
+<div id="dd3e1e53" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>img_comb <span class="op">=</span> np.hstack(img_list)</span>
@@ -740,7 +740,7 @@ Processing video frames 1319/1319</code></pre>
 <h2 class="anchored" data-anchor-id="détection-et-reconnaissance-de-visages">3.6 Détection et reconnaissance de visages</h2>
 <p>Localiser et identifier les visages présents dans une image donnée d’une vidéo est une manière courante de comprendre la structure narrative et le style visuel d’une source. Dans cette section, nous verrons comment travailler avec les visages à l’aide de la bibliothèque <strong>InsightFace</strong>, appliquée aux six images de l’extrait extraites dans la section précédente. Après avoir vu comment procéder sur un ensemble statique d’images, nous verrons dans la section suivante comment assembler le tout pour qu’il puisse passer à l’échelle sur des fichiers vidéo plus longs.</p>
 <p>Pour commencer, on initialise un objet <code>FaceAnalysis</code> d’InsightFace en précisant le pack de modèles <code>buffalo_l</code>. Au premier lancement, la fonction téléchargera automatiquement les fichiers de modèles nécessaires et les enregistrera localement.</p>
-<div id="58a39149" class="cell" data-execution_count="12">
+<div id="0eebbc6c" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>face_app <span class="op">=</span> FaceAnalysis(name<span class="op">=</span><span class="st">"buffalo_l"</span>, providers<span class="op">=</span>[<span class="st">"CPUExecutionProvider"</span>])</span>
@@ -761,7 +761,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 </div>
 <p>Pour détecter les visages, on convertit l’image du format RGB au format BGR (celui qu’attend InsightFace) et on la passe à la méthode <code>get</code> de l’objet <code>face_app</code>. Lançons la détection sur la troisième image (en se rappelant que Python commence à compter à zéro : la troisième image est donc à la position 2).</p>
-<div id="2d400a5e" class="cell" data-execution_count="13">
+<div id="f03275b2" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>image_bgr <span class="op">=</span> img_list[<span class="dv">2</span>][:, :, ::<span class="op">-</span><span class="dv">1</span>]</span>
@@ -769,7 +769,7 @@ set det-size: (640, 640)</code></pre>
 </details>
 </div>
 <p>On dessine ensuite les boîtes englobantes détectées sur l’image à l’aide de matplotlib. La boîte de chaque visage détecté est stockée dans l’attribut <code>bbox</code> de l’objet renvoyé. Ici, on voit que l’algorithme a détecté un seul visage — ce qui correspond très probablement au nombre de visages qu’un annotateur humain aurait trouvés sur l’image.</p>
-<div id="7279dfce" class="cell" data-execution_count="14">
+<div id="ced6531c" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> plt.cm.tab10.colors</span>
@@ -794,7 +794,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 </div>
 <p>Pour pouvoir utiliser cette détection dans une analyse computationnelle, il faut représenter la position du visage détecté dans un format structuré. On construit une table polars à partir des attributs <code>bbox</code> (coordonnées de la boîte englobante) et <code>det_score</code> (score de confiance de la détection) de chaque visage. Voici toutes les informations structurées sur le visage détecté dans l’image précédente :</p>
-<div id="8caa7dba" class="cell" data-execution_count="15">
+<div id="c6005f28" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(faces) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
@@ -855,7 +855,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 <p>Si vous avez suivi le notebook d’introduction sur les affiches de films, c’est la même information que celle utilisée pour détecter le nombre de visages présents sur chaque affiche. Ce qui change avec les images animées, c’est qu’on retrouve souvent les mêmes personnes d’une image ou d’un plan à l’autre. Étiqueter l’identité des personnes présentes dans chaque plan est une étape essentielle pour comprendre la structure narrative du matériau. <strong>InsightFace</strong> prend en charge la reconnaissance faciale en plus de la détection. Cela demande un peu plus de précautions : il faut commencer par identifier les personnages que l’on souhaite reconnaître.</p>
 <p>Par défaut, InsightFace associe également à chaque visage détecté une séquence de 512 nombres appelée <em>plongement normalisé</em> (accessible via l’attribut <code>normed_embedding</code>). Les nombres individuels n’ont pas de signification directe : ils sont définis de manière relative, de sorte que deux images d’une même personne aient des plongements plus proches l’un de l’autre que des plongements de visages différents. À titre d’exemple, voici la forme du tableau des plongements pour les visages détectés sur notre image.</p>
-<div id="1e8ae160" class="cell" data-execution_count="16">
+<div id="1714b5e3" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>np.array([f.normed_embedding <span class="cf">for</span> f <span class="kw">in</span> faces]).shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -866,7 +866,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 <p>Une façon d’utiliser ces plongements consiste à identifier d’abord les portraits des acteurs qui nous intéressent dans la vidéo, puis à associer chacun à un nom de personnage. On calcule ensuite les plongements de ces visages et on les stocke. À chaque visage détecté dans une image, on compare ensuite la similarité entre son plongement et ceux de notre ensemble de référence. Si l’un des personnages de référence est suffisamment proche, on suppose que c’est lui qu’on a trouvé.</p>
 <p>L’un des éléments téléchargés lors de la configuration du notebook était un dossier contenant les portraits des quatre acteurs principaux de <em>Bewitched</em>, nommés d’après leur personnage dans la série. Dans le code ci-dessous, on parcourt ces images, on charge chacune avec PIL, on lance InsightFace pour extraire le plongement, et on enregistre le nom du personnage. On stocke aussi une vignette du portrait pour l’affichage.</p>
-<div id="60d7ad1d" class="cell" data-execution_count="17">
+<div id="1ab4648b" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>face_embed <span class="op">=</span> []</span>
@@ -886,7 +886,7 @@ set det-size: (640, 640)</code></pre>
 </details>
 </div>
 <p>Voici les portraits des personnages. Ils sont rangés par ordre alphabétique : Darrin, Endora, Larry et Sam.</p>
-<div id="4c580105" class="cell" data-execution_count="18">
+<div id="b36286e4" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">12</span>))</span>
@@ -904,7 +904,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 </div>
 <p>Pour mesurer la similarité entre deux plongements, on utilise une technique mathématique appelée <em>produit scalaire</em>. Ce nombre vaut <code>1</code> si deux plongements sont exactement identiques, et <code>-1</code> s’ils sont exactement opposés. En général, deux visages de personnes différentes auront un score de similarité proche de zéro. Commençons par regarder les scores de similarité entre les quatre portraits.</p>
-<div id="e7750a61" class="cell" data-execution_count="19">
+<div id="fe8df0ff" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>np.dot(face_embed, face_embed.T)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -920,7 +920,7 @@ set det-size: (640, 640)</code></pre>
 <p>La première colonne correspond à Darrin, et compare Darrin à chacune des quatre images. Comme c’est la première image, on lit <code>.99999</code> parce que la photo est comparée à elle-même. L’image de Darrin est ensuite comparée à Endora (<code>.06135</code>), Larry (<code>-.19993</code>) et Samantha (<code>.16960</code>).</p>
 <p>Les valeurs sur la diagonale valent toutes 1 (ou presque) parce qu’on y compare un plongement à lui-même. Tous les autres scores se situent entre environ <code>-0,2</code> et <code>+0,17</code>, comme attendu, puisque chaque portrait représente un acteur différent.</p>
 <p>Comparons maintenant ces visages de référence au plongement de l’image avec laquelle nous avons commencé cette section : l’image centrale du troisième plan, qui montre Samantha dans une chambre rose (<code>img_list[2]</code>).</p>
-<div id="f80aaa1d" class="cell" data-execution_count="20">
+<div id="b4d1702f" class="cell" data-execution_count="20">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>image_bgr <span class="op">=</span> img_list[<span class="dv">2</span>][:, :, ::<span class="op">-</span><span class="dv">1</span>]</span>
@@ -938,7 +938,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 <p>On constate ici un score de similarité bien plus élevé (<code>0,59</code>) entre ce visage et le dernier personnage de l’ensemble. Et en regardant l’image, on voit en effet qu’il s’agit du même personnage : Samantha.</p>
 <p>On peut associer le visage au nom du personnage de manière algorithmique avec le code suivant.</p>
-<div id="ef32f42d" class="cell" data-execution_count="21">
+<div id="ff92b9ed" class="cell" data-execution_count="21">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>face_name[np.argmax(dist, axis <span class="op">=</span> <span class="dv">0</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -948,7 +948,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 </div>
 <p>Le code ci-dessus associe le visage au personnage dont la similarité est la plus élevée. Il serait également judicieux de conserver le score de similarité et de ne faire confiance à la correspondance que si ce score est suffisamment grand. On peut l’obtenir avec le code suivant.</p>
-<div id="a0fb924b" class="cell" data-execution_count="22">
+<div id="abf217f6" class="cell" data-execution_count="22">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>np.<span class="bu">max</span>(dist, axis <span class="op">=</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -962,7 +962,7 @@ set det-size: (640, 640)</code></pre>
 <section id="construire-des-annotations-à-partir-dun-fichier-vidéo" class="level2">
 <h2 class="anchored" data-anchor-id="construire-des-annotations-à-partir-dun-fichier-vidéo">3.7 Construire des annotations à partir d’un fichier vidéo</h2>
 <p>On peut combiner les techniques précédentes avec la fonction <code>yield_video</code> de <strong>dvt</strong> pour identifier les visages dans chacun des plans. Il est possible de faire tourner l’algorithme de détection sur chaque image, ce qui a certains avantages. Par souci de temps et de simplicité, nous l’appliquerons uniquement à l’image centrale de chaque plan détecté.</p>
-<div id="b8c445ba" class="cell" data-execution_count="23">
+<div id="f88966f4" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>output <span class="op">=</span> []</span>
@@ -1115,7 +1115,7 @@ set det-size: (640, 640)</code></pre>
 <p>Nous disposons à présent de toutes les méthodes et de tout le code nécessaires pour identifier les plans et les visages dans un fichier d’images animées. Si nous avions un épisode entier de <em>Bewitched</em>, nous pourrions exécuter la même séquence d’étapes sur l’épisode complet sans rien changer. La seule différence serait que les résultats prendraient bien plus de temps à arriver. Si nous avions un dossier contenant chaque épisode de la série, il suffirait d’ajouter une boucle supplémentaire pour parcourir chaque fichier vidéo, en veillant à inclure le nom du fichier dans chaque ligne de la sortie. Enfin, pour étendre tout cela à une autre série, il suffirait d’ajouter dans notre dossier d’images de référence les portraits des personnages que l’on souhaite identifier.</p>
 <p>Nous revenons aux deux séries — <em>Bewitched</em> et <em>I Dream of Jeannie</em> — qui sont au cœur du chapitre 5 de <em>Distant Viewing</em>. Le chapitre est construit autour d’une comparaison de ces deux sitcoms magiques, comparaison rendue possible par la combinaison de la détection des plans, de la détection des visages, et de la reconnaissance des visages.</p>
 <p>L’ensemble complet des fichiers vidéo des deux séries est assez volumineux et soumis au droit d’auteur. Le traitement de tous ces fichiers prend aussi beaucoup de temps, en particulier dans une session Colab gratuite. Puisqu’il n’est pas possible d’exécuter directement les annotations ici sur le corpus complet, nous travaillerons à la place avec les annotations précalculées téléchargées lors de la configuration. Le jeu de données comporte une ligne par plan, avec les informations de timing et le nombre de visages.</p>
-<div id="6f4f1e87" class="cell" data-execution_count="24">
+<div id="4f1c43ea" class="cell" data-execution_count="24">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>shots <span class="op">=</span> pl.read_csv(<span class="st">"data/ttl_sitcom_shots.csv"</span>)</span>
@@ -1257,7 +1257,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 </div>
 <p>Un indicateur rapide à calculer est la durée moyenne d’un plan pour chacune des deux séries. C’est une mesure couramment utilisée pour comprendre le rythme d’un film ou d’une série. Ici, on voit que <em>Bewitched</em> est légèrement plus rapide, avec une durée moyenne de plan de 5,3 secondes contre 6,2 secondes pour <em>I Dream of Jeannie</em>.</p>
-<div id="79e3cc6e" class="cell" data-execution_count="25">
+<div id="cc219303" class="cell" data-execution_count="25">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1279,7 +1279,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 </div>
 <p>Une mesure proche est la durée médiane des plans, qui montre ici que le plan médian est légèrement plus long dans <em>Bewitched</em> que dans <em>Jeannie</em>. Autrement dit, même si la durée moyenne d’un plan est un peu plus longue dans <em>Bewitched</em>, il pourrait y avoir dans <em>Jeannie</em> un ensemble de plans particulièrement longs qui tirent la moyenne vers le haut.</p>
-<div id="bd011ddb" class="cell" data-execution_count="26">
+<div id="849ac911" class="cell" data-execution_count="26">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1301,7 +1301,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 </div>
 <p>L’un des motifs intéressants que nous avons remarqués en rédigeant le chapitre consacré à ces deux séries est que la durée moyenne d’un plan est étroitement liée au nombre de visages présents à l’écran. Nous avons choisi de plafonner le nombre de visages à trois (toute valeur supérieure à 3 devient 3), au vu de notre connaissance des deux séries. On voit comment la durée moyenne du plan augmente avec le nombre de visages à l’écran, dans les deux séries.</p>
-<div id="7dd750ba" class="cell" data-execution_count="27">
+<div id="e546f700" class="cell" data-execution_count="27">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1325,7 +1325,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 <p>Nous avons déjà vu un exemple de ce motif dans notre extrait : le seul plan avec deux personnages était bien plus long que le plan avec un seul personnage. Cela permet de confirmer que la durée des plans est liée au style visuel. Pour ces deux séries, au moins, elle se rapporte à la fréquence avec laquelle on voit un gros plan sur un personnage seul (en train de parler ou d’agir) plutôt que plusieurs personnages interagissant dans un plan plus long.</p>
 <p>Nous disposons aussi d’un jeu de données indiquant les personnages précis détectés dans les plans des deux séries. Il s’appuie sur un algorithme de détection de visages similaire à celui utilisé dans notre extrait. On a ici une ligne par personnage détecté dans un plan. Il y a quatre personnages principaux dans chacune des séries.</p>
-<div id="28c93a0f" class="cell" data-execution_count="28">
+<div id="f5bf8763" class="cell" data-execution_count="28">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>characters <span class="op">=</span> pl.read_csv(<span class="st">"data/ttl_sitcom_characters.csv"</span>)</span>
@@ -1441,7 +1441,7 @@ set det-size: (640, 640)</code></pre>
 </div>
 </div>
 <p>On peut utiliser le temps d’écran moyen d’un personnage dans un épisode comme une mesure approximative de son importance visuelle dans la série. On calcule cette mesure pour chacun des personnages, puis on trie par ordre décroissant à l’intérieur de chaque série.</p>
-<div id="68d9820d" class="cell" data-execution_count="29">
+<div id="5a01a0f6" class="cell" data-execution_count="29">
 <details class="code-fold">
 <summary>View code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>(</span>

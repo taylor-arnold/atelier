@@ -33,7 +33,7 @@ téléchargement gratuit sous licence libre sur notre
 et du code supplémentaires permettant de reproduire les autres études
 présentées dans le texte.
 
-## 1.1 Configuration {#11-setup}
+## 1.1 Configuration
 
 Pour commencer, nous devons télécharger le jeu de données des affiches
 de films, et indiquer à Python toutes les fonctions dont nous aurons
@@ -108,7 +108,7 @@ données ne devrait être fait qu'une seule fois. Le chargement des
 modules dans le dernier bloc de code, en revanche, doit toujours être
 exécuté à chaque redémarrage de Python.
 
-## 1.2 Jeu de données des affiches de films {#12-movie-poster-dataset}
+## 1.2 Jeu de données des affiches de films
 
 Avant de plonger dans l'analyse des images d'affiches de films, il est
 important de prendre un moment pour examiner les métadonnées attachées
@@ -153,7 +153,7 @@ de films à travers les périodes et les genres.
 Maintenant que nous avons une idée de nos données, quelles questions
 pourrait-on vouloir explorer ?
 
-## 1.3 Images numériques {#13-digital-images}
+## 1.3 Images numériques
 
 Maintenant que nous avons vu les métadonnées des affiches, regardons
 comment les images numériques sont manipulées en Python en chargeant
@@ -321,7 +321,7 @@ nous pouvons combiner cela avec les métadonnées.
 Quelles autres questions peut-on se poser sur les affiches de films ?
 
 
-## 1.4 Distant Viewing : théorie {#14-distant-viewing-theory}
+## 1.4 Distant Viewing : théorie
 
 Les ordinateurs représentent les images comme des tableaux
 tridimensionnels de nombres. C'est très différent de la façon dont les
@@ -397,7 +397,7 @@ la nature des annotations d'images et les écarts sémantiques qui en
 résultent. Autrement dit, lorsque nous analysons des images par vision
 par ordinateur, nous faisons du distant viewing.
 
-## 1.5 Annoter la luminosité de l'image {#15-annotating-image-brightness}
+## 1.5 Annoter la luminosité de l'image
 
 Nous avons examiné en détail la manière dont les images numériques
 sont stockées, vu les implications pour la théorie du distant viewing,
@@ -548,7 +548,7 @@ Pouvez-vous résumer cette tendance ? Avez-vous des hypothèses sur ce
 qui se passe ici ?
 
 
-## 1.6 Saturation et chroma {#16-saturation-and-chroma}
+## 1.6 Saturation et chroma
 
 Nous avons déjà vu qu'avec une analyse soignée, on peut faire pas mal
 de choses avec une annotation relativement simple fondée sur la
@@ -712,7 +712,7 @@ ou (ii) particulièrement attendu ? Les deux types d'observations sont
 utiles pour comprendre le lien entre les messages véhiculés par la
 couleur de l'affiche et les genres associés.
 
-## 1.7 Couleur dominante {#17-dominant-color}
+## 1.7 Couleur dominante
 
 Après avoir examiné la luminosité/valeur et la saturation/chroma des
 affiches, nous passons au troisième élément de la couleur : la
@@ -899,7 +899,7 @@ Voyez-vous des motifs intéressants dans les données ci-dessus ? Après
 les avoir examinées de près, essayez de changer la couleur d'intérêt
 pour voir si d'autres motifs apparaissent.
 
-## 1.8 Conclusion et prochaines étapes {#18-conclusions-and-next-steps}
+## 1.8 Conclusion et prochaines étapes
 
 Ce tutoriel a couvert beaucoup de matière. Nous avons présenté les
 bases de Python ainsi qu'une compréhension de la façon dont les

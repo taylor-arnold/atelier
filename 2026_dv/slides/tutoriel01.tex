@@ -19,7 +19,7 @@
 \framesection{Introduction}
 \begin{rightframe}{Bienvenue}
 \splitcols{%
-  Ces diapositives accompagnent les tutoriels Python que nous avons conçus pour introduire les fondements théoriques et méthodologiques du distant viewing, ainsi qu'un aperçu des outils du Distant Viewing Toolkit.
+  Ces diapositives accompagnent les tutoriels Python que nous avons conçus pour introduire les fondements théoriques et méthodologiques du distant viewing, ainsi qu'un aperçu des outils du Python.
   
   Elles contiennent des notes, références et schémas supplémentaires que nous trouvons utiles lors des ateliers en présentiel. La plupart des notes techniques et du matériel se trouvent directement dans les notebooks.
 
@@ -40,7 +40,7 @@
 \end{rightframe}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{rightframe}{Distant Viewing Toolkit (DVT)}
+\begin{rightframe}{Distant Viewing : Outils générals}
 \splitcols{%
   Ces dernières années, les outils généralistes ont rattrapé les besoins des chercheurs travaillant avec des données variées, sans qu'il soit nécessaire de construire des modèles d'apprentissage automatique à partir de zéro. Face à ces évolutions, nous avons fait évoluer le toolkit en trois sous-projets :
   \begin{itemize}
@@ -165,24 +165,27 @@
 \splitcols{%
   En isolant uniquement les valeurs des pixels verts, on dispose d'assez de place pour voir les nombres eux-mêmes. Comme dans le code Python, ces nombres vont de 0 (pas de vert) à 255 (vert maximal).
 
-  Notez qu'il y a beaucoup de lumière verte ici, alors même que rien dans l'image originale n'est ce qu'on appellerait habituellement « vert ». Le vert se mélange au rouge et au bleu pour produire d'autres couleurs comme le marron, l'orange ou le blanc.
-
-  En général, surtout sur les écrans modernes, les pixels sont trop petits pour être discernables individuellement. Mais si l'on zoomait suffisamment, on verrait apparaître les lumières rouge, verte et bleue, comme sur l'image de droite.
+  Notez qu'il y a beaucoup de lumière verte ici, alors même que rien dans l'image originale n'est ce qu'on appellerait habituellement « vert ». 
 }{%
-  \imgcaption{media/image13.jpeg}{Visualisation des pixels RGB sur différents types d'écrans CRT et LCD.}
+  \imgcaption{media/imageB.png}{Visualisation des pixels verts.}
 }
 \end{rightframe}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{rightframe}{Lumière RGB}
 \splitcols{%
-  En isolant uniquement les valeurs des pixels verts, on dispose d'assez de place pour voir les nombres eux-mêmes. Comme dans le code Python, ces nombres vont de 0 (pas de vert) à 255 (vert maximal).
+  Le vert se mélange au rouge et au bleu pour produire d'autres couleurs comme le marron, l'orange ou le blanc.
+}{%
+  \imgcaption{media/image12.jpg}{Visualisation des pixels rouges, verts et bleus.}
+}
+\end{rightframe}
 
-  Notez qu'il y a beaucoup de lumière verte ici, alors même que rien dans l'image originale n'est ce qu'on appellerait habituellement « vert ». Le vert se mélange au rouge et au bleu pour produire d'autres couleurs comme le marron, l'orange ou le blanc.
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{rightframe}{Lumière RGB}
+\splitcols{%
   En général, surtout sur les écrans modernes, les pixels sont trop petits pour être discernables individuellement. Mais si l'on zoomait suffisamment, on verrait apparaître les lumières rouge, verte et bleue, comme sur l'image de droite.
 }{%
-  \imgcaption{media/image12.jpg}{Visualisation des pixels RGB sur différents types d'écrans CRT et LCD.}
+  \imgcaption{media/image13.jpeg}{Visualisation des pixels RGB sur différents types d'écrans CRT et LCD.}
 }
 \end{rightframe}
 
@@ -265,7 +268,7 @@
 
   Comment mesurer la luminosité d'une image ? Rappelons que les intensités des pixels indiquent la quantité de lumière rouge, verte et bleue nécessaire pour produire une couleur donnée. En faisant la moyenne des valeurs de pixels sur toute l'image, on obtient une indication de la quantité totale de lumière utilisée, et donc une manière de mesurer sa luminosité.
 }{%
-  \imgcaption{media/image17.png}{Différentes combinaisons d'intensités de rouge, vert et bleu produisant des luminosités perçues variées.}
+  \imgcaption{media/image13.jpeg}{Visualisation des pixels RGB sur différents types d'écrans CRT et LCD.}
 }
 \end{rightframe}
 
@@ -304,7 +307,7 @@
   \rmdim{1.5 Annoter la luminosité de l'image}
   \rmdim{1.6 Saturation et chroma}
   \rmitem{1.7 Couleur dominante}
-  \rmitem{1.8 Conclusion et prochaines étapes}
+  \rmdim{1.8 Conclusion et prochaines étapes}
 \end{outlineframe}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
