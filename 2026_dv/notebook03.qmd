@@ -189,16 +189,16 @@ optimisé pour réduire la taille des fichiers et le temps de
 décompression. Lorsqu'on travaille avec des images animées en Python,
 on décompresse en général ces fichiers pour les transformer en une
 suite d'images individuelles stockées comme des tableaux de pixels —
-une image par trame de la vidéo d'entrée. Le distant viewing toolkit
+une par image de la vidéo d'entrée. Le distant viewing toolkit
 (**dvt**) contient plusieurs fonctions pour travailler efficacement
 avec des fichiers vidéo en Python. Dans cette section, nous allons
 voir comment elles fonctionnent.
 
 D'abord, on peut utiliser la fonction `video_info` pour accéder aux
 métadonnées d'un fichier vidéo. Ici, nous chargeons les métadonnées de
-notre extrait, qui affichent le nombre de trames, la hauteur et la
-largeur de chaque trame en pixels, et la fréquence de lecture en
-trames par seconde (`fps`).
+notre extrait, qui affichent le nombre de images, la hauteur et la
+largeur de chaque image en pixels, et la fréquence de lecture en
+images par seconde (`IPS` ou `FPS` en anglais).
 
 ```{python}
 info = dvt.video_info('bewitched_sample.mp4')
@@ -206,8 +206,8 @@ info
 ```
 
 Comme on le voit dans les métadonnées, même ce court extrait contient
-1319 trames individuelles. Sur un épisode complet de série télévisée,
-sans parler d'un long métrage, charger toutes les trames d'une vidéo
+1319 images individuelles. Sur un épisode complet de série télévisée,
+sans parler d'un long métrage, charger toutes les images d'une vidéo
 en une seule fois en Python devient vite difficile. La taille des
 images, en particulier en haute définition, est tout simplement trop
 importante pour qu'elles tiennent toutes en même temps dans la mémoire
@@ -215,16 +215,16 @@ de l'ordinateur.
 
 Le distant viewing toolkit (**dvt**) propose une approche alternative
 avec la fonction `yield_video`. Elle permet d'écrire une boucle qui
-charge chaque trame de la vidéo une par une. À chaque appel, la
-fonction `yield` renvoie la trame suivante sous forme de tableau de
-pixels, un entier décrivant le numéro de la trame depuis le début de
+charge chaque image de la vidéo une par une. À chaque appel, la
+fonction `yield` renvoie la image suivante sous forme de tableau de
+pixels, un entier décrivant le numéro de la image depuis le début de
 la vidéo, et un code temporel donnant le nombre de secondes écoulées.
 
 Le code ci-dessous montre un exemple d'utilisation de `yield_video`.
-On parcourt chaque trame. Pour chacune, on stocke le numéro de trame,
+On parcourt chaque image. Pour chacune, on stocke le numéro de image,
 le code temporel, et la valeur moyenne des pixels (une mesure de la
-luminosité de la trame). Puis on transforme l'ensemble en une table
-de données avec une ligne par trame de la vidéo.
+luminosité de la image). Puis on transforme l'ensemble en une table
+de données avec une ligne par image de la vidéo.
 
 ```{python}
 output = {'frame': [], 'time': [], 'brightness': []}
@@ -240,7 +240,7 @@ output
 La luminosité est l'une des annotations les plus simples qu'on puisse
 utiliser pour résumer une image. Mais même cette mesure élémentaire
 permet déjà d'avoir une représentation grossière de notre extrait.
-Pour le voir, traçons la luminosité de la trame au cours du temps.
+Pour le voir, traçons la luminosité de la image au cours du temps.
 
 ```{python}
 (
@@ -276,7 +276,7 @@ Pour exécuter l'algorithme intégré, nous créons d'abord un annotateur
 avec la fonction `AnnoShotBreaks`. Puis nous le faisons tourner sur le
 fichier vidéo. C'est le seul annotateur du toolkit qui travaille
 directement sur un fichier vidéo plutôt que sur des images ou des
-trames individuelles. Le code Python affichera sa progression dans le
+images individuelles. Le code Python affichera sa progression dans le
 fichier au fur et à mesure, et renverra un dictionnaire contenant les
 ruptures prédites.
 
@@ -313,8 +313,8 @@ l'identification de visages. C'est une tâche courante lorsqu'on
 travaille avec des images animées, mais qui finalement s'applique sur
 des images individuelles. Pour simplifier le travail au début, nous
 allons utiliser le code suivant pour construire un jeu de données
-contenant une trame par plan détecté dans l'extrait. Plus précisément,
-nous prenons la trame centrale de chaque plan, telle que repérée dans
+contenant une image par plan détecté dans l'extrait. Plus précisément,
+nous prenons l'image centrale de chaque plan, telle que repérée dans
 la table `shot` ci-dessus.
 
 ```{python}
@@ -344,7 +344,7 @@ des personnages dans chaque plan.
 
 ## 3.6 Détection et reconnaissance de visages
 
-Localiser et identifier les visages présents dans une trame donnée
+Localiser et identifier les visages présents dans une image donnée
 d'une vidéo est une manière courante de comprendre la structure
 narrative et le style visuel d'une source. Dans cette section, nous
 verrons comment travailler avec les visages à l'aide de la
@@ -377,12 +377,12 @@ image_bgr = img_list[2][:, :, ::-1]
 faces = face_app.get(image_bgr)
 ```
 
-On dessine ensuite les boîtes englobantes détectées sur la trame à
+On dessine ensuite les boîtes englobantes détectées sur l'image à
 l'aide de matplotlib. La boîte de chaque visage détecté est stockée
 dans l'attribut `bbox` de l'objet renvoyé. Ici, on voit que
 l'algorithme a détecté un seul visage — ce qui correspond très
 probablement au nombre de visages qu'un annotateur humain aurait
-trouvés sur la trame.
+trouvés sur l'image.
 
 ```{python}
 colors = plt.cm.tab10.colors
@@ -404,7 +404,7 @@ computationnelle, il faut représenter la position du visage détecté
 dans un format structuré. On construit une table polars à partir des
 attributs `bbox` (coordonnées de la boîte englobante) et `det_score`
 (score de confiance de la détection) de chaque visage. Voici toutes
-les informations structurées sur le visage détecté dans la trame
+les informations structurées sur le visage détecté dans l'image
 précédente :
 
 ```{python}
@@ -427,7 +427,7 @@ Si vous avez suivi le notebook d'introduction sur les affiches de
 films, c'est la même information que celle utilisée pour détecter le
 nombre de visages présents sur chaque affiche. Ce qui change avec les
 images animées, c'est qu'on retrouve souvent les mêmes personnes d'une
-trame ou d'un plan à l'autre. Étiqueter l'identité des personnes
+image ou d'un plan à l'autre. Étiqueter l'identité des personnes
 présentes dans chaque plan est une étape essentielle pour comprendre
 la structure narrative du matériau. **InsightFace** prend en charge la
 reconnaissance faciale en plus de la détection. Cela demande un peu
@@ -441,7 +441,7 @@ signification directe : ils sont définis de manière relative, de sorte
 que deux images d'une même personne aient des plongements plus
 proches l'un de l'autre que des plongements de visages différents. À
 titre d'exemple, voici la forme du tableau des plongements pour les
-visages détectés sur notre trame.
+visages détectés sur notre image.
 
 ```{python}
 np.array([f.normed_embedding for f in faces]).shape
@@ -451,7 +451,7 @@ Une façon d'utiliser ces plongements consiste à identifier d'abord les
 portraits des acteurs qui nous intéressent dans la vidéo, puis à
 associer chacun à un nom de personnage. On calcule ensuite les
 plongements de ces visages et on les stocke. À chaque visage détecté
-dans une trame, on compare ensuite la similarité entre son plongement
+dans une image, on compare ensuite la similarité entre son plongement
 et ceux de notre ensemble de référence. Si l'un des personnages de
 référence est suffisamment proche, on suppose que c'est lui qu'on a
 trouvé.
@@ -514,8 +514,8 @@ y compare un plongement à lui-même. Tous les autres scores se situent
 entre environ `-0,2` et `+0,17`, comme attendu, puisque chaque
 portrait représente un acteur différent.
 
-Comparons maintenant ces visages de référence au plongement de la
-trame avec laquelle nous avons commencé cette section : la trame
+Comparons maintenant ces visages de référence au plongement de l'image
+avec laquelle nous avons commencé cette section : l'image
 centrale du troisième plan, qui montre Samantha dans une chambre rose
 (`img_list[2]`).
 
@@ -556,8 +556,8 @@ seule image, appliquons-le à chacun des plans de l'extrait.
 On peut combiner les techniques précédentes avec la fonction
 `yield_video` de **dvt** pour identifier les visages dans chacun des
 plans. Il est possible de faire tourner l'algorithme de détection sur
-chaque trame, ce qui a certains avantages. Par souci de temps et de
-simplicité, nous l'appliquerons uniquement à la trame centrale de
+chaque image, ce qui a certains avantages. Par souci de temps et de
+simplicité, nous l'appliquerons uniquement à l'image centrale de
 chaque plan détecté.
 
 ```{python}
@@ -594,8 +594,8 @@ personnages effectivement présents (si vous ne connaissez pas
 *Bewitched*, servez-vous des portraits pour apprendre les noms). La
 correspondance devrait être bonne, même si le quatrième plan a une
 confiance assez faible pour Darrin parce que son visage est assez
-petit sur la trame centrale. On obtiendrait de meilleurs résultats en
-ajoutant la première trame du plan, plus centrée sur Darrin. Nous
+petit sur l'image centrale. On obtiendrait de meilleurs résultats en
+ajoutant la première image du plan, plus centrée sur Darrin. Nous
 recommandons toujours de revenir aux résultats et de les inspecter au
 fur et à mesure. On peut alors ajuster son approche en fonction des
 données audiovisuelles avec lesquelles on travaille et des questions
@@ -761,7 +761,7 @@ sur deux bibliothèques complémentaires : le distant viewing toolkit
 (**dvt**) pour les utilitaires vidéo et la détection des ruptures de
 plan, et **InsightFace** pour la détection et la reconnaissance des
 visages. Nous avons vu comment obtenir des métadonnées de base sur un
-fichier vidéo depuis Python, comment parcourir les trames une par
+fichier vidéo depuis Python, comment parcourir les image une par
 une, comment détecter les ruptures de plan, et comment localiser et
 identifier des visages à l'aide de plongements. Enfin, nous avons
 chargé un jeu de données plus large rassemblant l'ensemble des plans

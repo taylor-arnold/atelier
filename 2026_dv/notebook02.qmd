@@ -1021,7 +1021,7 @@ axes[0].axis("off")
 im1 = axes[1].imshow(depth_normalized, cmap="inferno")
 axes[1].set_title("Depth map (inferno)")
 axes[1].axis("off")
-plt.colorbar(im1, ax=axes[1], fraction=0.046, pad=0.04, label="Relative depth (near → far)")
+plt.colorbar(im1, ax=axes[1], fraction=0.046, pad=0.04, label="Relative depth (far → near)")
 
 axes[2].imshow(image)
 axes[2].imshow(depth_normalized, cmap="plasma", alpha=0.6)
@@ -1756,7 +1756,7 @@ ressources locales.
 import base64
 from openai import OpenAI
 
-client = OpenAI()
+client = OpenAI(api_key="PLACEZ-LE-ICI")
 
 def encode_image(path):
     with open(path, "rb") as f:
