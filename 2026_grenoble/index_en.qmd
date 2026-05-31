@@ -1,5 +1,5 @@
 ---
-title: "Workshop: R for Linguistics (EN)"
+title: "Workshop: R for Linguistics"
 
 author:
   - name: "Taylor Arnold"

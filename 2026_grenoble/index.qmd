@@ -1,5 +1,5 @@
 ---
-title: "Atelier : R pour la linguistique (FR)"
+title: "Atelier : R pour la linguistique"
 
 author:
   - name: "Taylor Arnold"
