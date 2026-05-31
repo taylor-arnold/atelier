@@ -1,0 +1,142 @@
+body {
+    font-family: "Noto Sans", serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 40px 20px;
+    background-color: #fff;
+    color: #333;
+}
+
+.container {
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Noto Serif", sans-serif;
+    font-weight: 600;
+    color: #222;
+    margin-top: 2em;
+    margin-bottom: 0.2em;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+a {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #0066cc;
+}
+
+p {
+    margin-bottom: 1.2em;
+    text-align: justify;
+}
+
+li {
+    text-align: justify;
+}
+
+.quarto-title-meta .quarto-title-author-orcid {
+  display: inline-block;
+  margin-left: 0.0em;
+  margin-bottom: 0.3em;
+  vertical-align: middle;
+}
+
+.quarto-title-meta .quarto-title-author-orcid img {
+  display: inline;           
+  vertical-align: middle;
+  height: 1em !important;
+  width: auto !important;
+}
+
+.buttons-container {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.0rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.button.is-primary {
+  background-color: #94cac0;
+}
+
+.button.is-primary:hover {
+  background-color: #6daba0;
+}
+
+.button.is-info {
+  background-color: #d18da1;
+}
+
+.button.is-info:hover {
+  background-color: #b3657c;
+}
+
+.button .icon {
+  margin-right: 0.5rem;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  padding-left: 1rem;
+  font-weight: 400;
+}
+
+.lang-switcher {
+    position: fixed;
+    top: 1rem;
+    right: 1.2rem;
+    z-index: 1000;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.lang-switcher a {
+    display: inline-block;
+    font-size: 2rem;
+    text-decoration: none !important;
+    opacity: 0.8;
+    transition: opacity 0.2s, transform 0.2s;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25));
+}
+
+.lang-switcher a:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+.lang-switcher .lang-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #666;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-top: 0.1rem;
+}
+

@@ -1,0 +1,188 @@
+pays;code2;code3;region;sous_region
+Afghanistan;AF;AFG;Asie;Asie du Sud
+Albanie;AL;ALB;Europe;Europe du Sud
+Algérie;DZ;DZA;Afrique;Afrique du Nord
+Allemagne;DE;DEU;Europe;Europe occidentale
+Andorre;AD;AND;Europe;Europe du Sud
+Angola;AO;AGO;Afrique;Afrique centrale
+Anguilla;AI;AIA;Amériques;Caraïbes
+Argentine;AR;ARG;Amériques;Amérique du Sud
+Arménie;AM;ARM;Asie;Asie occidentale
+Aruba;AW;ABW;Amériques;Caraïbes
+Australie;AU;AUS;Océanie;Australie et Nouvelle-Zélande
+Autriche;AT;AUT;Europe;Europe occidentale
+Azerbaïdjan;AZ;AZE;Asie;Asie occidentale
+Bahamas;BS;BHS;Amériques;Caraïbes
+Bahreïn;BH;BHR;Asie;Asie occidentale
+Bangladesh;BD;BGD;Asie;Asie du Sud
+Barbade;BB;BRB;Amériques;Caraïbes
+Belgique;BE;BEL;Europe;Europe occidentale
+Belize;BZ;BLZ;Amériques;Amérique centrale
+Bermudes;BM;BMU;Amériques;Amérique du Nord
+Bhoutan;BT;BTN;Asie;Asie du Sud
+Bolivie;BO;BOL;Amériques;Amérique du Sud
+Bosnie-Herzégovine;BA;BIH;Europe;Europe du Sud
+Botswana;BW;BWA;Afrique;Afrique australe
+Bouvet;BV;BVT;Amériques;Amérique du Sud
+Brésil;BR;BRA;Amériques;Amérique du Sud
+Bulgarie;BG;BGR;Europe;Europe orientale
+Burundi;BI;BDI;Afrique;Afrique orientale
+Bélarus;BY;BLR;Europe;Europe orientale
+Bénin;BJ;BEN;Afrique;Afrique occidentale
+Cambodge;KH;KHM;Asie;Asie du Sud-Est
+Cameroun;CM;CMR;Afrique;Afrique centrale
+Canada;CA;CAN;Amériques;Amérique du Nord
+Caïmans;KY;CYM;Amériques;Caraïbes
+Chili;CL;CHL;Amériques;Amérique du Sud
+Chine;CN;CHN;Asie;Asie orientale
+Chypre;CY;CYP;Asie;Asie occidentale
+Cocos;CC;CCK;Océanie;Australie et Nouvelle-Zélande
+Colombie;CO;COL;Amériques;Amérique du Sud
+Comores;KM;COM;Afrique;Afrique orientale
+Congo;CD;COD;Afrique;Afrique centrale
+Corée;KR;KOR;Asie;Asie orientale
+Croatie;HR;HRV;Europe;Europe du Sud
+Cuba;CU;CUB;Amériques;Caraïbes
+Curaçao;CW;CUW;Amériques;Caraïbes
+Danemark;DK;DNK;Europe;Europe du Nord
+Djibouti;DJ;DJI;Afrique;Afrique orientale
+Dominique;DM;DMA;Amériques;Caraïbes
+Espagne;ES;ESP;Europe;Europe du Sud
+Estonie;EE;EST;Europe;Europe du Nord
+Fidji;FJ;FJI;Océanie;Mélanésie
+Finlande;FI;FIN;Europe;Europe du Nord
+France;FR;FRA;Europe;Europe occidentale
+Féroé;FO;FRO;Europe;Europe du Nord
+Gabon;GA;GAB;Afrique;Afrique centrale
+Gambie;GM;GMB;Afrique;Afrique occidentale
+Ghana;GH;GHA;Afrique;Afrique occidentale
+Gibraltar;GI;GIB;Europe;Europe du Sud
+Grenade;GD;GRD;Amériques;Caraïbes
+Groenland;GL;GRL;Amériques;Amérique du Nord
+Grèce;GR;GRC;Europe;Europe du Sud
+Guadeloupe;GP;GLP;Amériques;Caraïbes
+Guam;GU;GUM;Océanie;Micronésie
+Guatemala;GT;GTM;Amériques;Amérique centrale
+Guernesey;GG;GGY;Europe;Europe du Nord
+Guinée;GN;GIN;Afrique;Afrique occidentale
+Guinée-Bissau;GW;GNB;Afrique;Afrique occidentale
+Guyana;GY;GUY;Amériques;Amérique du Sud
+Géorgie;GE;GEO;Asie;Asie occidentale
+Haïti;HT;HTI;Amériques;Caraïbes
+Honduras;HN;HND;Amériques;Amérique centrale
+Hongrie;HU;HUN;Europe;Europe orientale
+Inde;IN;IND;Asie;Asie du Sud
+Indonésie;ID;IDN;Asie;Asie du Sud-Est
+Iran;IR;IRN;Asie;Asie du Sud
+Iraq;IQ;IRQ;Asie;Asie occidentale
+Irlande;IE;IRL;Europe;Europe du Nord
+Islande;IS;ISL;Europe;Europe du Nord
+Israël;IL;ISR;Asie;Asie occidentale
+Italie;IT;ITA;Europe;Europe du Sud
+Jamaïque;JM;JAM;Amériques;Caraïbes
+Japon;JP;JPN;Asie;Asie orientale
+Jersey;JE;JEY;Europe;Europe du Nord
+Jordanie;JO;JOR;Asie;Asie occidentale
+Kazakhstan;KZ;KAZ;Asie;Asie centrale
+Kenya;KE;KEN;Afrique;Afrique orientale
+Kirghizistan;KG;KGZ;Asie;Asie centrale
+Kiribati;KI;KIR;Océanie;Micronésie
+Koweït;KW;KWT;Asie;Asie occidentale
+Lao;LA;LAO;Asie;Asie du Sud-Est
+Lesotho;LS;LSO;Afrique;Afrique australe
+Lettonie;LV;LVA;Europe;Europe du Nord
+Liban;LB;LBN;Asie;Asie occidentale
+Libye;LY;LBY;Afrique;Afrique du Nord
+Libéria;LR;LBR;Afrique;Afrique occidentale
+Liechtenstein;LI;LIE;Europe;Europe occidentale
+Lituanie;LT;LTU;Europe;Europe du Nord
+Luxembourg;LU;LUX;Europe;Europe occidentale
+Macao;MO;MAC;Asie;Asie orientale
+Madagascar;MG;MDG;Afrique;Afrique orientale
+Malaisie;MY;MYS;Asie;Asie du Sud-Est
+Malawi;MW;MWI;Afrique;Afrique orientale
+Maldives;MV;MDV;Asie;Asie du Sud
+Mali;ML;MLI;Afrique;Afrique occidentale
+Malouines;FK;FLK;Amériques;Amérique du Sud
+Malte;MT;MLT;Europe;Europe du Sud
+Maroc;MA;MAR;Afrique;Afrique du Nord
+Martinique;MQ;MTQ;Amériques;Caraïbes
+Maurice;MU;MUS;Afrique;Afrique orientale
+Mauritanie;MR;MRT;Afrique;Afrique occidentale
+Mayotte;YT;MYT;Afrique;Afrique orientale
+Mexique;MX;MEX;Amériques;Amérique centrale
+Moldova;MD;MDA;Europe;Europe orientale
+Monaco;MC;MCO;Europe;Europe occidentale
+Mongolie;MN;MNG;Asie;Asie orientale
+Montserrat;MS;MSR;Amériques;Caraïbes
+Monténégro;ME;MNE;Europe;Europe du Sud
+Mozambique;MZ;MOZ;Afrique;Afrique orientale
+Myanmar;MM;MMR;Asie;Asie du Sud-Est
+Nauru;NR;NRU;Océanie;Micronésie
+Nicaragua;NI;NIC;Amériques;Amérique centrale
+Niger;NE;NER;Afrique;Afrique occidentale
+Nigéria;NG;NGA;Afrique;Afrique occidentale
+Niue;NU;NIU;Océanie;Polynésie
+Norvège;NO;NOR;Europe;Europe du Nord
+Nouvelle-Calédonie;NC;NCL;Océanie;Mélanésie
+Nouvelle-Zélande;NZ;NZL;Océanie;Australie et Nouvelle-Zélande
+Népal;NP;NPL;Asie;Asie du Sud
+Oman;OM;OMN;Asie;Asie occidentale
+Ouganda;UG;UGA;Afrique;Afrique orientale
+Ouzbékistan;UZ;UZB;Asie;Asie centrale
+Pakistan;PK;PAK;Asie;Asie du Sud
+Palaos;PW;PLW;Océanie;Micronésie
+Palestine;PS;PSE;Asie;Asie occidentale
+Panama;PA;PAN;Amériques;Amérique centrale
+Paraguay;PY;PRY;Amériques;Amérique du Sud
+Pays-Bas;NL;NLD;Europe;Europe occidentale
+Philippines;PH;PHL;Asie;Asie du Sud-Est
+Pitcairn;PN;PCN;Océanie;Polynésie
+Pologne;PL;POL;Europe;Europe orientale
+Portugal;PT;PRT;Europe;Europe du Sud
+Pérou;PE;PER;Amériques;Amérique du Sud
+Qatar;QA;QAT;Asie;Asie occidentale
+Roumanie;RO;ROU;Europe;Europe orientale
+Royaume-Uni;GB;GBR;Europe;Europe du Nord
+Russie;RU;RUS;Europe;Europe orientale
+Rwanda;RW;RWA;Afrique;Afrique orientale
+Réunion;RE;REU;Afrique;Afrique orientale
+Saint-Marin;SM;SMR;Europe;Europe du Sud
+Saint-Siège;VA;VAT;Europe;Europe du Sud
+Samoa;WS;WSM;Océanie;Polynésie
+Serbie;RS;SRB;Europe;Europe du Sud
+Seychelles;SC;SYC;Afrique;Afrique orientale
+Singapour;SG;SGP;Asie;Asie du Sud-Est
+Slovaquie;SK;SVK;Europe;Europe orientale
+Slovénie;SI;SVN;Europe;Europe du Sud
+Somalie;SO;SOM;Afrique;Afrique orientale
+Soudan;SD;SDN;Afrique;Afrique du Nord
+Suisse;CH;CHE;Europe;Europe occidentale
+Suriname;SR;SUR;Amériques;Amérique du Sud
+Suède;SE;SWE;Europe;Europe du Nord
+Sénégal;SN;SEN;Afrique;Afrique occidentale
+Tadjikistan;TJ;TJK;Asie;Asie centrale
+Tanzanie;TZ;TZA;Afrique;Afrique orientale
+Tchad;TD;TCD;Afrique;Afrique centrale
+Tchéquie;CZ;CZE;Europe;Europe orientale
+Thaïlande;TH;THA;Asie;Asie du Sud-Est
+Timor-Leste;TL;TLS;Asie;Asie du Sud-Est
+Togo;TG;TGO;Afrique;Afrique occidentale
+Tokelau;TK;TKL;Océanie;Polynésie
+Tonga;TO;TON;Océanie;Polynésie
+Trinité-et-Tobago;TT;TTO;Amériques;Caraïbes
+Tunisie;TN;TUN;Afrique;Afrique du Nord
+Turkménistan;TM;TKM;Asie;Asie centrale
+Tuvalu;TV;TUV;Océanie;Polynésie
+Ukraine;UA;UKR;Europe;Europe orientale
+Uruguay;UY;URY;Amériques;Amérique du Sud
+Vanuatu;VU;VUT;Océanie;Mélanésie
+Venezuela;VE;VEN;Amériques;Amérique du Sud
+Yémen;YE;YEM;Asie;Asie occidentale
+Zambie;ZM;ZMB;Afrique;Afrique orientale
+Zimbabwe;ZW;ZWE;Afrique;Afrique orientale
+Égypte;EG;EGY;Afrique;Afrique du Nord
+Équateur;EC;ECU;Amériques;Amérique du Sud
+Érythrée;ER;ERI;Afrique;Afrique orientale
+États-Unis;US;USA;Amériques;Amérique du Nord
+Éthiopie;ET;ETH;Afrique;Afrique orientale

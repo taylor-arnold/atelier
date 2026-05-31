@@ -1,0 +1,759 @@
+---
+title: "Exercises for workshop: R for Linguistics"
+date: "2026-06-01"
+format:
+  html:
+    include-in-header: templates/head.html
+    include-before-body: templates/before.html
+    include-after-body: templates/after.html
+    toc: true
+    code-copy: hover
+    link-external-newwindow: true
+
+lang: en
+---
+
+```{=html}
+<div class="lang-switcher">
+  <a href="atelier_exercices_fr.html" title="Version française">🇫🇷</a>
+  <span class="lang-label">FR</span>
+</div>
+```
+
+```{r, echo=FALSE}
+local({
+  hook_source <- knitr::knit_hooks$get("source")
+  knitr::knit_hooks$set(source = function(x, options) {
+    x <- x[!grepl("^# *keep\\s*$", x)]
+    hook_source(x, options)
+  })
+})
+```
+
+```{r, message=FALSE}
+# keep
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+## 2. Configuration
+
+You must run the code below to check, and if necessary download and load, the
+packages needed for the exercises.
+
+```{r, message=FALSE}
+# keep
+source("funs.R")
+
+verifier_packages(c("tidyverse", "glmnet", "tuneR", "phonTools", "umap", "dtw", "udpipe", "readtextgrid", "stringi"))
+```
+
+The code below configures the parameters needed for our work.
+
+```{r, message=FALSE}
+# keep
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_minimal())
+Sys.setenv(LANG = "en")
+```
+
+## 3. Tabular Data
+
+In the code block below, load the data
+`donnees/peterson_barney_voyelle_eng.csv`, save the tibble in the object `phone`,
+and inspect the data. Compare this table with the one in the notes.
+
+```{r, message=FALSE}
+phone <- read_csv2("donnees/peterson_barney_voyelle_eng.csv")
+phone
+```
+
+## 4. Visualize
+
+Create a visualization of the `phone` tibble showing F2 and F1 in the same form
+as in the notes, but apply colour to indicate the group. If you have problems
+with the symbols on your computer, use the `xsampa` column instead of IPA.
+
+```{r}
+phone |>
+  ggplot() +
+  geom_text(aes(x=f2, y=f1, label=api, colour=groupe)) +
+  scale_x_reverse() +
+  scale_y_reverse()
+```
+
+Create a boxplot of F1 values by IPA symbol using the `geom_boxplot` geometry.
+Simply provide `x` and `y` aesthetics.
+
+```{r}
+phone |>
+  ggplot() +
+  geom_boxplot(aes(x=api, y=f1))
+```
+
+Ask questions if you do not understand the meaning of each part of a boxplot!
+
+Create a boxplot visualization as above, but this time add a colour aesthetic
+linked to the `groupe` column. Pay attention to the results.
+
+```{r}
+phone |>
+  ggplot() +
+  geom_boxplot(aes(x=api, y=f1, colour=groupe))
+```
+
+Copy the code above, then replace the `colour` aesthetic with `fill`.
+
+```{r}
+phone |>
+  ggplot() +
+  geom_boxplot(aes(x=api, y=f1, fill=groupe))
+```
+
+What is the difference between `colour` and `fill` in the grammar of graphics?
+
+## 5. Manipulating a Table
+
+Select the 5 rows with the highest F1 values.
+
+```{r}
+phone |>
+  arrange(f1) |>
+  slice_head(n=5)
+```
+
+Select the 5 rows with the lowest F1 values.
+
+```{r}
+phone |>
+  arrange(desc(f1)) |>
+  slice_head(n=5)
+```
+
+Select the rows that are *not* associated with men using the `!=` symbol instead
+of `==`.
+
+```{r}
+phone |>
+  filter(groupe != "homme")
+```
+
+Create new variables giving the difference between F1 and F0 and between F2 and
+F1. These are sometimes useful for understanding the perceived qualities of
+vowels.
+
+```{r}
+phone |>
+  filter(groupe != "homme")
+```
+
+`quantile` is another function often applied inside `summarise`. You provide a
+`probs` argument, which is a number between 0 and 1. The result is the value
+below which `probs` percent of the data fall and above which `1-probs` percent
+fall. For example, `quantile(f1, probs=0.5)` gives the same result as the
+`median()` function. In the code below, create a table with a column `f1_q1`
+giving the 0.25 quantile for each IPA symbol.
+
+```{r}
+phone |>
+  group_by(api) |>
+  summarise(
+    f1_q1 = quantile(f1, probs=0.25)
+  )
+```
+
+Continue by creating the columns `f1_q1`, `f1_q2`, `f1_q3`, `f2_q1`, `f2_q2`,
+`f2_q3` with probs 0.25, 0.50, and 0.75. Save the results in a new object
+`phone_quant`.
+
+```{r}
+phone_quant <- phone |>
+  group_by(api) |>
+  summarise(
+    f1_q1 = quantile(f1, probs=0.25),
+    f1_q2 = quantile(f1, probs=0.50),
+    f1_q3 = quantile(f1, probs=0.75),
+    f2_q1 = quantile(f2, probs=0.25),
+    f2_q2 = quantile(f2, probs=0.50),
+    f2_q3 = quantile(f2, probs=0.75)
+  )
+phone_quant
+```
+
+**Going further** There is a `geom_segment` geometry with four required
+aesthetics: `x`, `xend`, `y`, and `yend`. This geometry creates line segments.
+Create a visualization of F1 and F2 values using the quantiles.
+
+```{r}
+phone_quant |>
+  ggplot() +
+  geom_segment(aes(x=f2_q2, xend=f2_q2, y=f1_q1, yend=f1_q3)) +
+  geom_segment(aes(x=f2_q1, xend=f2_q3, y=f1_q2, yend=f1_q2)) +
+  geom_text(aes(x=f2_q2 - 50, y=f1_q2 - 25, label=api)) +
+  scale_x_reverse() +
+  scale_y_reverse()
+```
+
+## 6. Statistical Models
+
+Load the data with the code below.
+
+```{r, message=FALSE}
+# keep
+mots <- read_csv2("donnees/keylog-mots.csv.bz2")
+mots
+```
+
+Create an object `mots_sub` from `mots` that contains only the words "the" and
+"and".
+
+```{r}
+mots_sub <- mots |>
+  filter(mot %in% c("the", "and"))
+```
+
+Perform a t-test to test the difference in duration between typing "the" and
+typing "and".
+
+```{r}
+t.test(dur_mot ~ mot, data = mots_sub)
+```
+
+Perform a linear regression that predicts the duration of a word based on its
+character length.
+
+```{r}
+summary(lm(dur_mot ~ char_mot, data = mots))
+```
+
+Interpret the results. Are they statistically significant?
+
+## 7. Multiple Tables
+
+Load the data with the code below.
+
+```{r, message=FALSE}
+meta <- read_csv2("donnees/keylog-meta.csv.bz2")
+meta
+```
+
+Load another table with:
+
+```{r}
+langs <- read_csv2("donnees/langs.csv")
+langs
+```
+
+Combine the `meta` and `langs` data using the `left_join` function.
+
+```{r}
+meta |>
+  left_join(langs, by = "lang")
+```
+
+As described in the notes, combine `mots` and `meta`. Then combine with `langs`
+and calculate the median of `d1`. Sort the rows by the medians.
+
+```{r}
+mots |>
+  left_join(meta, by = "id") |>
+  left_join(langs, by = "lang") |>
+  group_by(groupe) |>
+  summarise(mu = median(d1)) |>
+  arrange(desc(mu))
+```
+
+## 8. Sliding Windows
+
+Load the data with the code below.
+
+```{r, message=FALSE}
+touches <- read_csv2("donnees/keylog-touches.csv.bz2", na="NA")
+touches
+```
+
+Use the `lead` function to create a new column `space_apres` indicating whether
+the next key is a space. Then, use `filter` to select rows that are not spaces
+themselves. Calculate the median keystroke duration based on whether a space
+follows.
+
+```{r}
+touches |>
+  mutate(space_apres = lead(code) == "Space") |>
+  filter(code != "Space") |>
+  filter(!is.na(space_apres)) |>
+  group_by(space_apres) |>
+  summarise(
+    dur_moyenne = median(dur_apres)
+  )
+```
+
+## 9. Character Strings
+
+Load the data with the code below.
+
+```{r, message=FALSE}
+noms <- read_csv2("donnees/lexique_noms.csv")
+noms
+```
+
+Use the `stri_extract` function to create a new column `ter` containing the last
+character of each word. Calculate the proportion of feminine nouns for each
+final letter, filter to letters with at least 10 words, and sort results in
+descending order by proportion of feminine nouns.
+
+```{r}
+noms |>
+  mutate(ter = stri_extract(lemme, regex="\\w\\Z")) |>
+  group_by(ter) |>
+  summarise(
+    prop_f = mean(genre == "f"),
+    n = n()
+  ) |>
+  filter(n > 10) |>
+  arrange(desc(prop_f))
+```
+
+## 10. TextGrid
+
+Load a Rhapsodie file with the code below.
+
+```{r}
+# keep
+tg <- read_textgrid(
+  "donnees/rhapsodie/tg/Rhap-D0001-Pro.TextGrid",
+  encoding="UTF-8"
+)
+tg
+```
+
+Create an object `locuteur` containing only the "locuteur" tier.
+
+```{r}
+locuteur <- tg |>
+  filter(tier_name == "locuteur")
+locuteur
+```
+
+Create a summary counting the number of rows for each speaker value.
+
+```{r}
+locuteur |>
+  group_by(text) |>
+  summarise(n = n())
+```
+
+Using the `stri_count` function, create a new column `locuteur_nombre` in
+locuteur that counts the number of "$" signs. Save the results using the arrow
+symbol.
+
+```{r}
+locuteur <- locuteur |>
+  mutate(locuteur_nombre = stri_count(text, fixed = "$"))
+locuteur
+```
+
+Calculate the total duration for each speaker count.
+
+```{r}
+locuteur |>
+  group_by(locuteur_nombre) |>
+  summarise(
+    duree = sum(xmax - xmin)
+  )
+```
+
+## 11. Programming
+
+The code below creates an object listing all files containing dialogues from
+Rhapsodie.
+
+```{r}
+# keep
+dir_nom <- "donnees/rhapsodie/tg/"
+d <- dir(dir_nom, pattern="TextGrid$")
+d <- d[stri_sub(d, 1, 6) == "Rhap-D"]
+```
+
+By modifying the code below, save the speaker information from each file,
+including the number of speakers at each data point.
+
+```{r}
+df <- list("vector", length(d))
+for (j in seq_along(d)) {
+  tg <- read_textgrid(file.path(dir_nom, d[j]), encoding="UTF-8")
+  tg$id <- j
+
+  # ↓↓↓ cette partie ci-dessous fonctionne de traiter une seule
+  # ↓↓↓ fiche ; vous pouvez la changer
+  locuteur <- tg |>
+    filter(tier_name == "locuteur") |>
+    mutate(locuteur_nombre = stri_count(text, fixed = "$"))
+
+  res <- locuteur
+  # ↑↑↑
+
+  df[[j]] <- res
+}
+
+df <- bind_rows(df)
+df
+```
+
+Calculate the total duration for each number of speakers across the entire
+collection.
+
+```{r}
+df |>
+  group_by(locuteur_nombre) |>
+  summarise(
+    duree = sum(xmax - xmin)
+  )
+```
+
+## 12. Audio Data
+
+Load a wav format file with the code below.
+
+```{r}
+# keep
+w <- readWave("donnees/phrase.wav")
+snd <- makesound(w@left, fs = w@samp.rate)
+snd
+```
+
+Create a `formants` dataset using the `formanttrack` function.
+
+```{r}
+formants <- formanttrack(snd, fs = fs)
+```
+
+Convert the formants data to a tibble.
+
+```{r}
+formants <- as_tibble(formants)
+formants
+```
+
+I used Praat to locate the first vowel. It appears between 300 and 350
+milliseconds. Visualize all the formant values of this vowel (an /a/) using code
+similar to that in the earlier sections.
+
+```{r}
+formants |>
+  filter(time > 300 & time < 350) |>
+  ggplot() +
+  geom_point(aes(f2, f1)) +
+  scale_x_reverse(limits = c(500, 3500)) +
+  scale_y_reverse(limits = c(250, 1400))
+```
+
+## 13. Grammatical Analysis
+
+Load the data with the code below.
+
+```{r}
+# keep
+wikifr <- read_csv2("donnees/wiki_parsed.csv.bz2")
+wikifr
+```
+
+Select only the rows where the dependency relation (`dep`) equals "det"
+(determiner). Select only those whose lemmas are "le" and "un". Then, grouped
+by the head word (`head`), compute the mean proportion of lemmas equal to "le".
+Filter to head words appearing at least 600 times and sort the results in
+descending order.
+
+```{r}
+wikifr |>
+  filter(dep == "det") |>
+  filter(lemma %in% c("le", "un")) |>
+  group_by(head) |>
+  summarise(
+    prop_le = mean(lemma == "le"),
+    n = n()
+  ) |>
+  filter(n > 600) |>
+  arrange(desc(prop_le))
+```
+
+## 14. PCA + UMAP
+
+Load the data with the code below.
+
+```{r}
+# keep
+pays <- read_csv2("donnees/pays.csv")
+pays
+```
+
+Load the embeddings with:
+
+```{r}
+# keep
+embed <- read_rds("donnees/fasttext_embed.rds")
+idx <- match(pays$pays, rownames(embed))
+X <- embed[idx, ]
+dim(X)
+```
+
+Create the PCA components and add them to the `pays` object.
+
+```{r}
+apc <- prcomp(X, center = TRUE, scale. = TRUE)
+pays$apc1 <- apc$x[, 1]
+pays$apc2 <- apc$x[, 2]
+pays
+```
+
+Visualize the PCA components as in the notes, with colour linked to `region`.
+
+```{r}
+pays |>
+  ggplot(aes(apc1, apc2)) +
+    geom_point(aes(colour = region)) +
+    geom_text(
+      aes(label = pays, colour = region),
+      size = 2,
+      nudge_y = -0.25
+    )
+```
+
+Create a new table `europe` containing European countries. Then create the PCA
+components, add them to the table, and visualize with the `sous_region` column.
+
+```{r}
+europe <- pays |>
+  filter(region == "Europe")
+
+embed <- read_rds("donnees/fasttext_embed.rds")
+idx <- match(europe$pays, rownames(embed))
+X <- embed[idx, ]
+dim(X)
+
+apc <- prcomp(X, center = TRUE, scale. = TRUE)
+europe$apc1 <- apc$x[, 1]
+europe$apc2 <- apc$x[, 2]
+
+europe |>
+  ggplot(aes(apc1, apc2)) +
+    geom_point(aes(colour = sous_region)) +
+    geom_text(
+      aes(label = pays, colour = sous_region),
+      size = 2,
+      nudge_y = -0.25
+    )
+```
+
+Create the UMAP embeddings and add them to the `europe` table. Visualize again
+in the same way.
+
+```{r}
+obj <- umap(X)
+europe$umap1 <- obj$layout[, 1]
+europe$umap2 <- obj$layout[, 2]
+
+europe |>
+  ggplot(aes(umap1, umap2)) +
+    geom_point(aes(colour = sous_region)) +
+    geom_text(
+      aes(label = pays, colour = sous_region),
+      size = 2,
+      nudge_y = -0.1
+    )
+```
+
+## 15. Predictive Models
+
+Load the data with the code below.
+
+```{r}
+# keep
+parse <- read_csv2("donnees/polarity_parse.csv.bz2")
+meta <- read_csv2("donnees/polarity_meta.csv.bz2")
+```
+
+Create an object `X` as in the notes but use the `pos` column instead of
+`lemma`.
+
+```{r}
+X <- parse |>
+  to_sparse(doc_id, pos)
+dim(X)
+```
+
+Create the objects `df_meta`, `ind_train`, and `ind_valid` using the code below.
+
+```{r}
+# keep
+df_meta <- tibble(doc_id = as.numeric(rownames(X))) |>
+  left_join(meta, by = "doc_id")
+df_meta
+
+ind_train <- sort(sample(seq_len(nrow(X)), 10000))
+ind_valid <- setdiff(seq_len(nrow(X)), ind_train)
+```
+
+Create a predictive model with the data.
+
+```{r}
+model <- cv.glmnet(
+  X[ind_train,], df_meta$polarity[ind_train], family="binomial"
+)
+```
+
+Evaluate the classification rate on the validation data.
+
+```{r}
+pred <- predict(model, newx=X[ind_valid,], type = "class")
+mean(pred == df_meta$polarity[ind_valid])
+```
+
+Create a confusion matrix.
+
+```{r}
+table(pred=pred, y=df_meta$polarity[ind_valid])
+```
+
+Examine the model coefficients. You can pass the argument `s = model$lambda.1se`
+to the `coef` function.
+
+```{r}
+cf <- coef(model, s = model$lambda.1se)
+cf <- cf[cf[,1] != 0,,drop=FALSE][-1,,drop=FALSE]
+cf[order(cf[,1]),,drop=FALSE]
+```
+
+## 16. LLM
+
+Load the data with the code below and create the objects `X`, `df_meta`,
+`ind_train`, and `ind_valid`.
+
+```{r}
+# keep
+llm <- read_csv2("donnees/polarity_llm.csv.bz2")
+llm
+
+X <- parse |>
+  mutate(lemma = stri_trans_tolower(lemma)) |>
+  group_by(lemma) |>
+  filter(n() > 200) |>
+  to_sparse(doc_id, lemma)
+df_meta <- tibble(doc_id = as.numeric(rownames(X))) |>
+  left_join(meta, by = "doc_id")
+ind_train <- sort(sample(seq_len(nrow(X)), 10000))
+ind_valid <- setdiff(seq_len(nrow(X)), ind_train)
+```
+
+Create a predictive model for the `certain` values.
+
+```{r}
+X_nouv <- X[as.character(llm$doc_id),]
+model <- cv.glmnet(X_nouv, llm$certain)
+```
+
+Examine the model coefficients.
+
+```{r}
+cf <- coef(model, s = model$lambda[12])
+cf <- cf[cf[,1] != 0,,drop=FALSE][-1,,drop=FALSE]
+cf[order(cf[,1]),,drop=FALSE]
+```
+
+You can repeat this with the other columns of `llm`.
+
+## 17. Whisper
+
+Load the data with the code below.
+
+```{r}
+# keep
+whisper_mots <- read_csv2("donnees/whisper_mots.csv")
+whisper_mots
+```
+
+We will study this table in section 19.
+
+## 18. Text Embeddings
+
+Load the data with the code below and create the objects `ind_train` and
+`ind_valid`.
+
+```{r}
+# keep
+X <- read_rds("donnees/polarity_embed.rds")
+ind_train <- sort(sample(seq_len(nrow(X)), 700))
+ind_valid <- setdiff(seq_len(nrow(X)), ind_train)
+```
+
+Create a model for `certain` as in the notes.
+
+```{r}
+model <- cv.glmnet(
+  X[ind_train,], llm$certain[ind_train], alpha=0
+)
+```
+
+Run the code below to create predictions.
+
+```{r}
+# keep
+df <- tibble(
+  certain = llm$certain[ind_valid],
+  pred = as.numeric(predict(model, newx=X[ind_valid,], type = "class"))
+)
+df
+```
+
+Visualize the relationship between the `certain` values and the predictions.
+
+```{r}
+df |>
+  ggplot() +
+  geom_point(aes(factor(certain), pred))
+```
+
+
+## 19. Text Alignment
+
+Load the data with the code below and create a table `tg_mots`.
+
+```{r}
+# keep
+tg <- read_textgrid(
+  "donnees/rhapsodie/tg/Rhap-D0001-Pro.TextGrid",
+  encoding="UTF-8"
+)
+tg_mots <- tg |>
+  filter(tier_name == "words") |>
+  filter(text != "_") |>
+  select(text, xmin, xmax)
+```
+
+Use the `alignement_des_textes` function to align `tg_mots` and `whisper_mots`.
+Save the data in an object `df_comb`.
+
+```{r}
+df_comb <- alignement_des_textes(
+  tg_mots,
+  whisper_mots,
+  col1 = text,
+  col2 = word,
+  suffix_y = "_whisper"
+)
+df_comb
+```
+
+Finish by calculating the mean differences for `xmin` and `xmax` between the
+two datasets. You can use the `abs()` function.
+
+```{r}
+df_comb |>
+  mutate(
+    diff_min = xmin - start_whisper,
+    diff_max = xmax - end_whisper
+  ) |>
+  summarise(
+    diff_min_moyenne = mean(abs(diff_min)),
+    diff_max_moyenne = mean(abs(diff_max))
+  )
+```
