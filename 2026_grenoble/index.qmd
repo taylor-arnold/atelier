@@ -66,6 +66,8 @@ Bien que nous présentions les principaux concepts dans les notes suivantes, nou
 
 - [*R for Data Science (2e)*](https://r4ds.hadley.nz/) Livre disponible gratuitement en anglais qui approfondit les fonctions essentielles de visualisation, de manipulation et de programmation des données dans R présentées dans ces notes.
 - [*Humanities Data in R (2e)*](https://humanitiesdata.org/text/) Livre accèsible en anglais (nom d'utilisateur et mot de passe son "hdir") qui donne les méthodes plus avancées pour traiter des données complexes et multimodales.
+- [*Foundations of Data Science*](https://taylor-arnold.github.io/fds-py/)
+Livre accèsible (CC-BY) en anglais qui explique les méthodes de la science de données dans Python.
 - Les aides-mémoirs :
 [les graphiques](https://raw.githubusercontent.com/rstudio/cheatsheets/main/translations/french/data-visualization_fr.pdf),
 [remaniement de données](https://raw.githubusercontent.com/rstudio/cheatsheets/main/translations/french/data-wrangling_fr.pdf), et

@@ -60,6 +60,7 @@ Although we cover the main concepts in the following notes, we suggest consultin
 
 - [*R for Data Science (2e)*](https://r4ds.hadley.nz/) A freely available book in English that covers the essential functions for data visualization, manipulation, and programming in R presented in these notes.
 - [*Humanities Data in R (2e)*](https://humanitiesdata.org/text/) A book accessible in English (username and password are "hdir") that provides more advanced methods for handling complex and multimodal data.
+- [*Foundations of Data Science*](https://taylor-arnold.github.io/fds-py/) My freely available (CC-BY), updated notes showing how to do similar data science techniques with Python.
 - Cheatsheets:
 [graphics](https://raw.githubusercontent.com/rstudio/cheatsheets/main/translations/french/data-visualization_fr.pdf),
 [data wrangling](https://raw.githubusercontent.com/rstudio/cheatsheets/main/translations/french/data-wrangling_fr.pdf), and
