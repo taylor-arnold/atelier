@@ -1198,12 +1198,12 @@ Voici un exemple d'utilisation d'un LLM avec la fonction `oai_chat`, LM Studio e
 msg <- "Combien de personnes vivent dans le 11e arrondissement de Paris ?"
 
 res <- oai_chat(
-  base_url = "http://localhost:1234",
-  model = "openai/gpt-oss-20b",
+  base_url = "http://127.0.0.1:1234",
+  model = "google/gemma-4-31b",
   msg = msg,
   temperature = 0.7,
 )
-res
+cat(res)
 ```
 ```{r}
 #| echo: false
