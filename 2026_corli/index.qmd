@@ -1,0 +1,161 @@
+---
+title: "R pour les petits modèles de langue"
+subtitle: "Formation CORLI"
+
+author:
+  - name: "Taylor Arnold"
+    orcid: "0000-0003-0576-0669"
+    url: "https://taylorarnold.org/"
+  - name: "Nicolas Ballier"
+
+date: "2026-12-01"
+format:
+  html:
+
+    include-in-header: templates/head.html
+    include-before-body: templates/before.html
+    include-after-body: templates/after.html
+    toc: true
+    code-copy: hover
+    link-external-newwindow: true
+    lightbox: true
+    bibliography: references.bib
+    csl: vancouver.csl
+
+lang: fr
+language: 
+  title-block-author-plural: "Auteurs"
+  title-block-published: "Publié le"
+---
+
+Dans cette formation, nous utilisons le langage R pour piloter des petits
+modèles de langage qui tournent sur votre propre machine. Les notes complètes
+et le code seront publiés sur cette page avant le 1er décembre 2026. Vous
+trouverez ci-dessous les objectifs, les pré-requis et le programme prévu.
+
+## 1. Objectifs
+
+Cette journée de formation en ligne s'adresse plutôt à des utilisateurs qui
+connaissent déjà un peu R. Elle est déconseillée aux grands débutants.
+L'objectif de la formation est d'utiliser R pour piloter des petits modèles
+de langage afin de :
+
+- interagir avec des agents conversationnels de type ChatGPT ;
+- conserver les dialogues et les réponses en local ;
+- évaluer des modèles à partir de jeux de test ;
+- répliquer quelques expériences publiées qui ont évalué les performances
+  de grands modèles commerciaux.
+
+Dans une démarche de réplicabilité, chaque expérience part d'un article
+publié et de ses données. Nous montrons comment récupérer les données,
+les mettre sous forme de tableau, interroger le modèle et mesurer ses
+réponses.
+
+## 2. Pré-requis
+
+Avant la formation, les stagiaires devront :
+
+- avoir installé une version récente de R (et RStudio ou Positron) sur leur
+  machine ;
+- avoir installé [Ollama](https://ollama.com/) et téléchargé au moins un
+  modèle, par exemple `qwen3:8b` (environ 5 Go) ou, pour une machine moins
+  puissante, `qwen3:4b` ;
+- avoir installé les packages R `ellmer`, `dplyr`, `readr`, `jsonlite` et
+  `arrow`.
+
+Les instructions détaillées seront ajoutées ici. Quelques rappels sur R
+seront faits en début de journée, mais la formation suppose que vous savez
+déjà lire un tableau, filtrer des lignes et écrire une fonction simple.
+
+**Serveur de secours.** Nous montrerons l'installation complète sur une
+machine personnelle. Pour le jour de la formation, nous mettrons aussi à
+disposition un serveur équipé d'un GPU, accessible par une API depuis R.
+Si l'installation locale ne fonctionne pas sur votre ordinateur, vous
+pourrez suivre toutes les expériences avec ce serveur. Les identifiants
+seront communiqués le matin même.
+
+## 3. Programme de la journée
+
+La journée est organisée en quatre blocs. Chaque bloc part d'une question
+de recherche, d'un jeu de données et d'un article publié.
+
+### Bloc 1 : Dialoguer avec un modèle depuis R
+
+- Lancer un modèle avec Ollama et l'interroger depuis R avec le package
+  `ellmer`.
+- Conserver les questions et les réponses dans un tableau et les
+  enregistrer en local.
+- Activer et désactiver le mode « raisonnement » de Qwen3 et conserver la
+  trace du raisonnement.
+- Expérience : préparer quelques questions sur l'histoire de la Chine
+  (Tienanmen), le statut de Taïwan et le traitement des Ouïgours, puis
+  comparer les réponses de Qwen3 dans sa version d'origine et dans une
+  version « débridée » (abliterated).
+
+### Bloc 2 : Construire un banc d'essai
+
+- Réplication de *The Imperfective Paradox in Large Language Models*
+  (Ma et Miyao, ACL 2026, [article](https://aclanthology.org/2026.acl-long.689/),
+  [données et code](https://github.com/boleima/ImperfectiveParadox)).
+- Le jeu de données ImperfectiveNLI contient 400 paires prémisse /
+  hypothèse en anglais, avec une étiquette vrai, faux ou inconnu. Exemple :
+  « The carpenter was building a gazebo, but a storm destroyed the frame »
+  implique-t-il « The carpenter built a gazebo » ?
+- Lire un fichier `.json`, le transformer en tableau et l'enregistrer en
+  `.csv`.
+- Écrire une boucle qui interroge le modèle sur chaque item, avec plusieurs
+  formulations de consigne (zero-shot, règle linguistique, chaîne de
+  raisonnement).
+- Calculer l'exactitude par groupe de verbes et comparer avec les chiffres
+  de l'article.
+
+### Bloc 3 : Les mots composés et la tokenisation
+
+- Jeu de données CompoundPiece
+  ([article](https://arxiv.org/abs/2305.14214),
+  [données](https://huggingface.co/datasets/benjamin/compoundpiece)) :
+  255 000 mots dans 56 langues, chaque mot composé étant accompagné de sa
+  segmentation. Le jeu de données n'est pas exempt de reproches.
+- Apprendre à récupérer un jeu de données sur HuggingFace depuis R.
+- Demander au modèle de découper un échantillon de composés en français et
+  en allemand, puis mesurer la proportion de bonnes réponses.
+- Expliquer la sous-tokenisation (découpage des mots en sous-unités) et son
+  rôle possible dans les erreurs du modèle.
+
+### Bloc 4 : Prédire le niveau de langue d'un texte
+
+- Tâche : prédire le niveau CECRL en anglais à partir du texte brut d'un
+  étudiant (*automated essay grading*).
+- Corpus CELVA.SP, collecté à Rennes dans le cadre de l'ANR
+  [A4LL](https://lidile.recherche.univ-rennes2.fr/article/a4ll-analytics-language-learning),
+  disponible sur [Nakala](https://www.nakala.fr/10.34847/nkl.98cb790l).
+- Méthode inspirée de *Machine–human agreement in marking undergraduate
+  assignments is specific to model, prompt and institution* (Corsi et al.,
+  2026, [article](https://arxiv.org/abs/2610.18019),
+  [code](https://github.com/giuliocorsi/machine-human-marking-agreement),
+  [données](https://zenodo.org/records/21676733)). Les textes de cet article
+  ne sont pas distribués ; nous reprenons sa méthode sur le corpus CELVA.SP.
+- Comparer les niveaux prédits aux niveaux attribués par des experts
+  (accord, kappa pondéré), mesurer l'effet de la consigne et observer la
+  tendance des modèles à ramener les notes vers le milieu de l'échelle.
+- Intérêt du traitement en local : les textes des étudiants ne quittent pas
+  la machine.
+
+## 4. Pistes complémentaires
+
+Selon le temps disponible et l'intérêt des participants, nous pourrons
+aborder :
+
+- **Les compétences phonologiques des modèles.** PhonologyBench
+  ([Suvarna et al., 2024](https://aclanthology.org/2024.knowllm-1.1.pdf))
+  teste la conversion graphème-phonème, le comptage de syllabes et la
+  recherche de rimes en anglais ; Phun-Bench
+  ([Yue et al., 2026](https://aclanthology.org/2026.acl-long.1041/)) fait
+  de même pour le chinois. Les données de PhonologyBench ne sont pas
+  disponibles en ligne ; une version maison pour le français peut être
+  construite à partir de Lexique 3.
+- **Les biais des modèles.** Travaux du projet ANR
+  [InExtenso](https://anr-inextenso.loria.fr/publications/) sur les biais de
+  genre dans les modèles de langue en français, par exemple
+  [Évaluation automatique des biais de genre dans des modèles de langue
+  auto-régressifs](https://inria.hal.science/hal-04621134v1).
