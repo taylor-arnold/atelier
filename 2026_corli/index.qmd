@@ -29,9 +29,11 @@ language:
 ---
 
 Dans cette formation, nous utilisons le langage R pour piloter des petits
-modèles de langage qui tournent sur votre propre machine. Les notes complètes
-et le code seront publiés sur cette page avant le 1er décembre 2026. Vous
-trouverez ci-dessous les objectifs, les pré-requis et le programme prévu.
+modèles de langage qui tournent sur votre propre machine. La formation a
+lieu le 1er décembre 2026 sur Zoom, de 9h à 12h et de 13h30 à 17h. Les notes
+complètes et le code seront publiés sur cette page au fur et à mesure, avant
+le jour de la formation. Vous trouverez ci-dessous les objectifs, les
+pré-requis, le programme prévu et les modalités d'inscription.
 
 ## 1. Objectifs
 
@@ -64,7 +66,7 @@ Avant la formation, les stagiaires devront :
   `arrow`.
 
 Les instructions détaillées seront ajoutées ici. Quelques rappels sur R
-seront faits en début de journée, mais la formation suppose que vous savez
+seront faits en début de journée, mais la formation suppose que vous sachiez
 déjà lire un tableau, filtrer des lignes et écrire une fonction simple.
 
 **Serveur de secours.** Nous montrerons l'installation complète sur une
@@ -76,10 +78,13 @@ seront communiqués le matin même.
 
 ## 3. Programme de la journée
 
-La journée est organisée en quatre blocs. Chaque bloc part d'une question
-de recherche, d'un jeu de données et d'un article publié.
+Nous présenterons différents formats de jeux de données et différents
+types de requêtes et de scripts pour analyser les performances des petits
+modèles, ainsi que les différents types de consignes (*prompts*)
+utilisables. La journée est organisée en quatre blocs. Chaque bloc part
+d'une question de recherche, d'un jeu de données et d'un article publié.
 
-### Bloc 1 : Dialoguer avec un modèle depuis R
+### Bloc 1 : Dialoguer avec un modèle depuis R (utiliser un modèle débridé, explorer le mode délibératif)
 
 - Lancer un modèle avec Ollama et l'interroger depuis R avec le package
   `ellmer`.
@@ -109,7 +114,7 @@ de recherche, d'un jeu de données et d'un article publié.
 - Calculer l'exactitude par groupe de verbes et comparer avec les chiffres
   de l'article.
 
-### Bloc 3 : Les mots composés et la tokenisation
+### Bloc 3 : L'analyse multilingue des composés (et les problèmes de tokenisation)
 
 - Jeu de données CompoundPiece
   ([article](https://arxiv.org/abs/2305.14214),
@@ -122,7 +127,7 @@ de recherche, d'un jeu de données et d'un article publié.
 - Expliquer la sous-tokenisation (découpage des mots en sous-unités) et son
   rôle possible dans les erreurs du modèle.
 
-### Bloc 4 : Prédire le niveau de langue d'un texte
+### Bloc 4 : Une tâche de prédiction du niveau CECRL d'un texte en anglais
 
 - Tâche : prédire le niveau CECRL en anglais à partir du texte brut d'un
   étudiant (*automated essay grading*).
@@ -159,3 +164,9 @@ aborder :
   genre dans les modèles de langue en français, par exemple
   [Évaluation automatique des biais de genre dans des modèles de langue
   auto-régressifs](https://inria.hal.science/hal-04621134v1).
+
+## 5. Inscription
+
+La formation sera enregistrée et mise en ligne sur le site de CORLI. Il est
+donc demandé de s'inscrire (60 places) et de retourner le formulaire de
+droit à l'image pour obtenir le lien Zoom de connexion.

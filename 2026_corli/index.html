@@ -63,12 +63,13 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#pré-requis" id="toc-pré-requis" class="nav-link" data-scroll-target="#pré-requis">2. Pré-requis</a></li>
   <li><a href="#programme-de-la-journée" id="toc-programme-de-la-journée" class="nav-link" data-scroll-target="#programme-de-la-journée">3. Programme de la journée</a>
   <ul class="collapse">
-  <li><a href="#bloc-1-dialoguer-avec-un-modèle-depuis-r" id="toc-bloc-1-dialoguer-avec-un-modèle-depuis-r" class="nav-link" data-scroll-target="#bloc-1-dialoguer-avec-un-modèle-depuis-r">Bloc 1 : Dialoguer avec un modèle depuis R</a></li>
+  <li><a href="#bloc-1-dialoguer-avec-un-modèle-depuis-r-utiliser-un-modèle-débridé-explorer-le-mode-délibératif" id="toc-bloc-1-dialoguer-avec-un-modèle-depuis-r-utiliser-un-modèle-débridé-explorer-le-mode-délibératif" class="nav-link" data-scroll-target="#bloc-1-dialoguer-avec-un-modèle-depuis-r-utiliser-un-modèle-débridé-explorer-le-mode-délibératif">Bloc 1 : Dialoguer avec un modèle depuis R (utiliser un modèle débridé, explorer le mode délibératif)</a></li>
   <li><a href="#bloc-2-construire-un-banc-dessai" id="toc-bloc-2-construire-un-banc-dessai" class="nav-link" data-scroll-target="#bloc-2-construire-un-banc-dessai">Bloc 2 : Construire un banc d’essai</a></li>
-  <li><a href="#bloc-3-les-mots-composés-et-la-tokenisation" id="toc-bloc-3-les-mots-composés-et-la-tokenisation" class="nav-link" data-scroll-target="#bloc-3-les-mots-composés-et-la-tokenisation">Bloc 3 : Les mots composés et la tokenisation</a></li>
-  <li><a href="#bloc-4-prédire-le-niveau-de-langue-dun-texte" id="toc-bloc-4-prédire-le-niveau-de-langue-dun-texte" class="nav-link" data-scroll-target="#bloc-4-prédire-le-niveau-de-langue-dun-texte">Bloc 4 : Prédire le niveau de langue d’un texte</a></li>
+  <li><a href="#bloc-3-lanalyse-multilingue-des-composés-et-les-problèmes-de-tokenisation" id="toc-bloc-3-lanalyse-multilingue-des-composés-et-les-problèmes-de-tokenisation" class="nav-link" data-scroll-target="#bloc-3-lanalyse-multilingue-des-composés-et-les-problèmes-de-tokenisation">Bloc 3 : L’analyse multilingue des composés (et les problèmes de tokenisation)</a></li>
+  <li><a href="#bloc-4-une-tâche-de-prédiction-du-niveau-cecrl-dun-texte-en-anglais" id="toc-bloc-4-une-tâche-de-prédiction-du-niveau-cecrl-dun-texte-en-anglais" class="nav-link" data-scroll-target="#bloc-4-une-tâche-de-prédiction-du-niveau-cecrl-dun-texte-en-anglais">Bloc 4 : Une tâche de prédiction du niveau CECRL d’un texte en anglais</a></li>
   </ul></li>
   <li><a href="#pistes-complémentaires" id="toc-pistes-complémentaires" class="nav-link" data-scroll-target="#pistes-complémentaires">4. Pistes complémentaires</a></li>
+  <li><a href="#inscription" id="toc-inscription" class="nav-link" data-scroll-target="#inscription">5. Inscription</a></li>
   </ul>
 </nav>
 </div>
@@ -108,7 +109,7 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Dans cette formation, nous utilisons le langage R pour piloter des petits modèles de langage qui tournent sur votre propre machine. Les notes complètes et le code seront publiés sur cette page avant le 1er décembre 2026. Vous trouverez ci-dessous les objectifs, les pré-requis et le programme prévu.</p>
+<p>Dans cette formation, nous utilisons le langage R pour piloter des petits modèles de langage qui tournent sur votre propre machine. La formation a lieu le 1er décembre 2026 sur Zoom, de 9h à 12h et de 13h30 à 17h. Les notes complètes et le code seront publiés sur cette page au fur et à mesure, avant le jour de la formation. Vous trouverez ci-dessous les objectifs, les pré-requis, le programme prévu et les modalités d’inscription.</p>
 <section id="objectifs" class="level2">
 <h2 class="anchored" data-anchor-id="objectifs">1. Objectifs</h2>
 <p>Cette journée de formation en ligne s’adresse plutôt à des utilisateurs qui connaissent déjà un peu R. Elle est déconseillée aux grands débutants. L’objectif de la formation est d’utiliser R pour piloter des petits modèles de langage afin de :</p>
@@ -128,14 +129,14 @@ ul.task-list li input[type="checkbox"] {
 <li>avoir installé <a href="https://ollama.com/">Ollama</a> et téléchargé au moins un modèle, par exemple <code>qwen3:8b</code> (environ 5 Go) ou, pour une machine moins puissante, <code>qwen3:4b</code> ;</li>
 <li>avoir installé les packages R <code>ellmer</code>, <code>dplyr</code>, <code>readr</code>, <code>jsonlite</code> et <code>arrow</code>.</li>
 </ul>
-<p>Les instructions détaillées seront ajoutées ici. Quelques rappels sur R seront faits en début de journée, mais la formation suppose que vous savez déjà lire un tableau, filtrer des lignes et écrire une fonction simple.</p>
+<p>Les instructions détaillées seront ajoutées ici. Quelques rappels sur R seront faits en début de journée, mais la formation suppose que vous sachiez déjà lire un tableau, filtrer des lignes et écrire une fonction simple.</p>
 <p><strong>Serveur de secours.</strong> Nous montrerons l’installation complète sur une machine personnelle. Pour le jour de la formation, nous mettrons aussi à disposition un serveur équipé d’un GPU, accessible par une API depuis R. Si l’installation locale ne fonctionne pas sur votre ordinateur, vous pourrez suivre toutes les expériences avec ce serveur. Les identifiants seront communiqués le matin même.</p>
 </section>
 <section id="programme-de-la-journée" class="level2">
 <h2 class="anchored" data-anchor-id="programme-de-la-journée">3. Programme de la journée</h2>
-<p>La journée est organisée en quatre blocs. Chaque bloc part d’une question de recherche, d’un jeu de données et d’un article publié.</p>
-<section id="bloc-1-dialoguer-avec-un-modèle-depuis-r" class="level3">
-<h3 class="anchored" data-anchor-id="bloc-1-dialoguer-avec-un-modèle-depuis-r">Bloc 1 : Dialoguer avec un modèle depuis R</h3>
+<p>Nous présenterons différents formats de jeux de données et différents types de requêtes et de scripts pour analyser les performances des petits modèles, ainsi que les différents types de consignes (<em>prompts</em>) utilisables. La journée est organisée en quatre blocs. Chaque bloc part d’une question de recherche, d’un jeu de données et d’un article publié.</p>
+<section id="bloc-1-dialoguer-avec-un-modèle-depuis-r-utiliser-un-modèle-débridé-explorer-le-mode-délibératif" class="level3">
+<h3 class="anchored" data-anchor-id="bloc-1-dialoguer-avec-un-modèle-depuis-r-utiliser-un-modèle-débridé-explorer-le-mode-délibératif">Bloc 1 : Dialoguer avec un modèle depuis R (utiliser un modèle débridé, explorer le mode délibératif)</h3>
 <ul>
 <li>Lancer un modèle avec Ollama et l’interroger depuis R avec le package <code>ellmer</code>.</li>
 <li>Conserver les questions et les réponses dans un tableau et les enregistrer en local.</li>
@@ -153,8 +154,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Calculer l’exactitude par groupe de verbes et comparer avec les chiffres de l’article.</li>
 </ul>
 </section>
-<section id="bloc-3-les-mots-composés-et-la-tokenisation" class="level3">
-<h3 class="anchored" data-anchor-id="bloc-3-les-mots-composés-et-la-tokenisation">Bloc 3 : Les mots composés et la tokenisation</h3>
+<section id="bloc-3-lanalyse-multilingue-des-composés-et-les-problèmes-de-tokenisation" class="level3">
+<h3 class="anchored" data-anchor-id="bloc-3-lanalyse-multilingue-des-composés-et-les-problèmes-de-tokenisation">Bloc 3 : L’analyse multilingue des composés (et les problèmes de tokenisation)</h3>
 <ul>
 <li>Jeu de données CompoundPiece (<a href="https://arxiv.org/abs/2305.14214">article</a>, <a href="https://huggingface.co/datasets/benjamin/compoundpiece">données</a>) : 255 000 mots dans 56 langues, chaque mot composé étant accompagné de sa segmentation. Le jeu de données n’est pas exempt de reproches.</li>
 <li>Apprendre à récupérer un jeu de données sur HuggingFace depuis R.</li>
@@ -162,8 +163,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Expliquer la sous-tokenisation (découpage des mots en sous-unités) et son rôle possible dans les erreurs du modèle.</li>
 </ul>
 </section>
-<section id="bloc-4-prédire-le-niveau-de-langue-dun-texte" class="level3">
-<h3 class="anchored" data-anchor-id="bloc-4-prédire-le-niveau-de-langue-dun-texte">Bloc 4 : Prédire le niveau de langue d’un texte</h3>
+<section id="bloc-4-une-tâche-de-prédiction-du-niveau-cecrl-dun-texte-en-anglais" class="level3">
+<h3 class="anchored" data-anchor-id="bloc-4-une-tâche-de-prédiction-du-niveau-cecrl-dun-texte-en-anglais">Bloc 4 : Une tâche de prédiction du niveau CECRL d’un texte en anglais</h3>
 <ul>
 <li>Tâche : prédire le niveau CECRL en anglais à partir du texte brut d’un étudiant (<em>automated essay grading</em>).</li>
 <li>Corpus CELVA.SP, collecté à Rennes dans le cadre de l’ANR <a href="https://lidile.recherche.univ-rennes2.fr/article/a4ll-analytics-language-learning">A4LL</a>, disponible sur <a href="https://www.nakala.fr/10.34847/nkl.98cb790l">Nakala</a>.</li>
@@ -180,6 +181,10 @@ ul.task-list li input[type="checkbox"] {
 <li><strong>Les compétences phonologiques des modèles.</strong> PhonologyBench (<a href="https://aclanthology.org/2024.knowllm-1.1.pdf">Suvarna et al., 2024</a>) teste la conversion graphème-phonème, le comptage de syllabes et la recherche de rimes en anglais ; Phun-Bench (<a href="https://aclanthology.org/2026.acl-long.1041/">Yue et al., 2026</a>) fait de même pour le chinois. Les données de PhonologyBench ne sont pas disponibles en ligne ; une version maison pour le français peut être construite à partir de Lexique 3.</li>
 <li><strong>Les biais des modèles.</strong> Travaux du projet ANR <a href="https://anr-inextenso.loria.fr/publications/">InExtenso</a> sur les biais de genre dans les modèles de langue en français, par exemple <a href="https://inria.hal.science/hal-04621134v1">Évaluation automatique des biais de genre dans des modèles de langue auto-régressifs</a>.</li>
 </ul>
+</section>
+<section id="inscription" class="level2">
+<h2 class="anchored" data-anchor-id="inscription">5. Inscription</h2>
+<p>La formation sera enregistrée et mise en ligne sur le site de CORLI. Il est donc demandé de s’inscrire (60 places) et de retourner le formulaire de droit à l’image pour obtenir le lien Zoom de connexion.</p>
 </section>
 
 </main>
